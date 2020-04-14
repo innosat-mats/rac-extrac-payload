@@ -1,4 +1,4 @@
-package main
+package pus
 
 import (
 	"encoding/binary"
@@ -21,6 +21,7 @@ type STAT struct { //(34 octets)
 	SPWEEP uint32 // SpaceWire received EEPs
 }
 
-func (s *STAT) read(buf io.Reader) error {
+// Read ...
+func (s *STAT) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, s)
 }

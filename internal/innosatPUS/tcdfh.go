@@ -1,4 +1,4 @@
-package main
+package pus
 
 import (
 	"encoding/binary"
@@ -13,6 +13,7 @@ type TCDataFieldHeader struct {
 	ServiceSubType uint8
 }
 
+// TCDataFieldHeader
 func readTCDFH(buf io.Reader) TCDataFieldHeader {
 	tcdfh := TCDataFieldHeader{}
 	err := binary.Read(buf, binary.BigEndian, &tcdfh)
@@ -21,14 +22,8 @@ func readTCDFH(buf io.Reader) TCDataFieldHeader {
 	}
 	return tcdfh
 }
-func (dh TCDataFieldHeader) getPUS() uint8 {
+
+//PUSVersion ...
+func (dh TCDataFieldHeader) PUSVersion() uint8 {
 	return (dh.PUS << 1) >> 5
-}
-
-func (dh TCDataFieldHeader) getServiceType() uint8 {
-	return dh.ServiceType
-}
-
-func (dh TCDataFieldHeader) getServiceSubType() uint8 {
-	return dh.ServiceSubType
 }

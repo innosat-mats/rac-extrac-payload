@@ -1,4 +1,4 @@
-package main
+package pus
 
 import (
 	"encoding/binary"
@@ -18,6 +18,7 @@ type PWR struct {
 	PWRP3C3 uint16 // +3V3 current sense 0..4095
 }
 
-func (s *PWR) read(buf io.Reader) error {
+// Read ...
+func (s *PWR) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, s)
 }

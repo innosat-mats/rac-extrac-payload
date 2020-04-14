@@ -1,4 +1,4 @@
-package main
+package pus
 
 import (
 	"encoding/binary"
@@ -14,22 +14,17 @@ type TMDataFieldHeader struct {
 	CUCTimeFraction uint16
 }
 
-func (h *TMDataFieldHeader) read(buf io.Reader) error {
+// Read ...
+func (h *TMDataFieldHeader) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, h)
 }
 
-func (h *TMDataFieldHeader) getPUS() uint8 {
+// PUSVersion ...
+func (h *TMDataFieldHeader) PUSVersion() uint8 {
 	return (h.PUS << 1) >> 5
 }
 
-func (h *TMDataFieldHeader) getServiceType() uint8 {
-	return h.ServiceType
-}
-
-func (h *TMDataFieldHeader) getServiceSubType() uint8 {
-	return h.ServiceSubType
-}
-
-func (h *TMDataFieldHeader) getTime() uint32 {
+// Time ...
+func (h *TMDataFieldHeader) Time() uint32 {
 	return h.CUCTimeSeconds
 }
