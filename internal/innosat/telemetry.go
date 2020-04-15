@@ -14,7 +14,7 @@ type TMDataFieldHeader struct {
 	CUCTimeFraction uint16
 }
 
-// Read ...
+// Read TMDataFieldHeader
 func (h *TMDataFieldHeader) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, h)
 }

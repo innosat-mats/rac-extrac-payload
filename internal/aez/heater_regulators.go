@@ -33,7 +33,7 @@ type HTR struct {
 	HTR8OD uint16
 }
 
-// Read ..
+// Read HTR
 func (s *HTR) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, s)
 }
