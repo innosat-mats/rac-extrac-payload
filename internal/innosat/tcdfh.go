@@ -1,4 +1,4 @@
-package pus
+package innosat
 
 import (
 	"encoding/binary"

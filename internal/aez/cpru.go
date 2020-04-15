@@ -1,4 +1,4 @@
-package pus
+package aez
 
 import (
 	"encoding/binary"

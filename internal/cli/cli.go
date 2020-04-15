@@ -3,129 +3,114 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
+	"io"
 	"log"
 	"os"
 
-	pus "github.com/innosat-mats/rac-extract-payload/internal/innosatPUS"
+	"github.com/howeyc/crc16"
+	"github.com/innosat-mats/rac-extract-payload/internal/aez"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
 func main() {
-	fmt.Println("hej")
 	var err error
-	var n int
-	var messageType uint
-	var buf []byte
+	var startPayload int
 	f, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
-	for i := 0; i < 20; i++ {
-		// Read RAC PDU part
-		pduData := make([]byte, 32)
-		n, err = f.Read(pduData)
+	for {
+		// Read ramses part
+		ramsesData := ramses.Ramses{}
+		_, err = ramsesData.Read(f)
 		if err != nil {
-			log.Fatal(err, n)
+			if err == io.EOF {
+				break
+			}
+			log.Fatal(err)
 		}
 
-		// Source packet header
-
-		header := pus.SourcePacketHeader{}
-		err = header.Read(f)
-		if err != nil {
-			log.Panic(err)
+		if !ramsesData.Valid() {
+			log.Fatal("Not a valid RAC-file")
 		}
 
-		// packetID
-		fmt.Printf("%03b ", header.Version())
-		fmt.Printf("%b ", header.Type())
-		fmt.Printf("%b ", header.HeaderType())
-		fmt.Printf("%5d ", header.APID())
-
-		//sequence
-		fmt.Printf("%02b ", header.GroupingFlags())
-		fmt.Printf("%5d ", header.SequenceCount())
-
-		//size
-		fmt.Printf("%7d ", header.PacketLength)
-
-		buf = make([]byte, header.PacketLength+1)
-		n, err = f.Read(buf)
-		if err != nil {
-			log.Fatal(err, n)
-		}
-
-		// Data Field Header
-		dataHeader := pus.TMDataFieldHeader{}
-		dhsize := binary.Size(dataHeader)
-		dhr := bytes.NewReader(buf[0:])
-		err = dataHeader.Read(dhr)
+		// Get the payload inside the ramses packate
+		ramsesPayload := make([]byte, ramsesData.Length)
+		_, err = f.Read(ramsesPayload)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// Data field  header
-		fmt.Printf("%04b ", dataHeader.PUSVersion())
-
-		fmt.Printf("%4d ", dataHeader.ServiceType)
-		fmt.Printf("%4d ", dataHeader.ServiceSubType)
-		if messageType == 0 {
-			fmt.Printf("%d ", dataHeader.Time())
+		r := bytes.NewReader(ramsesPayload)
+		if ramsesData.SecureTrans() {
+			ramsesSecure := ramses.Secure{}
+			startPayload, err = ramsesSecure.Read(r)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
-		// if crc16.ChecksumCCITTFalse(append(header, data[:dataPackageLength-2]...)) == binary.BigEndian.Uint16(data[dataPackageLength-2:dataPackageLength]) {
-		// 	fmt.Print("✔️ ")
-		// } else {
-		// 	fmt.Print("❌ ")
-		// }
-		if dataHeader.ServiceType == 3 && dataHeader.ServiceSubType == 25 {
-			sid := binary.BigEndian.Uint16(buf[dhsize:])
-			r := bytes.NewReader(buf[dhsize+2:])
+		// Source packet header
+
+		header := innosat.SourcePacketHeader{}
+		err = header.Read(r)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Data Field Header
+		dataHeader := innosat.TMDataFieldHeader{}
+		err = dataHeader.Read(r)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if crc16.ChecksumCCITTFalse(ramsesPayload[startPayload:ramsesData.Length-2]) != binary.BigEndian.Uint16(ramsesPayload[ramsesData.Length-2:]) {
+			log.Fatal("checksum bad")
+		}
+		if header.Type() == 1 && header.APID() == 100 && dataHeader.ServiceType == 3 && dataHeader.ServiceSubType == 25 {
+			var sid uint16
+			binary.Read(r, binary.BigEndian, &sid)
 			if sid == 1 {
-				stat := pus.STAT{}
+				stat := aez.STAT{}
 				err = stat.Read(r)
 				if err != nil {
 					log.Fatal("stat", err)
 				}
-				fmt.Print(" STAT: ", stat)
 			}
 			if sid == 10 {
-				htr := pus.HTR{}
+				htr := aez.HTR{}
 				err = htr.Read(r)
-				// if err != nil {
-				// 	log.Fatal("htr", err)
-				// }
-				fmt.Print(" HTR:  ", htr)
+				if err != nil {
+					log.Fatal("htr", err)
+				}
 			}
 			if sid == 20 {
-				pwr := pus.PWR{}
+				pwr := aez.PWR{}
 				err = pwr.Read(r)
 				if err != nil {
 					log.Fatal("pwr", err)
 				}
-				fmt.Print(" PWR:  ", pwr)
 			}
 			if sid == 30 {
-				cprua := pus.CPRU{}
+				cprua := aez.CPRU{}
 				err = cprua.Read(r)
 				if err != nil {
 					log.Fatal("cprua", err)
 				}
-				fmt.Print(" CPRUA:", cprua)
 			}
 			if sid == 31 {
-				cprub := pus.CPRU{}
+				cprub := aez.CPRU{}
 				err = cprub.Read(r)
 				if err != nil {
 					log.Fatal("cprub", err)
 				}
-				fmt.Print(" CPRUB:", cprub)
 			}
 
 		}
 
-		fmt.Println()
 	}
 
 }
