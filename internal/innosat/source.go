@@ -12,7 +12,7 @@ type SourcePacketHeader struct {
 	PacketLength          uint16
 }
 
-//Read ...
+//Read SourcePacketHeader
 func (h *SourcePacketHeader) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, h)
 }

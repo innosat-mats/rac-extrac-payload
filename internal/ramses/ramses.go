@@ -17,11 +17,9 @@ type Ramses struct {
 	Date   int32  // days since 2000-01-01 00:00:00.00
 }
 
-// Read fills a structure with data
-func (r *Ramses) Read(buf io.Reader) (int, error) {
-	n := binary.Size(r)
-	err := binary.Read(buf, binary.LittleEndian, r)
-	return n, err
+// Read Ramses
+func (r *Ramses) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.LittleEndian, r)
 }
 
 // Created is when the package was created

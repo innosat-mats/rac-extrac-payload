@@ -16,8 +16,6 @@ type Secure struct {
 }
 
 // Read fills a structure with data
-func (r *Secure) Read(buf io.Reader) (int, error) {
-	n := binary.Size(r)
-	err := binary.Read(buf, binary.LittleEndian, r)
-	return n, err
+func (r *Secure) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.LittleEndian, r)
 }

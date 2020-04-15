@@ -21,7 +21,7 @@ type STAT struct { //(34 octets)
 	SPWEEP uint32 // SpaceWire received EEPs
 }
 
-// Read ...
+// Read STAT
 func (s *STAT) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, s)
 }
