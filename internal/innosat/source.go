@@ -13,36 +13,36 @@ type SourcePacketHeader struct {
 }
 
 //Read SourcePacketHeader
-func (h *SourcePacketHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, h)
+func (sph *SourcePacketHeader) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, sph)
 }
 
 // Version ...
-func (h *SourcePacketHeader) Version() uint {
-	return uint(h.PacketID >> 13)
+func (sph *SourcePacketHeader) Version() uint {
+	return uint(sph.PacketID >> 13)
 }
 
 // Type ...
-func (h *SourcePacketHeader) Type() uint {
-	return uint((h.PacketID << 3) >> 15)
+func (sph *SourcePacketHeader) Type() uint {
+	return uint((sph.PacketID << 3) >> 15)
 }
 
 // HeaderType ...
-func (h *SourcePacketHeader) HeaderType() uint {
-	return uint((h.PacketID << 4) >> 15)
+func (sph *SourcePacketHeader) HeaderType() uint {
+	return uint((sph.PacketID << 4) >> 15)
 }
 
 // APID ...
-func (h *SourcePacketHeader) APID() uint16 {
-	return (h.PacketID << 5) >> 5
+func (sph *SourcePacketHeader) APID() uint16 {
+	return (sph.PacketID << 5) >> 5
 }
 
 // GroupingFlags ...
-func (h *SourcePacketHeader) GroupingFlags() uint {
-	return uint(h.PacketSequenceControl >> 14)
+func (sph *SourcePacketHeader) GroupingFlags() uint {
+	return uint(sph.PacketSequenceControl >> 14)
 }
 
 // SequenceCount ...
-func (h *SourcePacketHeader) SequenceCount() uint16 {
-	return (h.PacketSequenceControl << 2) >> 2
+func (sph *SourcePacketHeader) SequenceCount() uint16 {
+	return (sph.PacketSequenceControl << 2) >> 2
 }

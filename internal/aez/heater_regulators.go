@@ -34,6 +34,6 @@ type HTR struct {
 }
 
 // Read HTR
-func (s *HTR) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, s)
+func (htr *HTR) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, htr)
 }

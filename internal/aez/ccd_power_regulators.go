@@ -26,6 +26,6 @@ type CPRU struct {
 }
 
 // Read CRPU
-func (r *CPRU) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, r)
+func (cpru *CPRU) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, cpru)
 }

@@ -13,11 +13,11 @@ type TCDataFieldHeader struct {
 }
 
 // Read TCDataFieldHeader
-func (h *TCDataFieldHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, &h)
+func (tcdfh *TCDataFieldHeader) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, &tcdfh)
 }
 
 //PUSVersion ...
-func (h *TCDataFieldHeader) PUSVersion() uint8 {
-	return (h.PUS << 1) >> 5
+func (tcdfh *TCDataFieldHeader) PUSVersion() uint8 {
+	return (tcdfh.PUS << 1) >> 5
 }

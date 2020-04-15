@@ -15,16 +15,16 @@ type TMDataFieldHeader struct {
 }
 
 // Read TMDataFieldHeader
-func (h *TMDataFieldHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, h)
+func (tmdfh *TMDataFieldHeader) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, tmdfh)
 }
 
 // PUSVersion ...
-func (h *TMDataFieldHeader) PUSVersion() uint8 {
-	return (h.PUS << 1) >> 5
+func (tmdfh *TMDataFieldHeader) PUSVersion() uint8 {
+	return (tmdfh.PUS << 1) >> 5
 }
 
 // Time ...
-func (h *TMDataFieldHeader) Time() uint32 {
-	return h.CUCTimeSeconds
+func (tmdfh *TMDataFieldHeader) Time() uint32 {
+	return tmdfh.CUCTimeSeconds
 }
