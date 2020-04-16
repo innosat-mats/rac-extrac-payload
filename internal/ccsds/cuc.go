@@ -26,7 +26,9 @@ func UnsegmentedTimeNanoseconds(coarseTime uint32, fineTime uint16) int64 {
 	var fine float64 = 0
 	var mask uint16 = 0x8000
 	for pos := 0; pos < 16; pos++ {
-		fine += float64(fineTime&(mask>>pos)) * math.Pow(2, -float64(pos+1))
+		if fineTime&(mask>>pos) == (mask >> pos) {
+			fine += math.Pow(2, -float64(pos))
+		}
 	}
 
 	nanos += int64(math.Round(fine * milliesPerSecond))
