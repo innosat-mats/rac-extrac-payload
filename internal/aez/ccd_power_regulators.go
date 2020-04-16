@@ -1,4 +1,4 @@
-package main
+package aez
 
 import (
 	"encoding/binary"
@@ -25,6 +25,7 @@ type CPRU struct {
 	VOD3   uint16 // CCD3 Output Drain Voltage 0..4095
 }
 
-func (s *CPRU) read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, s)
+// Read CRPU
+func (cpru *CPRU) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, cpru)
 }

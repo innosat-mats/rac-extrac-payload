@@ -1,4 +1,4 @@
-package main
+package aez
 
 import (
 	"encoding/binary"
@@ -33,6 +33,7 @@ type HTR struct {
 	HTR8OD uint16
 }
 
-func (s *HTR) read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, s)
+// Read HTR
+func (htr *HTR) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, htr)
 }
