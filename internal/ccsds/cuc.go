@@ -41,7 +41,7 @@ func UnsegmentedTimeNanoseconds(coarseTime uint32, fineTime uint16) int64 {
 //
 // * coarseTime is time since epoch in seconds
 // * fineTime is subseconds is a binary division of a second
-func UnsegmentedTimeDate(coarseTime uint32, fineTime uint16) time.Time {
+func UnsegmentedTimeDate(coarseTime uint32, fineTime uint16, epoch time.Time) time.Time {
 	duration := UnsegmentedTimeNanoseconds(coarseTime, fineTime)
-	return TAI.Add(time.Duration(duration))
+	return epoch.Add(time.Duration(duration))
 }

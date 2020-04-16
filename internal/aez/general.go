@@ -3,6 +3,9 @@ package aez
 import (
 	"encoding/binary"
 	"io"
+	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
 //STAT General status housekeeping report of the payload instrument.
@@ -24,4 +27,14 @@ type STAT struct { //(34 octets)
 // Read STAT
 func (stat *STAT) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, stat)
+}
+
+// Time returns the measurement time in UTC
+func (stat *STAT) Time(epoch time.Time) time.Time {
+	return ccsds.UnsegmentedTimeDate(stat.TS, stat.TSS, epoch)
+}
+
+// Nanoseconds returns the measurement time in nanoseconds since epoch
+func (stat *STAT) Nanoseconds() int64 {
+	return ccsds.UnsegmentedTimeNanoseconds(stat.TS, stat.TSS)
 }

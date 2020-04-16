@@ -37,15 +37,25 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
+	type args struct {
+		epoch time.Time
+	}
 	tests := []struct {
 		name   string
 		fields fields
+		args   args
 		want   time.Time
 	}{
-		{"Returns Epoch/TAI", fields{0, 0, 0, 0, 0}, ccsds.TAI},
+		{
+			"Returns Epoch/TAI",
+			fields{},
+			args{ccsds.TAI},
+			ccsds.TAI,
+		},
 		{
 			"Returns expected time",
-			fields{0, 0, 0, 10, 0b0100000000000000},
+			fields{CUCTimeSeconds: 10, CUCTimeFraction: 0b0100000000000000},
+			args{ccsds.TAI},
 			ccsds.TAI.Add(time.Second * 10).Add(time.Millisecond * 500),
 		},
 	}
@@ -58,7 +68,7 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
 				CUCTimeFraction: tt.fields.CUCTimeFraction,
 			}
-			if got := h.Time(); !reflect.DeepEqual(got, tt.want) {
+			if got := h.Time(tt.args.epoch); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("TMDataFieldHeader.Time() = %v, want %v", got, tt.want)
 			}
 		})

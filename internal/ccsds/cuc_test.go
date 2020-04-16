@@ -36,18 +36,23 @@ func TestUnsegmentedTimeDate(t *testing.T) {
 	type args struct {
 		coarseTime uint32
 		fineTime   uint16
+		epoch      time.Time
 	}
 	tests := []struct {
 		name string
 		args args
 		want time.Time
 	}{
-		{"Returns Epoch/TAI", args{0, 0}, TAI},
-		{"Returns expected time", args{10, 2}, TAI.Add(time.Second*10 + time.Millisecond*500)},
+		{"Returns Epoch/TAI", args{0, 0, TAI}, TAI},
+		{
+			"Returns expected time",
+			args{10, 0b0100000000000000, TAI},
+			TAI.Add(time.Second*10 + time.Millisecond*500),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := UnsegmentedTimeDate(tt.args.coarseTime, tt.args.fineTime); !reflect.DeepEqual(got, tt.want) {
+			if got := UnsegmentedTimeDate(tt.args.coarseTime, tt.args.fineTime, tt.args.epoch); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("UnsegmentedTimeDate() = %v, want %v", got, tt.want)
 			}
 		})

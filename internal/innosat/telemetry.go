@@ -28,8 +28,8 @@ func (tmdfh *TMDataFieldHeader) PUSVersion() uint8 {
 }
 
 // Time returns the telemetry data time in UTC
-func (tmdfh *TMDataFieldHeader) Time() time.Time {
-	return ccsds.UnsegmentedTimeDate(tmdfh.CUCTimeSeconds, tmdfh.CUCTimeFraction)
+func (tmdfh *TMDataFieldHeader) Time(epoch time.Time) time.Time {
+	return ccsds.UnsegmentedTimeDate(tmdfh.CUCTimeSeconds, tmdfh.CUCTimeFraction, epoch)
 }
 
 // Nanoseconds returns the telemetry data time in nanoseconds since its epoch
