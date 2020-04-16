@@ -17,6 +17,7 @@ func TestUnsegmentedTimeNanoSeconds(t *testing.T) {
 		{0, 0, 0000000000},
 		{42, 0, 42000000000},
 		{0, 0x8000, 1000000000},
+		{0, 0b0100000000000000, 500000000},
 		{0, 0x8000 >> 8, int64(math.Round(math.Pow(2, -8) * math.Pow10(9)))},
 		{0, (0x8000 >> 1) | (0x8000 >> 2), 750000000},
 		{42, 0x8000 >> 3, 42000000000 + int64(math.Round(math.Pow(2, -3)*math.Pow10(9)))},
