@@ -19,6 +19,6 @@ type PWR struct {
 }
 
 // Read PWR
-func (s *PWR) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, s)
+func (pwr *PWR) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, pwr)
 }

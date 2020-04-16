@@ -18,21 +18,21 @@ type TMDataFieldHeader struct {
 }
 
 // Read TMDataFieldHeader
-func (h *TMDataFieldHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, h)
+func (tmdfh *TMDataFieldHeader) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.BigEndian, tmdfh)
 }
 
 // PUSVersion ...
-func (h *TMDataFieldHeader) PUSVersion() uint8 {
-	return (h.PUS << 1) >> 5
+func (tmdfh *TMDataFieldHeader) PUSVersion() uint8 {
+	return (tmdfh.PUS << 1) >> 5
 }
 
 // Time returns the telemetry data time in UTC
-func (h *TMDataFieldHeader) Time() time.Time {
-	return ccsds.UnsegmentedTimeDate(h.CUCTimeSeconds, h.CUCTimeFraction)
+func (tmdfh *TMDataFieldHeader) Time() time.Time {
+	return ccsds.UnsegmentedTimeDate(tmdfh.CUCTimeSeconds, tmdfh.CUCTimeFraction)
 }
 
 // Nanoseconds returns the telemetry data time in nanoseconds since its epoch
-func (h *TMDataFieldHeader) Nanoseconds() int64 {
-	return ccsds.UnsegmentedTimeNanoseconds(h.CUCTimeSeconds, h.CUCTimeFraction)
+func (tmdfh *TMDataFieldHeader) Nanoseconds() int64 {
+	return ccsds.UnsegmentedTimeNanoseconds(tmdfh.CUCTimeSeconds, tmdfh.CUCTimeFraction)
 }

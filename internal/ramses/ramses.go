@@ -18,22 +18,22 @@ type Ramses struct {
 }
 
 // Read Ramses
-func (r *Ramses) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, r)
+func (ramses *Ramses) Read(buf io.Reader) error {
+	return binary.Read(buf, binary.LittleEndian, ramses)
 }
 
 // Created is when the package was created
-func (r *Ramses) Created() time.Time {
+func (ramses *Ramses) Created() time.Time {
 	start := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-	return start.Add(time.Hour * 24 * time.Duration(r.Date)).Add(time.Millisecond * time.Duration(r.Time))
+	return start.Add(time.Hour * 24 * time.Duration(ramses.Date)).Add(time.Millisecond * time.Duration(ramses.Time))
 }
 
 // Valid as in correct version
-func (r *Ramses) Valid() bool {
-	return r.Synch == 0xeb90
+func (ramses *Ramses) Valid() bool {
+	return ramses.Synch == 0xeb90
 }
 
 //SecureTrans always true?
-func (r *Ramses) SecureTrans() bool {
+func (ramses *Ramses) SecureTrans() bool {
 	return true
 }
