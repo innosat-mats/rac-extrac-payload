@@ -8,6 +8,10 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
+
+// Specification describes what version the current implementation follows
+var Specification string = "AEZICD002:E"
+
 // SID is the id of a single housekeeping parameter
 type SID uint16
 
