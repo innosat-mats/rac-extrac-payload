@@ -54,7 +54,7 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 		},
 		{
 			"Returns expected time",
-			fields{CUCTimeSeconds: 10, CUCTimeFraction: 0b0100000000000000},
+			fields{CUCTimeSeconds: 10, CUCTimeFraction: 0b1000000000000000},
 			args{ccsds.TAI},
 			ccsds.TAI.Add(time.Second * 10).Add(time.Millisecond * 500),
 		},
@@ -89,7 +89,7 @@ func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 		want   int64
 	}{
 		{"Returns 0", fields{0, 0, 0, 0, 0}, 0},
-		{"Returns nanoseconds", fields{0, 0, 0, 10, 0b0100000000000000}, 10500000000},
+		{"Returns nanoseconds", fields{0, 0, 0, 10, 0b1000000000000000}, 10500000000},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
