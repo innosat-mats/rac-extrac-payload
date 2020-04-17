@@ -12,8 +12,8 @@ type SourcePacketHeaderType uint
 //
 //TC is the source package type for telecommand
 const (
-	TM SourcePacketHeaderType = 0
-	TC SourcePacketHeaderType = 1
+	TC SourcePacketHeaderType = 0
+	TM SourcePacketHeaderType = 1
 )
 
 //SourcePacketHeader Source Packet Header
