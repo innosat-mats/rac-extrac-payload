@@ -37,10 +37,9 @@ func UnsegmentedTimeNanoseconds(coarseTime uint32, fineTime uint16) int64 {
 // units and follows the CCSDS 301.0-B-2 - CCSDS 301.0-B-4 specification
 // in the specification.
 //
-// It sets epoch as TAI (1958-01-01, UTC)
-//
 // * coarseTime is time since epoch in seconds
 // * fineTime is subseconds is a binary division of a second
+// * epoch is the reference time, such as e.g. TAI
 func UnsegmentedTimeDate(coarseTime uint32, fineTime uint16, epoch time.Time) time.Time {
 	duration := UnsegmentedTimeNanoseconds(coarseTime, fineTime)
 	return epoch.Add(time.Duration(duration))
