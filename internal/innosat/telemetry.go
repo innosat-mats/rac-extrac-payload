@@ -3,6 +3,9 @@ package innosat
 import (
 	"encoding/binary"
 	"io"
+	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
 //TMDataFieldHeader (9 octets)
@@ -24,7 +27,12 @@ func (tmdfh *TMDataFieldHeader) PUSVersion() uint8 {
 	return (tmdfh.PUS << 1) >> 5
 }
 
-// Time ...
-func (tmdfh *TMDataFieldHeader) Time() uint32 {
-	return tmdfh.CUCTimeSeconds
+// Time returns the telemetry data time in UTC
+func (tmdfh *TMDataFieldHeader) Time(epoch time.Time) time.Time {
+	return ccsds.UnsegmentedTimeDate(tmdfh.CUCTimeSeconds, tmdfh.CUCTimeFraction, epoch)
+}
+
+// Nanoseconds returns the telemetry data time in nanoseconds since its epoch
+func (tmdfh *TMDataFieldHeader) Nanoseconds() int64 {
+	return ccsds.UnsegmentedTimeNanoseconds(tmdfh.CUCTimeSeconds, tmdfh.CUCTimeFraction)
 }

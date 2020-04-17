@@ -1,6 +1,12 @@
 package innosat
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+)
 
 func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
 	tests := []struct {
@@ -18,6 +24,84 @@ func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.h.PUSVersion(); got != tt.want {
 				t.Errorf("TMDataFieldHeader.PUSVersion() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTMDataFieldHeader_Time(t *testing.T) {
+	type fields struct {
+		PUS             uint8
+		ServiceType     uint8
+		ServiceSubType  uint8
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	type args struct {
+		epoch time.Time
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   time.Time
+	}{
+		{
+			"Returns Epoch/TAI",
+			fields{},
+			args{ccsds.TAI},
+			ccsds.TAI,
+		},
+		{
+			"Returns expected time",
+			fields{CUCTimeSeconds: 10, CUCTimeFraction: 0b1000000000000000},
+			args{ccsds.TAI},
+			ccsds.TAI.Add(time.Second * 10).Add(time.Millisecond * 500),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := &TMDataFieldHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			if got := h.Time(tt.args.epoch); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TMDataFieldHeader.Time() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
+	type fields struct {
+		PUS             uint8
+		ServiceType     uint8
+		ServiceSubType  uint8
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   int64
+	}{
+		{"Returns 0", fields{0, 0, 0, 0, 0}, 0},
+		{"Returns nanoseconds", fields{0, 0, 0, 10, 0b1000000000000000}, 10500000000},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := &TMDataFieldHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			if got := h.Nanoseconds(); got != tt.want {
+				t.Errorf("TMDataFieldHeader.Nanoseconds() = %v, want %v", got, tt.want)
 			}
 		})
 	}
