@@ -25,7 +25,7 @@ var TAI = time.Date(1958, time.January, 1, 0, 0, 0, 0, time.UTC)
 func UnsegmentedTimeNanoseconds(coarseTime uint32, fineTime uint16) int64 {
 	var nanos int64 = int64(coarseTime) * int64(milliesPerSecond)
 	var fine = big.NewFloat(float64(fineTime))
-	fine.SetMantExp(fine, -15)
+	fine.SetMantExp(fine, -16)
 	fineValue, _ := fine.Float64()
 	return nanos + int64(math.Round(fineValue*milliesPerSecond))
 }

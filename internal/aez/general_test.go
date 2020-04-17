@@ -35,7 +35,7 @@ func TestSTAT_Time(t *testing.T) {
 		{"Defaults to epoch", fields{}, args{ccsds.TAI}, ccsds.TAI},
 		{
 			"Returns time after epoch",
-			fields{TS: 10, TSS: 0b0110000000000000},
+			fields{TS: 10, TSS: 0b1100000000000000},
 			args{ccsds.TAI},
 			ccsds.TAI.Add(time.Second * 10).Add(time.Millisecond * 750),
 		},
@@ -88,7 +88,7 @@ func TestSTAT_Nanoseconds(t *testing.T) {
 		},
 		{
 			"Returns nanoseconds",
-			fields{TS: 10, TSS: 0b0110000000000000},
+			fields{TS: 10, TSS: 0b1100000000000000},
 			10750000000,
 		},
 	}

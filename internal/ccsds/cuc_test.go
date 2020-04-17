@@ -16,11 +16,10 @@ func TestUnsegmentedTimeNanoSeconds(t *testing.T) {
 	}{
 		{0, 0, 0000000000},
 		{42, 0, 42000000000},
-		{0, 0x8000, 1000000000},
-		{0, 0b0100000000000000, 500000000},
-		{0, 0x8000 >> 8, int64(math.Round(math.Pow(2, -8) * math.Pow10(9)))},
-		{0, (0x8000 >> 1) | (0x8000 >> 2), 750000000},
-		{42, 0x8000 >> 3, 42000000000 + int64(math.Round(math.Pow(2, -3)*math.Pow10(9)))},
+		{0, 0x8000, 500000000},
+		{0, 0b1100000000000000, 750000000},
+		{0, 0x8000 >> 7, int64(math.Round(math.Pow(2, -8) * math.Pow10(9)))},
+		{42, 0x8000 >> 3, 42000000000 + int64(math.Round(math.Pow(2, -4)*math.Pow10(9)))},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("coarse=%d,fine=%d", tt.coarse, tt.fine), func(t *testing.T) {
@@ -47,7 +46,7 @@ func TestUnsegmentedTimeDate(t *testing.T) {
 		{
 			"Returns expected time",
 			args{10, 0b0100000000000000, TAI},
-			TAI.Add(time.Second*10 + time.Millisecond*500),
+			TAI.Add(time.Second*10 + time.Millisecond*250),
 		},
 	}
 	for _, tt := range tests {
