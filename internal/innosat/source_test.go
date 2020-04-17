@@ -23,7 +23,7 @@ func TestType(t *testing.T) {
 		0}
 
 	ans := sph.Type()
-	if ans != 1 {
+	if ans != TM {
 		t.Errorf("Type() = %b; want 1", ans)
 	}
 }
@@ -36,18 +36,6 @@ func TestHeaderType(t *testing.T) {
 	ans := sph.HeaderType()
 	if ans != 1 {
 		t.Errorf("HeaderType() = %b; want 1", ans)
-	}
-}
-
-func TestAPID(t *testing.T) {
-	sph := SourcePacketHeader{
-		0b0000011111111111,
-		0,
-		0}
-
-	ans := sph.APID()
-	if ans != 0b11111111111 {
-		t.Errorf("APID() = %b; want 11111111111", ans)
 	}
 }
 
@@ -72,5 +60,33 @@ func TestSequenceCount(t *testing.T) {
 	ans := sph.SequenceCount()
 	if ans != 0b11111111111111 {
 		t.Errorf("SequenceCount() = %02b; want 11111111111111", ans)
+	}
+}
+
+func TestSourcePacketHeader_IsMainApplication(t *testing.T) {
+	type fields struct {
+		PacketID              uint16
+		PacketSequenceControl uint16
+		PacketLength          uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		{"Returns false when apid not 100", fields{}, false},
+		{"Returns true when apid is 100", fields{PacketID: 0b1100110011000000}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sph := &SourcePacketHeader{
+				PacketID:              tt.fields.PacketID,
+				PacketSequenceControl: tt.fields.PacketSequenceControl,
+				PacketLength:          tt.fields.PacketLength,
+			}
+			if got := sph.IsMainApplication(); got != tt.want {
+				t.Errorf("SourcePacketHeader.IsMainApplication() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

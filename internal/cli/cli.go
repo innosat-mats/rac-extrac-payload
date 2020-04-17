@@ -63,7 +63,7 @@ func main() {
 			log.Fatal("checksum bad")
 		}
 
-		if header.Type() != 1 {
+		if header.Type() != innosat.TC {
 			// Telecommands not supported yet
 			continue
 		}
@@ -74,38 +74,38 @@ func main() {
 			log.Fatal(err)
 		}
 
-		if header.Type() == 1 && header.APID() == 100 && dataHeader.ServiceType == 3 && dataHeader.ServiceSubType == 25 {
-			var sid uint16
+		if header.Type() == innosat.TM && header.IsMainApplication() && dataHeader.IsHousekeeping() {
+			var sid aez.SID
 			binary.Read(reader, binary.BigEndian, &sid)
-			if sid == 1 {
+			if sid == aez.SIDSTAT {
 				stat := aez.STAT{}
 				err = stat.Read(reader)
 				if err != nil {
 					log.Fatal("stat", err)
 				}
 			}
-			if sid == 10 {
+			if sid == aez.SIDHTR {
 				htr := aez.HTR{}
 				err = htr.Read(reader)
 				if err != nil {
 					log.Fatal("htr", err)
 				}
 			}
-			if sid == 20 {
+			if sid == aez.SIDPWR {
 				pwr := aez.PWR{}
 				err = pwr.Read(reader)
 				if err != nil {
 					log.Fatal("pwr", err)
 				}
 			}
-			if sid == 30 {
+			if sid == aez.SIDCPRUA {
 				cprua := aez.CPRU{}
 				err = cprua.Read(reader)
 				if err != nil {
 					log.Fatal("cprua", err)
 				}
 			}
-			if sid == 31 {
+			if sid == aez.SIDCPRUB {
 				cprub := aez.CPRU{}
 				err = cprub.Read(reader)
 				if err != nil {
