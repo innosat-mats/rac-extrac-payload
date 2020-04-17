@@ -5,32 +5,38 @@ import (
 	"io"
 )
 
+type htr uint16
+
+func (data htr) voltage() float64 {
+	return voltageConstant * float64(data)
+}
+
 //HTR housekeeping report returns data on all heater regulators.
 type HTR struct {
-	HTR1A  uint16 // Heater 1 Temperature sense A 0..4095
-	HTR1B  uint16 // Heater 1 Temperature sense B 0..4095
-	HTR1OD uint16 // Heater 1 Output Drive setting 0..4095
-	HTR2A  uint16
-	HTR2B  uint16
-	HTR2OD uint16
-	HTR3A  uint16
-	HTR3B  uint16
-	HTR3OD uint16
-	HTR4A  uint16
-	HTR4B  uint16
-	HTR4OD uint16
-	HTR5A  uint16
-	HTR5B  uint16
-	HTR5OD uint16
-	HTR6A  uint16
-	HTR6B  uint16
-	HTR6OD uint16
-	HTR7A  uint16
-	HTR7B  uint16
-	HTR7OD uint16
-	HTR8A  uint16
-	HTR8B  uint16
-	HTR8OD uint16
+	HTR1A  htr // Heater 1 Temperature sense A 0..4095
+	HTR1B  htr // Heater 1 Temperature sense B 0..4095
+	HTR1OD htr // Heater 1 Output Drive setting 0..4095
+	HTR2A  htr
+	HTR2B  htr
+	HTR2OD htr
+	HTR3A  htr
+	HTR3B  htr
+	HTR3OD htr
+	HTR4A  htr
+	HTR4B  htr
+	HTR4OD htr
+	HTR5A  htr
+	HTR5B  htr
+	HTR5OD htr
+	HTR6A  htr
+	HTR6B  htr
+	HTR6OD htr
+	HTR7A  htr
+	HTR7B  htr
+	HTR7OD htr
+	HTR8A  htr
+	HTR8B  htr
+	HTR8OD htr
 }
 
 //HTRReport housekeeping report returns data on all heater regulators in useful units.
@@ -66,36 +72,32 @@ func (htr *HTR) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, htr)
 }
 
-func htrVoltage(data uint16) float64 {
-	return voltageConstant * float64(data)
-}
-
 // Report returns a HTRReport with useful units
 func (htr *HTR) Report() HTRReport {
 	return HTRReport{
-		HTR1A:  htrVoltage(htr.HTR1A),
-		HTR1B:  htrVoltage(htr.HTR1B),
-		HTR1OD: htrVoltage(htr.HTR1OD),
-		HTR2A:  htrVoltage(htr.HTR2A),
-		HTR2B:  htrVoltage(htr.HTR2B),
-		HTR2OD: htrVoltage(htr.HTR2OD),
-		HTR3A:  htrVoltage(htr.HTR3A),
-		HTR3B:  htrVoltage(htr.HTR3B),
-		HTR3OD: htrVoltage(htr.HTR3OD),
-		HTR4A:  htrVoltage(htr.HTR4A),
-		HTR4B:  htrVoltage(htr.HTR4B),
-		HTR4OD: htrVoltage(htr.HTR4OD),
-		HTR5A:  htrVoltage(htr.HTR5A),
-		HTR5B:  htrVoltage(htr.HTR5B),
-		HTR5OD: htrVoltage(htr.HTR5OD),
-		HTR6A:  htrVoltage(htr.HTR6A),
-		HTR6B:  htrVoltage(htr.HTR6B),
-		HTR6OD: htrVoltage(htr.HTR6OD),
-		HTR7A:  htrVoltage(htr.HTR7A),
-		HTR7B:  htrVoltage(htr.HTR7B),
-		HTR7OD: htrVoltage(htr.HTR7OD),
-		HTR8A:  htrVoltage(htr.HTR8A),
-		HTR8B:  htrVoltage(htr.HTR8B),
-		HTR8OD: htrVoltage(htr.HTR8OD),
+		HTR1A:  htr.HTR1A.voltage(),
+		HTR1B:  htr.HTR1B.voltage(),
+		HTR1OD: htr.HTR1OD.voltage(),
+		HTR2A:  htr.HTR2A.voltage(),
+		HTR2B:  htr.HTR2B.voltage(),
+		HTR2OD: htr.HTR2OD.voltage(),
+		HTR3A:  htr.HTR3A.voltage(),
+		HTR3B:  htr.HTR3B.voltage(),
+		HTR3OD: htr.HTR3OD.voltage(),
+		HTR4A:  htr.HTR4A.voltage(),
+		HTR4B:  htr.HTR4B.voltage(),
+		HTR4OD: htr.HTR4OD.voltage(),
+		HTR5A:  htr.HTR5A.voltage(),
+		HTR5B:  htr.HTR5B.voltage(),
+		HTR5OD: htr.HTR5OD.voltage(),
+		HTR6A:  htr.HTR6A.voltage(),
+		HTR6B:  htr.HTR6B.voltage(),
+		HTR6OD: htr.HTR6OD.voltage(),
+		HTR7A:  htr.HTR7A.voltage(),
+		HTR7B:  htr.HTR7B.voltage(),
+		HTR7OD: htr.HTR7OD.voltage(),
+		HTR8A:  htr.HTR8A.voltage(),
+		HTR8B:  htr.HTR8B.voltage(),
+		HTR8OD: htr.HTR8OD.voltage(),
 	}
 }

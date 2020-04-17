@@ -5,22 +5,86 @@ import (
 	"io"
 )
 
+type pwr uint16
+
+func (data pwr) voltageADC() float64 {
+	return voltageConstant * float64(data)
+}
+
+type pwrt pwr
+
+func (data pwrt) voltage() float64 {
+	return pwr(data).voltageADC()
+}
+
+func (data pwrt) resistance() float64 {
+	return 3300/data.voltage() - 1000
+}
+
+type pwrp32v pwr
+
+func (data pwrp32v) voltage() float64 {
+	return 21 * pwr(data).voltageADC()
+}
+
+type pwrp32c pwr
+
+func (data pwrp32c) current() float64 {
+	return 10.1 / 100 * pwr(data).voltageADC()
+}
+
+type pwrp16v pwr
+
+func (data pwrp16v) voltage() float64 {
+	return 11 * pwr(data).voltageADC()
+}
+
+type pwrp16c pwr
+
+func (data pwrp16c) current() float64 {
+	return 10.1 / 5 * pwr(data).voltageADC()
+}
+
+type pwrm16v pwr
+
+func (data pwrm16v) voltage() float64 {
+	return -10 * pwr(data).voltageADC()
+}
+
+type pwrm16c pwr
+
+func (data pwrm16c) current() float64 {
+	return 10.1 / 100 * pwr(data).voltageADC()
+}
+
+type pwrp3v3 pwr
+
+func (data pwrp3v3) voltage() float64 {
+	return 4 * pwr(data).voltageADC()
+}
+
+type pwrp3c3 pwr
+
+func (data pwrp3c3) current() float64 {
+	return 10.1 / 20 * pwr(data).voltageADC()
+}
+
 //PWR structure 18 octext
 type PWR struct {
-	PWRT    uint16 // Temp. sense 0..4095
-	PWRP32V uint16 // +32V voltage sense 0..4095
-	PWRP32C uint16 // +32V current sense 0..4095
-	PWRP16V uint16 // +16V voltage sense 0..4095
-	PWRP16C uint16 // +16V current sense 0..4095
-	PWRM16V uint16 // -16V voltage sense 0..4095
-	PWRM16C uint16 // -16V current sense 0..4095
-	PWRP3V3 uint16 // +3V3 voltage sense 0..4095
-	PWRP3C3 uint16 // +3V3 current sense 0..4095
+	PWRT    pwrt    // Temp. sense 0..4095
+	PWRP32V pwrp32v // +32V voltage sense 0..4095
+	PWRP32C pwrp32c // +32V current sense 0..4095
+	PWRP16V pwrp16v // +16V voltage sense 0..4095
+	PWRP16C pwrp16c // +16V current sense 0..4095
+	PWRM16V pwrm16v // -16V voltage sense 0..4095
+	PWRM16C pwrm16c // -16V current sense 0..4095
+	PWRP3V3 pwrp3v3 // +3V3 voltage sense 0..4095
+	PWRP3C3 pwrp3c3 // +3V3 current sense 0..4095
 }
 
 //PWRReport structure in useful units
 type PWRReport struct {
-	PWRT    float64 // Temp. sense voltage
+	PWRT    float64 // Temp. sense resistance
 	PWRP32V float64 // +32V voltage sense voltage
 	PWRP32C float64 // +32V current sense current
 	PWRP16V float64 // +16V voltage sense voltage
@@ -43,14 +107,14 @@ func pwrVoltageADC(data uint16) float64 {
 // Report returns a PWRReport with useful units
 func (pwr *PWR) Report() PWRReport {
 	return PWRReport{
-		PWRT:    pwrVoltageADC(pwr.PWRT),
-		PWRP32V: 21 * pwrVoltageADC(pwr.PWRP32V),
-		PWRP16V: 11 * pwrVoltageADC(pwr.PWRP16V),
-		PWRM16V: -10 * pwrVoltageADC(pwr.PWRM16V),
-		PWRP3V3: 4 * pwrVoltageADC(pwr.PWRP3V3),
-		PWRP32C: 10.1 / 100 * pwrVoltageADC(pwr.PWRP32C),
-		PWRP16C: 10.1 / 5 * pwrVoltageADC(pwr.PWRP16C),
-		PWRM16C: 10.1 / 100 * pwrVoltageADC(pwr.PWRM16C),
-		PWRP3C3: 10.1 / 20 * pwrVoltageADC(pwr.PWRP3C3),
+		PWRT:    pwr.PWRT.resistance(),
+		PWRP32V: pwr.PWRP32V.voltage(),
+		PWRP32C: pwr.PWRP32C.current(),
+		PWRP16V: pwr.PWRP16V.voltage(),
+		PWRP16C: pwr.PWRP16C.current(),
+		PWRM16V: pwr.PWRM16V.voltage(),
+		PWRM16C: pwr.PWRM16C.current(),
+		PWRP3V3: pwr.PWRP3V3.voltage(),
+		PWRP3C3: pwr.PWRP3C3.current(),
 	}
 }

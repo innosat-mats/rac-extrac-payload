@@ -7,29 +7,30 @@ import (
 
 func TestCPRU_Report(t *testing.T) {
 	type fields struct {
-		VGATE0 uint16
-		VSUBS0 uint16
-		VRD0   uint16
-		VOD0   uint16
-		VGATE1 uint16
-		VSUBS1 uint16
-		VRD1   uint16
-		VOD1   uint16
-		VGATE2 uint16
-		VSUBS2 uint16
-		VRD2   uint16
-		VOD2   uint16
-		VGATE3 uint16
-		VSUBS3 uint16
-		VRD3   uint16
-		VOD3   uint16
+		VGATE0 gate
+		VSUBS0 subs
+		VRD0   rd
+		VOD0   od
+		VGATE1 gate
+		VSUBS1 subs
+		VRD1   rd
+		VOD1   od
+		VGATE2 gate
+		VSUBS2 subs
+		VRD2   rd
+		VOD2   od
+		VGATE3 gate
+		VSUBS3 subs
+		VRD3   rd
+		VOD3   od
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		want   CPRUReport
 	}{
-		{"Transforms VGATE0", fields{VGATE0: 10}, CPRUReport{VGATE0: gateVoltage(10)}},
+		{"Transforms VGATE0", fields{VGATE0: 10}, CPRUReport{VGATE0: gate(10).voltage()}},
+		{"Transforms VSUBS0", fields{VSUBS0: 10}, CPRUReport{VSUBS0: subs(10).voltage()}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
