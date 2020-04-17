@@ -36,3 +36,8 @@ func (tmdfh *TMDataFieldHeader) Time(epoch time.Time) time.Time {
 func (tmdfh *TMDataFieldHeader) Nanoseconds() int64 {
 	return ccsds.UnsegmentedTimeNanoseconds(tmdfh.CUCTimeSeconds, tmdfh.CUCTimeFraction)
 }
+
+// IsHousekeeping returns if payload contains housekeeping data
+func (tmdfh *TMDataFieldHeader) IsHousekeeping() bool {
+	return tmdfh.ServiceType == 3 && tmdfh.ServiceSubType == 25
+}

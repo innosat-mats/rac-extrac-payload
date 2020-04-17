@@ -71,7 +71,7 @@ func Example() {
 			log.Fatal("checksum bad")
 		}
 
-		fmt.Println(header.APID())
+		fmt.Println(header.IsMainApplication())
 
 		dataHeader := innosat.TMDataFieldHeader{}
 		err = dataHeader.Read(reader)
@@ -79,7 +79,7 @@ func Example() {
 			log.Fatal(err)
 		}
 
-		if header.APID() == 100 && dataHeader.ServiceType == 3 && dataHeader.ServiceSubType == 25 {
+		if header.IsMainApplication() && dataHeader.IsHousekeeping() {
 			var sid uint16
 			binary.Read(reader, binary.BigEndian, &sid)
 			if sid == 1 {
@@ -94,6 +94,6 @@ func Example() {
 	}
 	// Output:
 	// 2019-03-01 15:07:59.7 +0000 UTC
-	// 100
+	// true
 	// {32516 2 33284 2 2485518336 4761 2 0 0 50331648 1811939328 419430400}
 }
