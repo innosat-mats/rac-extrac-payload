@@ -8,6 +8,26 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
+// SID is the id of a single housekeeping parameter
+type SID uint16
+
+// SIDSTAT is the SID of STAT.
+//
+// SIDHTR is the SID of HTR.
+//
+// SIDPWR is the SID of PWR.
+//
+// SIDCPRUA is the SID of CPRUA.
+//
+// SIDCPRUB is the SID of CPRUB.
+const (
+	SIDSTAT  SID = 1
+	SIDHTR   SID = 10
+	SIDPWR   SID = 20
+	SIDCPRUA SID = 30
+	SIDCPRUB SID = 31
+)
+
 //STAT General status housekeeping report of the payload instrument.
 type STAT struct { //(34 octets)
 	SPID   uint16 // Software Part ID

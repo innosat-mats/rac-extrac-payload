@@ -106,3 +106,41 @@ func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 		})
 	}
 }
+
+func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
+	type fields struct {
+		PUS             uint8
+		ServiceType     uint8
+		ServiceSubType  uint8
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		{"False in general", fields{}, false},
+		{"False if only correct ServiceType", fields{ServiceType: 3}, false},
+		{"False if only correct ServiceSubType", fields{ServiceSubType: 25}, false},
+		{
+			"True if correct ServiceType and ServiceSubType",
+			fields{ServiceType: 3, ServiceSubType: 25},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmdfh := &TMDataFieldHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			if got := tmdfh.IsHousekeeping(); got != tt.want {
+				t.Errorf("TMDataFieldHeader.IsHousekeeping() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

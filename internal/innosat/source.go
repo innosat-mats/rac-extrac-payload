@@ -5,6 +5,17 @@ import (
 	"io"
 )
 
+//SourcePacketHeaderType is the type of the source packet (TM/TC)
+type SourcePacketHeaderType uint
+
+//TM is the source package type for telemetry
+//
+//TC is the source package type for telecommand
+const (
+	TM SourcePacketHeaderType = 0
+	TC SourcePacketHeaderType = 1
+)
+
 //SourcePacketHeader Source Packet Header
 type SourcePacketHeader struct {
 	PacketID              uint16
@@ -22,9 +33,9 @@ func (sph *SourcePacketHeader) Version() uint {
 	return uint(sph.PacketID >> 13)
 }
 
-// Type ...
-func (sph *SourcePacketHeader) Type() uint {
-	return uint((sph.PacketID << 3) >> 15)
+// Type is either Telecommand or Telemetry
+func (sph *SourcePacketHeader) Type() SourcePacketHeaderType {
+	return SourcePacketHeaderType((sph.PacketID << 3) >> 15)
 }
 
 // HeaderType ...
@@ -32,9 +43,13 @@ func (sph *SourcePacketHeader) HeaderType() uint {
 	return uint((sph.PacketID << 4) >> 15)
 }
 
-// APID ...
-func (sph *SourcePacketHeader) APID() uint16 {
+func (sph *SourcePacketHeader) apid() uint16 {
 	return (sph.PacketID << 5) >> 5
+}
+
+// IsMainApplication says if packet is for main application
+func (sph *SourcePacketHeader) IsMainApplication() bool {
+	return sph.apid() == 100
 }
 
 // GroupingFlags ...
