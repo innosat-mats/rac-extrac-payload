@@ -9,7 +9,7 @@ import (
 )
 
 // Specification describes what version the current implementation follows
-var Specification string = "AEZICD002"
+var Specification string = "AEZICD002:E"
 
 //STAT General status housekeeping report of the payload instrument.
 type STAT struct { //(34 octets)
