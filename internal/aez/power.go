@@ -18,7 +18,7 @@ func (data pwrt) voltage() float64 {
 }
 
 func (data pwrt) resistance() float64 {
-	return 3300/data.voltage() - 1000
+	return 3.3*1000/data.voltage() - 1000
 }
 
 type pwrp32v pwr
