@@ -8,6 +8,9 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
+// Specification describes what version the current implementation follows
+var Specification string = "AEZICD002"
+
 //STAT General status housekeeping report of the payload instrument.
 type STAT struct { //(34 octets)
 	SPID   uint16 // Software Part ID
