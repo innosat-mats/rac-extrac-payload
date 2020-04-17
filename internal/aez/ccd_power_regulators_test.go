@@ -31,6 +31,20 @@ func TestCPRU_Report(t *testing.T) {
 	}{
 		{"Transforms VGATE0", fields{VGATE0: 10}, CPRUReport{VGATE0: gate(10).voltage()}},
 		{"Transforms VSUBS0", fields{VSUBS0: 10}, CPRUReport{VSUBS0: subs(10).voltage()}},
+		{"Transforms VRD0", fields{VRD0: 10}, CPRUReport{VRD0: rd(10).voltage()}},
+		{"Transforms VOD0", fields{VOD0: 10}, CPRUReport{VOD0: od(10).voltage()}},
+		{"Transforms VGATE1", fields{VGATE1: 10}, CPRUReport{VGATE1: gate(10).voltage()}},
+		{"Transforms VSUBS1", fields{VSUBS1: 10}, CPRUReport{VSUBS1: subs(10).voltage()}},
+		{"Transforms VRD1", fields{VRD1: 10}, CPRUReport{VRD1: rd(10).voltage()}},
+		{"Transforms VOD1", fields{VOD1: 10}, CPRUReport{VOD1: od(10).voltage()}},
+		{"Transforms VGATE2", fields{VGATE2: 10}, CPRUReport{VGATE2: gate(10).voltage()}},
+		{"Transforms VSUBS2", fields{VSUBS2: 10}, CPRUReport{VSUBS2: subs(10).voltage()}},
+		{"Transforms VRD2", fields{VRD2: 10}, CPRUReport{VRD2: rd(10).voltage()}},
+		{"Transforms VOD2", fields{VOD2: 10}, CPRUReport{VOD2: od(10).voltage()}},
+		{"Transforms VGATE3", fields{VGATE3: 10}, CPRUReport{VGATE3: gate(10).voltage()}},
+		{"Transforms VSUBS3", fields{VSUBS3: 10}, CPRUReport{VSUBS3: subs(10).voltage()}},
+		{"Transforms VRD3", fields{VRD3: 10}, CPRUReport{VRD3: rd(10).voltage()}},
+		{"Transforms VOD3", fields{VOD3: 10}, CPRUReport{VOD3: od(10).voltage()}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
