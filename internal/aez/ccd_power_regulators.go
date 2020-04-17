@@ -34,6 +34,9 @@ func (data od) voltage() float64 {
 
 //CPRU structure
 type CPRU struct {
+	STAT uint8 // CPRU/CRB power status
+	// CCD overvoltage fault, one bit per CCD. Bit [7..4]
+	// CCD power enabled, one bit per CCD. Bit [3..0]
 	VGATE0 gate // CCD0 Gate Voltage 0..4095
 	VSUBS0 subs // CCD0 Substrate Voltage 0..4095
 	VRD0   rd   // CCD0 Reset transistor Drain Voltage 0..4095
@@ -54,6 +57,7 @@ type CPRU struct {
 
 //CPRUReport structure
 type CPRUReport struct {
+	STAT
 	VGATE0 float64 // CCD0 Gate Voltage
 	VSUBS0 float64 // CCD0 Substrate Voltage
 	VRD0   float64 // CCD0 Reset transistor Drain Voltage
