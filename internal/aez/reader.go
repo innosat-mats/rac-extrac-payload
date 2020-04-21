@@ -12,63 +12,56 @@ import (
 type PackageType interface {
 }
 
-// DecodePackages ...
-func DecodePackages(source chan innosat.SourcePackage, target chan PackageType) {
+// Packages ...
+func Packages(source <-chan innosat.SourcePackage, target chan<- PackageType) {
 	defer close(target)
 	for sourcePackage := range source {
-
 		var err error
 		var data PackageType
 		reader := bytes.NewReader(sourcePackage.Application)
 		if sourcePackage.Header.GroupingFlags() == innosat.SPStandalone {
-
 			if sourcePackage.Header.Type() == innosat.TM && sourcePackage.Header.IsMainApplication() {
 				var sid SID
 				binary.Read(reader, binary.BigEndian, &sid)
-				if sid == SIDSTAT {
+				switch sid {
+				case SIDSTAT:
 					stat := STAT{}
 					err = stat.Read(reader)
 					if err != nil {
-						log.Fatal("stat", err)
+						log.Output(log.Llongfile, err.Error())
 					}
 					data = stat
-				}
-				if sid == SIDHTR {
+				case SIDHTR:
 					htr := HTR{}
 					err = htr.Read(reader)
 					if err != nil {
-						log.Fatal("htr", err)
+						log.Output(log.Llongfile, err.Error())
 					}
 					data = htr
-				}
-				if sid == SIDPWR {
+				case SIDPWR:
 					pwr := PWR{}
 					err = pwr.Read(reader)
 					if err != nil {
-						log.Fatal("pwr", err)
+						log.Output(log.Llongfile, err.Error())
 					}
 					data = pwr
-				}
-				if sid == SIDCPRUA {
+				case SIDCPRUA:
 					cpru := CPRU{}
 					err = cpru.Read(reader)
 					if err != nil {
-						log.Fatal("cprua", err)
+						log.Output(log.Llongfile, err.Error())
 					}
 					data = cpru
-				}
-				if sid == SIDCPRUB {
+				case SIDCPRUB:
 					cpru := CPRU{}
 					err = cpru.Read(reader)
 					if err != nil {
-						log.Fatal("cprub", err)
+						log.Output(log.Llongfile, err.Error())
 					}
 					data = cpru
 				}
 				target <- data
 			}
 		}
-
 	}
-
 }

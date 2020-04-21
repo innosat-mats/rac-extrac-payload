@@ -17,7 +17,7 @@ func ExtractData(byteStream io.Reader, extract func(aez ...interface{}) (int, er
 	ramsesErrors := make(chan error)
 	innosatPackages := make(chan innosat.SourcePackage)
 	dataPackages := make(chan aez.PackageType)
-	go aez.DecodePackages(innosatPackages, dataPackages)
+	go aez.Packages(innosatPackages, dataPackages)
 	go ramses.Packages(byteStream, ramsesPackages, ramsesErrors)
 
 	go func() {

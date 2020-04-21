@@ -14,10 +14,10 @@ type Package struct {
 	Payload      []byte
 }
 
-//Packages ...
-func Packages(buf io.Reader, rPack chan Package, rErr chan error) {
-	defer close(rPack)
-	defer close(rErr)
+//Packages reads Ramses packages from buffer
+func Packages(buf io.Reader, packageChannel chan<- Package, errorChannel chan<- error) {
+	defer close(packageChannel)
+	defer close(errorChannel)
 	var err error
 	for {
 		header := Ramses{}
@@ -26,12 +26,12 @@ func Packages(buf io.Reader, rPack chan Package, rErr chan error) {
 			if err == io.EOF {
 				break
 			}
-			rErr <- err
+			errorChannel <- err
 			break
 		}
 
 		if !header.Valid() {
-			rErr <- errors.New("Not a valid RAC-file")
+			errorChannel <- errors.New("Not a valid RAC-file")
 			break
 		}
 
@@ -39,7 +39,7 @@ func Packages(buf io.Reader, rPack chan Package, rErr chan error) {
 		if header.SecureTrans() {
 			err = secureHeader.Read(buf)
 			if err != nil {
-				rErr <- err
+				errorChannel <- err
 				break
 			}
 			header.Length -= uint16(binary.Size(secureHeader))
@@ -48,11 +48,11 @@ func Packages(buf io.Reader, rPack chan Package, rErr chan error) {
 		payload := make([]byte, header.Length)
 		_, err = buf.Read(payload)
 		if err != nil {
-			rErr <- err
+			errorChannel <- err
 			break
 		}
 		if err == nil {
-			rPack <- Package{header, secureHeader, payload}
+			packageChannel <- Package{header, secureHeader, payload}
 		}
 	}
 }
