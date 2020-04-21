@@ -36,7 +36,11 @@ func ExtractData(byteStream io.Reader, extract func(aez ...interface{}) (int, er
 				continue
 			}
 		default:
-			innosatPackage := innosat.DecodeSource(ramsesPackage)
+			innosatPackage, err := innosat.DecodeSource(ramsesPackage.Payload)
+			if err != nil {
+				log.Output(log.Llongfile, err.Error())
+				continue
+			}
 			innosatPackages <- innosatPackage
 		}
 	}
