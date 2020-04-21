@@ -57,7 +57,6 @@ type CPRU struct {
 
 //CPRUReport structure
 type CPRUReport struct {
-	STAT
 	VGATE0 float64 // CCD0 Gate Voltage
 	VSUBS0 float64 // CCD0 Substrate Voltage
 	VRD0   float64 // CCD0 Reset transistor Drain Voltage
