@@ -23,7 +23,7 @@ func (tmdfh *TMDataFieldHeader) Read(buf io.Reader) error {
 }
 
 // PUSVersion ...
-func (tmdfh *TMDataFieldHeader) PUSVersion() uint8 {
+func (tmdfh TMDataFieldHeader) PUSVersion() uint8 {
 	return (tmdfh.PUS << 1) >> 5
 }
 

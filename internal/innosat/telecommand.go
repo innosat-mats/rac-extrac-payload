@@ -18,6 +18,6 @@ func (tcdfh *TCDataFieldHeader) Read(buf io.Reader) error {
 }
 
 //PUSVersion ...
-func (tcdfh *TCDataFieldHeader) PUSVersion() uint8 {
+func (tcdfh TCDataFieldHeader) PUSVersion() uint8 {
 	return (tcdfh.PUS << 1) >> 5
 }

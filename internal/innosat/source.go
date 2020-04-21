@@ -12,8 +12,22 @@ type SourcePacketHeaderType uint
 //
 //TC is the source package type for telecommand
 const (
-	TC SourcePacketHeaderType = 0
-	TM SourcePacketHeaderType = 1
+	TM SourcePacketHeaderType = 0
+	TC SourcePacketHeaderType = 1
+)
+
+//SourcePackageContinuationFlagType type for continuation groups
+type SourcePackageContinuationFlagType uint
+
+//SPCont Continuation packet
+//SPStart start sequence of continuation packets
+//SPStop end of continuation packets
+//SPStandalone a single packet
+const (
+	SPCont SourcePackageContinuationFlagType = iota
+	SPStart
+	SPStop
+	SPStandalone
 )
 
 //SourcePacketHeader Source Packet Header
@@ -34,7 +48,7 @@ func (sph *SourcePacketHeader) Version() uint {
 }
 
 // Type is either Telecommand or Telemetry
-func (sph *SourcePacketHeader) Type() SourcePacketHeaderType {
+func (sph SourcePacketHeader) Type() SourcePacketHeaderType {
 	return SourcePacketHeaderType((sph.PacketID << 3) >> 15)
 }
 
@@ -43,18 +57,19 @@ func (sph *SourcePacketHeader) HeaderType() uint {
 	return uint((sph.PacketID << 4) >> 15)
 }
 
-func (sph *SourcePacketHeader) apid() uint16 {
+// APID ...
+func (sph SourcePacketHeader) APID() uint16 {
 	return (sph.PacketID << 5) >> 5
 }
 
 // IsMainApplication says if packet is for main application
 func (sph *SourcePacketHeader) IsMainApplication() bool {
-	return sph.apid() == 100
+	return sph.APID() == 100
 }
 
 // GroupingFlags ...
-func (sph *SourcePacketHeader) GroupingFlags() uint {
-	return uint(sph.PacketSequenceControl >> 14)
+func (sph SourcePacketHeader) GroupingFlags() SourcePackageContinuationFlagType {
+	return SourcePackageContinuationFlagType(sph.PacketSequenceControl >> 14)
 }
 
 // SequenceCount ...

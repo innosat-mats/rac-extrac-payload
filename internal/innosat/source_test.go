@@ -23,7 +23,7 @@ func TestType(t *testing.T) {
 		0}
 
 	ans := sph.Type()
-	if ans != TM {
+	if ans != TC {
 		t.Errorf("Type() = %b; want 1", ans)
 	}
 }
