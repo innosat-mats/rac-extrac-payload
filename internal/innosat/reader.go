@@ -3,10 +3,9 @@ package innosat
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
+	"errors"
 
 	"github.com/howeyc/crc16"
-	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
 // SourcePayload ...
@@ -21,24 +20,24 @@ type SourcePackage struct {
 	Application []byte
 }
 
-// DecodeSource ..
-func DecodeSource(ramsesPackage ramses.Package) SourcePackage {
+// DecodeSource decodes a byte array to a SourcePackage
+func DecodeSource(data []byte) (SourcePackage, error) {
 	var err error
-	buf := bytes.NewReader(ramsesPackage.Payload)
+	buf := bytes.NewReader(data)
 	header := SourcePacketHeader{}
 	err = header.Read(buf)
 	if err != nil {
-		log.Fatalln("Source Header read error", err)
+		return SourcePackage{}, err
 	}
-	if crc16.ChecksumCCITTFalse(ramsesPackage.Payload[:len(ramsesPackage.Payload)-2]) != binary.BigEndian.Uint16(ramsesPackage.Payload[len(ramsesPackage.Payload)-2:]) {
-		log.Fatal("checksum bad")
+	if crc16.ChecksumCCITTFalse(data[:len(data)-2]) != binary.BigEndian.Uint16(data[len(data)-2:]) {
+		return SourcePackage{}, errors.New("checksum bad")
 	}
 	var payload SourcePayload
 	if header.Type() == TM {
 		tmpayload := TMDataFieldHeader{}
 		err = tmpayload.Read(buf)
 		if err != nil {
-			log.Fatal(err)
+			return SourcePackage{}, err
 		}
 		payload = tmpayload
 	}
@@ -46,7 +45,7 @@ func DecodeSource(ramsesPackage ramses.Package) SourcePackage {
 		tcpayload := TCDataFieldHeader{}
 		err = tcpayload.Read(buf)
 		if err != nil {
-			log.Fatal(err)
+			return SourcePackage{}, err
 		}
 		payload = tcpayload
 	}
@@ -54,6 +53,6 @@ func DecodeSource(ramsesPackage ramses.Package) SourcePackage {
 	return SourcePackage{
 		header,
 		payload,
-		ramsesPackage.Payload[binary.Size(header)+binary.Size(payload) : len(ramsesPackage.Payload)-2],
-	}
+		data[binary.Size(header)+binary.Size(payload) : len(data)-2],
+	}, nil
 }
