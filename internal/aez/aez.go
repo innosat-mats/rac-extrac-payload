@@ -22,7 +22,7 @@ func DecodePackages(source chan innosat.SourcePackage, target chan PackageType) 
 		reader := bytes.NewReader(sourcePackage.Application)
 		if sourcePackage.Header.GroupingFlags() == innosat.SPStandalone {
 
-			if sourcePackage.Header.Type() == 0 && sourcePackage.Header.IsMainApplication() {
+			if sourcePackage.Header.Type() == innosat.TM && sourcePackage.Header.IsMainApplication() {
 				var sid SID
 				binary.Read(reader, binary.BigEndian, &sid)
 				if sid == SIDSTAT {
