@@ -26,7 +26,7 @@ type Wdw uint8
 
 // Mode returns the WDWMode type used encoded in Bit[7]
 func (wdw Wdw) Mode() WDWMode {
-	if (wdw & 1) == 0 {
+	if (wdw & 0b0000001) == 0 {
 		return WDWModeManual
 	}
 	return WDWModeAutomatic
@@ -41,7 +41,7 @@ func (wdw Wdw) Mode() WDWMode {
 //
 // If full range of Bit[15..0] is used the JPEGQ should be 0xFF
 func (wdw Wdw) InputDataWindow() (int, int, error) {
-	switch wdw >> 5 {
+	switch wdw & 0b111 {
 	case 0x0:
 		return 11, 0, nil
 	case 0x1:
@@ -65,12 +65,12 @@ type NCBin uint16
 
 // FPGAColumns returns number FPGA columns to bin
 func (ncBin NCBin) FPGAColumns() int {
-	return int(math.Round(math.Pow(2, float64((ncBin<<4)>>8))))
+	return int(math.Round(math.Pow(2, float64((ncBin>>8)&0b1111))))
 }
 
 // CCDColumns returns number of CCD columns to bin
 func (ncBin NCBin) CCDColumns() int {
-	return (int)(ncBin >> 8)
+	return (int)(ncBin & 0xf)
 }
 
 // CCDGain is game composite information
@@ -96,25 +96,25 @@ const (
 	FullTiming
 )
 
-// Mode returns high/low signal mode
+// Mode returns high/low signal mode, Bit[12]
 func (gain CCDGain) Mode() CCDGainMode {
-	if gain&(1>>3) == 0 {
+	if (gain>>12)&1 == 0 {
 		return HighSignalMode
 	}
 	return LowSignalMode
 }
 
-// Timing returns the full timing flag
+// Timing returns the full timing flag, Bit[8]
 func (gain CCDGain) Timing() CCDGainTiming {
-	if gain&(1>>7) == 0 {
+	if (gain>>8)&1 == 0 {
 		return FasterTiming
 	}
 	return FullTiming
 }
 
-// Truncation returns number of bits to be truncated (digital gain)
+// Truncation returns number of bits to be truncated (digital gain), Bit[3..0]
 func (gain CCDGain) Truncation() uint8 {
-	return uint8(gain >> 11)
+	return uint8(gain & 0b1111)
 }
 
 // CCDImagePackData contains the composite information from the CCD and the CRB module
