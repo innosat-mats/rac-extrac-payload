@@ -23,18 +23,6 @@ type HTR struct {
 	HTR2A  htr
 	HTR2B  htr
 	HTR2OD htr
-	HTR3A  htr
-	HTR3B  htr
-	HTR3OD htr
-	HTR4A  htr
-	HTR4B  htr
-	HTR4OD htr
-	HTR5A  htr
-	HTR5B  htr
-	HTR5OD htr
-	HTR6A  htr
-	HTR6B  htr
-	HTR6OD htr
 	HTR7A  htr
 	HTR7B  htr
 	HTR7OD htr
@@ -51,18 +39,6 @@ type HTRReport struct {
 	HTR2A  float64
 	HTR2B  float64
 	HTR2OD float64
-	HTR3A  float64
-	HTR3B  float64
-	HTR3OD float64
-	HTR4A  float64
-	HTR4B  float64
-	HTR4OD float64
-	HTR5A  float64
-	HTR5B  float64
-	HTR5OD float64
-	HTR6A  float64
-	HTR6B  float64
-	HTR6OD float64
 	HTR7A  float64
 	HTR7B  float64
 	HTR7OD float64
@@ -85,18 +61,6 @@ func (htr *HTR) Report() HTRReport {
 		HTR2A:  htr.HTR2A.voltage(),
 		HTR2B:  htr.HTR2B.resistance(),
 		HTR2OD: htr.HTR2OD.voltage(),
-		HTR3A:  htr.HTR3A.voltage(),
-		HTR3B:  htr.HTR3B.resistance(),
-		HTR3OD: htr.HTR3OD.voltage(),
-		HTR4A:  htr.HTR4A.voltage(),
-		HTR4B:  htr.HTR4B.resistance(),
-		HTR4OD: htr.HTR4OD.voltage(),
-		HTR5A:  htr.HTR5A.voltage(),
-		HTR5B:  htr.HTR5B.resistance(),
-		HTR5OD: htr.HTR5OD.voltage(),
-		HTR6A:  htr.HTR6A.voltage(),
-		HTR6B:  htr.HTR6B.resistance(),
-		HTR6OD: htr.HTR6OD.voltage(),
 		HTR7A:  htr.HTR7A.voltage(),
 		HTR7B:  htr.HTR7B.resistance(),
 		HTR7OD: htr.HTR7OD.voltage(),
