@@ -55,7 +55,7 @@ func (wdw Wdw) InputDataWindow() (int, int, error) {
 		return 15, 0, nil
 	}
 	return -1, -1, fmt.Errorf(
-		"WDW value has unknown Input Data Window '%x'", wdw>>5,
+		"WDW value has unknown Input Data Window '%x'", wdw&0b111,
 	)
 }
 
