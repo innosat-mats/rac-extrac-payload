@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"math"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
@@ -63,14 +62,14 @@ func (wdw Wdw) InputDataWindow() (int, int, error) {
 // NCBin contains the FPGA and CCD columns bin count
 type NCBin uint16
 
-// FPGAColumns returns number FPGA columns to bin
+// FPGAColumns returns number FPGA columns to bin, Bit[11..8]
 func (ncBin NCBin) FPGAColumns() int {
-	return int(math.Round(math.Pow(2, float64((ncBin>>8)&0b1111))))
+	return 1 << ((ncBin >> 8) & 0x0f)
 }
 
-// CCDColumns returns number of CCD columns to bin
+// CCDColumns returns number of CCD columns to bin, Bit[7..0]
 func (ncBin NCBin) CCDColumns() int {
-	return (int)(ncBin & 0xf)
+	return (int)(ncBin & 0xff)
 }
 
 // CCDGain is game composite information
@@ -98,7 +97,7 @@ const (
 
 // Mode returns high/low signal mode, Bit[12]
 func (gain CCDGain) Mode() CCDGainMode {
-	if (gain>>12)&1 == 0 {
+	if (gain & 0b00000000000001) == 0 {
 		return HighSignalMode
 	}
 	return LowSignalMode
@@ -106,7 +105,7 @@ func (gain CCDGain) Mode() CCDGainMode {
 
 // Timing returns the full timing flag, Bit[8]
 func (gain CCDGain) Timing() CCDGainTiming {
-	if (gain>>8)&1 == 0 {
+	if (gain & 0b000000001) == 0 {
 		return FasterTiming
 	}
 	return FullTiming
