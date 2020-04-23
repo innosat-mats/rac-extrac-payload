@@ -47,7 +47,7 @@ func (sph *SourcePacketHeader) Version() uint {
 }
 
 // Type is either Telecommand or Telemetry
-func (sph SourcePacketHeader) Type() SourcePacketHeaderType {
+func (sph *SourcePacketHeader) Type() SourcePacketHeaderType {
 	return SourcePacketHeaderType((sph.PacketID << 3) >> 15)
 }
 
@@ -57,12 +57,12 @@ func (sph *SourcePacketHeader) HeaderType() uint {
 }
 
 // APID ...
-func (sph SourcePacketHeader) APID() SourcePacketAPIDType {
+func (sph *SourcePacketHeader) APID() SourcePacketAPIDType {
 	return SourcePacketAPIDType(sph.PacketID & 0x07FF)
 }
 
 // GroupingFlags ...
-func (sph SourcePacketHeader) GroupingFlags() SourcePackageContinuationFlagType {
+func (sph *SourcePacketHeader) GroupingFlags() SourcePackageContinuationFlagType {
 	return SourcePackageContinuationFlagType(sph.PacketSequenceControl >> 14)
 }
 
