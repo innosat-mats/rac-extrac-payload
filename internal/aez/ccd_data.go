@@ -13,9 +13,9 @@ import (
 type WDWMode uint8
 
 const (
-	// WDWModeManual = 0, check WDWOV for overflows
-	WDWModeManual    WDWMode = 0
-	// WDWModeAutomatic, window selected depending on input data
+	// WDWModeManual check WDWOV for overflows
+	WDWModeManual WDWMode = 0
+	// WDWModeAutomatic window selected depending on input data
 	WDWModeAutomatic WDWMode = 1
 )
 
@@ -24,7 +24,7 @@ type Wdw uint8
 
 // Mode returns the WDWMode type used encoded in Bit[7]
 func (wdw Wdw) Mode() WDWMode {
-	if (wdw & 0b0000001) == 0 {
+	if (wdw & 0x80) == 0 {
 		return WDWModeManual
 	}
 	return WDWModeAutomatic
@@ -86,17 +86,16 @@ const (
 // CCDGainTiming is the timing flag
 type CCDGainTiming int
 
-// FasterTiming = 0, used for binned and discarded pixels
-//
-// FullTiming = 1, used even for pixels that are not read out
 const (
+	// FasterTiming used for binned and discarded pixels
 	FasterTiming CCDGainTiming = iota
+	// FullTiming used even for pixels that are not read out
 	FullTiming
 )
 
 // Mode returns high/low signal mode, Bit[12]
 func (gain CCDGain) Mode() CCDGainMode {
-	if (gain & 0b00000000000001) == 0 {
+	if (gain & 0x1000) == 0 {
 		return HighSignalMode
 	}
 	return LowSignalMode
@@ -104,7 +103,7 @@ func (gain CCDGain) Mode() CCDGainMode {
 
 // Timing returns the full timing flag, Bit[8]
 func (gain CCDGain) Timing() CCDGainTiming {
-	if (gain & 0b000000001) == 0 {
+	if (gain & 0x100) == 0 {
 		return FasterTiming
 	}
 	return FullTiming

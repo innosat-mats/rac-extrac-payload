@@ -16,7 +16,7 @@ func TestWdw_Mode(t *testing.T) {
 		wdw  Wdw
 		want WDWMode
 	}{
-		{"Reads the correct bit", 0b0000001, WDWModeAutomatic},
+		{"Reads the correct bit", 0b10000000, WDWModeAutomatic},
 		{"Is manual if bit is zero", 0, WDWModeManual},
 	}
 	for _, tt := range tests {
@@ -107,7 +107,7 @@ func TestCCDGain_Mode(t *testing.T) {
 		gain CCDGain
 		want CCDGainMode
 	}{
-		{"Reads 12th bit", 0b0000000000001, LowSignalMode},
+		{"Reads 12th bit", 1 << 12, LowSignalMode},
 		{"bit as 0 means high", 0, HighSignalMode},
 	}
 	for _, tt := range tests {
@@ -125,7 +125,7 @@ func TestCCDGain_Timing(t *testing.T) {
 		gain CCDGain
 		want CCDGainTiming
 	}{
-		{"Reads the 8th bit", 0x001, FullTiming},
+		{"Reads the 8th bit", 1 << 8, FullTiming},
 		{"Bit as 0 means faster timing", 0, FasterTiming},
 	}
 	for _, tt := range tests {
