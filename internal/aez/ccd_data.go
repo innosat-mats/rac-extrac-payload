@@ -12,11 +12,10 @@ import (
 // WDWMode describes the CCD WDW parameter
 type WDWMode uint8
 
-// WDWModeManual = 0, check WDWOV for overflows
-//
-// WDWModeAutomatic, window selected depending on input data
 const (
+	// WDWModeManual = 0, check WDWOV for overflows
 	WDWModeManual    WDWMode = 0
+	// WDWModeAutomatic, window selected depending on input data
 	WDWModeAutomatic WDWMode = 1
 )
 
