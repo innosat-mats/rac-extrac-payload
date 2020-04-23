@@ -1,48 +1,40 @@
 package common
 
 import (
-	"io"
-	"log"
 	"sync"
-
-	"github.com/innosat-mats/rac-extract-payload/internal/aez"
-	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
-	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
 // ExtractData reads Ramses data packages and extract the instrument data.
-func ExtractData(byteStream io.Reader, extract func(aez ...interface{}) (int, error)) {
+func ExtractData(callback func(data DataRecord), streamBatch ...StreamBatch) {
 	var waitGroup sync.WaitGroup
-	ramsesPackages := make(chan ramses.Package)
-	ramsesErrors := make(chan error)
-	innosatPackages := make(chan innosat.SourcePackage)
-	dataPackages := make(chan aez.PackageType)
-	go aez.Packages(innosatPackages, dataPackages)
-	go ramses.Packages(byteStream, ramsesPackages, ramsesErrors)
+	records := make(chan DataRecord)
+	innosatPackages := make(chan DataRecord)
+	dataPackages := make(chan DataRecord)
+	go DataPackets(innosatPackages, dataPackages)
+	go Packets(records, streamBatch...)
 
 	go func() {
 		waitGroup.Add(1)
 		for data := range dataPackages {
-			extract(data)
+			callback(data)
 		}
 		waitGroup.Done()
 	}()
 
-	for ramsesPackage := range ramsesPackages {
-		select {
-		case err := <-ramsesErrors:
-			if err != nil {
-				log.Output(log.Llongfile, err.Error())
-				continue
-			}
-		default:
-			innosatPackage, err := innosat.DecodeSource(ramsesPackage.Payload)
-			if err != nil {
-				log.Output(log.Llongfile, err.Error())
-				continue
-			}
-			innosatPackages <- innosatPackage
+	for ramsesPackage := range records {
+		innosatPackage, err := DecodeSource(ramsesPackage.Buffer)
+		if err != nil {
+			ramsesPackage.SourceHeader = innosatPackage.Header
+			ramsesPackage.TMHeader = innosatPackage.Payload
+			ramsesPackage.Buffer = innosatPackage.ApplicationPayload
+			ramsesPackage.Error = err
+			innosatPackages <- ramsesPackage
+			continue
 		}
+		ramsesPackage.SourceHeader = innosatPackage.Header
+		ramsesPackage.TMHeader = innosatPackage.Payload
+		ramsesPackage.Buffer = innosatPackage.ApplicationPayload
+		innosatPackages <- ramsesPackage
 	}
 	close(innosatPackages)
 	waitGroup.Wait()

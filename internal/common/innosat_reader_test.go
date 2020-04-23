@@ -1,8 +1,10 @@
-package innosat
+package common
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 func TestDecodeSource(t *testing.T) {
@@ -35,9 +37,9 @@ func TestDecodeSource(t *testing.T) {
 				0x01, 0x2e, 0x01, 0x30, 0x01, 0x2b, 0x01, 0x2f, 0x01, 0x31, 0x01, 0x32, 0x01, 0x32, 0x01, 0x33,
 				0x01, 0x2e, 0x01, 0x31, 0x01, 0x2d, 0x01, 0x2e, 0x01, 0x20, 0xf7}},
 			SourcePackage{
-				SourcePacketHeader{2148, 34967, 65},
-				TMDataFieldHeader{16, 128, 25, 4633, 55934},
-				[]byte{0, 23, 1, 47, 1, 49, 1, 47, 1, 47, 1, 47, 1, 49, 1, 46, 1, 50, 1, 48, 1, 47, 1, 47, 1, 47, 1, 45, 1, 48, 1, 46, 1, 48, 1, 43, 1, 47, 1, 49, 1, 50, 1, 50, 1, 51, 1, 46, 1, 49, 1, 45, 1, 46, 1},
+				Header:             innosat.SourcePacketHeader{PacketID: 2148, PacketSequenceControl: 34967, PacketLength: 65},
+				Payload:            innosat.TMDataFieldHeader{PUS: 16, ServiceType: 128, ServiceSubType: 25, CUCTimeSeconds: 4633, CUCTimeFraction: 55934},
+				ApplicationPayload: []byte{0, 23, 1, 47, 1, 49, 1, 47, 1, 47, 1, 47, 1, 49, 1, 46, 1, 50, 1, 48, 1, 47, 1, 47, 1, 47, 1, 45, 1, 48, 1, 46, 1, 48, 1, 43, 1, 47, 1, 49, 1, 50, 1, 50, 1, 51, 1, 46, 1, 49, 1, 45, 1, 46, 1},
 			},
 			false,
 		},

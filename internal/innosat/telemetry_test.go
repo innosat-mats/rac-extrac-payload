@@ -32,7 +32,7 @@ func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
 func TestTMDataFieldHeader_Time(t *testing.T) {
 	type fields struct {
 		PUS             uint8
-		ServiceType     uint8
+		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
@@ -78,7 +78,7 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 	type fields struct {
 		PUS             uint8
-		ServiceType     uint8
+		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
@@ -110,7 +110,7 @@ func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 	type fields struct {
 		PUS             uint8
-		ServiceType     uint8
+		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
@@ -121,11 +121,11 @@ func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 		want   bool
 	}{
 		{"False in general", fields{}, false},
-		{"False if only correct ServiceType", fields{ServiceType: 3}, false},
+		{"False if only correct ServiceType", fields{ServiceType: HousekeepingDiagnosticDataReporting}, false},
 		{"False if only correct ServiceSubType", fields{ServiceSubType: 25}, false},
 		{
 			"True if correct ServiceType and ServiceSubType",
-			fields{ServiceType: 3, ServiceSubType: 25},
+			fields{ServiceType: HousekeepingDiagnosticDataReporting, ServiceSubType: 25},
 			true,
 		},
 	}

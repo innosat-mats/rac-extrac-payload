@@ -11,7 +11,7 @@ import (
 //TMDataFieldHeader (9 octets)
 type TMDataFieldHeader struct {
 	PUS             uint8
-	ServiceType     uint8
+	ServiceType     SourcePackageServiceType
 	ServiceSubType  uint8
 	CUCTimeSeconds  uint32
 	CUCTimeFraction uint16
@@ -23,7 +23,7 @@ func (tmdfh *TMDataFieldHeader) Read(buf io.Reader) error {
 }
 
 // PUSVersion ...
-func (tmdfh TMDataFieldHeader) PUSVersion() uint8 {
+func (tmdfh *TMDataFieldHeader) PUSVersion() uint8 {
 	return (tmdfh.PUS << 1) >> 5
 }
 
@@ -39,5 +39,5 @@ func (tmdfh *TMDataFieldHeader) Nanoseconds() int64 {
 
 // IsHousekeeping returns if payload contains housekeeping data
 func (tmdfh *TMDataFieldHeader) IsHousekeeping() bool {
-	return tmdfh.ServiceType == 3 && tmdfh.ServiceSubType == 25
+	return tmdfh.ServiceType == HousekeepingDiagnosticDataReporting && tmdfh.ServiceSubType == 25
 }
