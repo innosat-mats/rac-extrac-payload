@@ -57,7 +57,7 @@ func TestDataPackets(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			source := make(chan DataRecord)
 			target := make(chan DataRecord)
-			go DataPackets(source, target)
+			go DecodeAEZ(target, source)
 			source <- tt.arg
 			close(source)
 			got := <-target

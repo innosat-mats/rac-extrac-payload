@@ -13,8 +13,8 @@ import (
 type PackageType interface {
 }
 
-// DataPackets processes data packages
-func DataPackets(source <-chan DataRecord, target chan<- DataRecord) {
+// DecodeAEZ processes data packages
+func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
 	defer close(target)
 	for sourcePacket := range source {
 		if sourcePacket.Error != nil {

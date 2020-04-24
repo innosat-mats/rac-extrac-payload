@@ -21,8 +21,8 @@ type StreamBatch struct {
 	Origin OriginDescription
 }
 
-//Packets reads Ramses packages from buffer
-func Packets(recordChannel chan<- DataRecord, streamBatch ...StreamBatch) {
+//DecodeRamses reads Ramses packages from buffer
+func DecodeRamses(recordChannel chan<- DataRecord, streamBatch ...StreamBatch) {
 	defer close(recordChannel)
 	var err error
 	for _, stream := range streamBatch {

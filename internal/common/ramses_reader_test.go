@@ -49,7 +49,7 @@ func TestRamsesPackages(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			packs := make(chan DataRecord)
-			go Packets(packs, StreamBatch{Buf: tt.args.buf})
+			go DecodeRamses(packs, StreamBatch{Buf: tt.args.buf})
 			got := <-packs
 			if !reflect.DeepEqual(got.Buffer, tt.want) {
 				t.Errorf("Package.Payload = %v, want %v", got.Buffer, tt.want)
