@@ -14,21 +14,39 @@ var Specification string = "AEZICD002:H"
 // SID is the id of a single housekeeping parameter
 type SID uint16
 
-// SIDSTAT is the SID of STAT.
-//
-// SIDHTR is the SID of HTR.
-//
-// SIDPWR is the SID of PWR.
-//
-// SIDCPRUA is the SID of CPRUA.
-//
-// SIDCPRUB is the SID of CPRUB.
 const (
-	SIDSTAT  SID = 1
-	SIDHTR   SID = 10
-	SIDPWR   SID = 20
+	// SIDSTAT is the SID of STAT.
+	SIDSTAT SID = 1
+	// SIDHTR is the SID of HTR.
+	SIDHTR SID = 10
+	// SIDPWR is the SID of PWR.
+	SIDPWR SID = 20
+	// SIDCPRUA is the SID of CPRUA.
 	SIDCPRUA SID = 30
+	// SIDCPRUB is the SID of CPRUB.
 	SIDCPRUB SID = 31
+)
+
+// RID is Report Identification
+type RID uint16
+
+const (
+	// CCD1 is connected to CPRUA port 0
+	CCD1 RID = 21
+	// CCD2 is connected to CPRUA port 1
+	CCD2 RID = 22
+	// CCD3 is connected to CPRUA port 2
+	CCD3 RID = 23
+	// CCD4 is connected to CPRUA port 3
+	CCD4 RID = 24
+	// CCD5 is connected to CPRUB port 0
+	CCD5 RID = 25
+	// CCD6 is connected to CPRUB port 1
+	CCD6 RID = 26
+	// CCD7 is connected to CPRUB port 2
+	CCD7 RID = 27
+	// PM is Photometer data
+	PM RID = 30
 )
 
 //STAT General status housekeeping report of the payload instrument.

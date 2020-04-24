@@ -41,3 +41,8 @@ func (tmdfh *TMDataFieldHeader) Nanoseconds() int64 {
 func (tmdfh *TMDataFieldHeader) IsHousekeeping() bool {
 	return tmdfh.ServiceType == 3 && tmdfh.ServiceSubType == 25
 }
+
+// IsTransparentData can be either CCD or Photometer data
+func (tmdfh *TMDataFieldHeader) IsTransparentData() bool {
+	return tmdfh.ServiceType == 128 && tmdfh.ServiceSubType == 25
+}
