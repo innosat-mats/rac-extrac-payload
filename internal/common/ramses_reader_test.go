@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestRamsesPackages(t *testing.T) {
+func TestDecodeRamses(t *testing.T) {
 	type args struct {
 		buf io.Reader
 	}

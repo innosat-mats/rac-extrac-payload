@@ -10,7 +10,7 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
-func TestDataPackets(t *testing.T) {
+func TestDecodeAEZ(t *testing.T) {
 
 	tests := []struct {
 		name    string
