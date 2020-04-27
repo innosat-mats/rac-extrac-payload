@@ -8,9 +8,10 @@ BIN_DIR=bin
 
 
 all: test build
-build: 
+build:
 		$(GOBUILD) -o $(BIN_DIR) -v ./...
-test: 
+		mv ${BIN_DIR}/cli ${BIN_DIR}/rac
+test:
 		$(GOTEST) -v ./...
-clean: 
+clean:
 		$(GOCLEAN)
