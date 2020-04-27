@@ -4,8 +4,14 @@ import (
 	"sync"
 )
 
+// ExtractCallback is the type of the callback function
+type ExtractCallback func(data DataRecord)
+
+// ExtractFunction is the type of the ExtractData function
+type ExtractFunction func(callback ExtractCallback, streamBatch ...StreamBatch)
+
 // ExtractData reads Ramses data packages and extract the instrument data.
-func ExtractData(callback func(data DataRecord), streamBatch ...StreamBatch) {
+func ExtractData(callback ExtractCallback, streamBatch ...StreamBatch) {
 	var waitGroup sync.WaitGroup
 	ramsesChannel := make(chan DataRecord)
 	innosatChannel := make(chan DataRecord)
