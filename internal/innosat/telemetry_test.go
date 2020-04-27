@@ -148,7 +148,7 @@ func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
 	type fields struct {
 		PUS             uint8
-		ServiceType     uint8
+		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
