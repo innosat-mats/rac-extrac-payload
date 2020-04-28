@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
+	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
@@ -22,7 +23,7 @@ func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
 			continue
 		}
 		reader := bytes.NewReader(sourcePacket.Buffer)
-		if sourcePacket.SourceHeader.GroupingFlags() == innosat.SPStandalone {
+		if sourcePacket.SourceHeader.PacketSequenceControl.GroupingFlags() == innosat.SPStandalone {
 			switch {
 			case sourcePacket.TMHeader.IsHousekeeping():
 				var sid aez.SID
@@ -39,8 +40,8 @@ func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
 	}
 }
 
-func instrumentHK(sid aez.SID, buf io.Reader) (PackageType, error) {
-	var dataPackage PackageType
+func instrumentHK(sid aez.SID, buf io.Reader) (exports.Exportable, error) {
+	var dataPackage exports.Exportable
 	var err error
 	switch sid {
 	case aez.SIDSTAT:

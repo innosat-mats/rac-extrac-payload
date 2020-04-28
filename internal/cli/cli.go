@@ -4,35 +4,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 )
-
-func generateDiskWriterCallback(
-	output string,
-	writeImages bool,
-	writeTimeseries bool,
-) common.ExtractCallback {
-	return func(pkg common.DataRecord) {
-		// This is just a placeholder, should write to output directory
-	}
-}
-
-func generateStdoutCallback(
-	out io.Writer,
-	writeTimeseries bool,
-) common.ExtractCallback {
-
-	return func(pkg common.DataRecord) {
-		if writeTimeseries {
-			fmt.Fprintf(out, "%+v\n", pkg)
-		}
-	}
-}
 
 var skipImages *bool
 var skipTimeseries *bool
@@ -53,7 +31,7 @@ func getCallback(
 	outputDirectory string,
 	skipImages bool,
 	skipTimeseries bool,
-) (common.ExtractCallback, error) {
+) (exports.Callback, error) {
 	if outputDirectory == "" && !stdout {
 		flag.Usage()
 		fmt.Println("\nExpected an output directory")
@@ -64,9 +42,9 @@ func getCallback(
 	}
 
 	if stdout {
-		return generateStdoutCallback(os.Stdout, !skipTimeseries), nil
+		return exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries), nil
 	}
-	return generateDiskWriterCallback(
+	return exports.DiskCallbackFactory(
 		outputDirectory,
 		!skipImages,
 		!skipTimeseries,
@@ -76,7 +54,7 @@ func getCallback(
 func processFiles(
 	extractor common.ExtractFunction,
 	inputFiles []string,
-	callback common.ExtractCallback,
+	callback exports.Callback,
 ) error {
 	batch := make([]common.StreamBatch, len(inputFiles))
 	for n, filename := range inputFiles {

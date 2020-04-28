@@ -2,7 +2,9 @@ package aez
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
+	"reflect"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
@@ -82,4 +84,35 @@ func (stat *STAT) Time(epoch time.Time) time.Time {
 // Nanoseconds returns the measurement time in nanoseconds since epoch
 func (stat *STAT) Nanoseconds() int64 {
 	return ccsds.UnsegmentedTimeNanoseconds(stat.TS, stat.TSS)
+}
+
+// CSVSpecifications returns the version of the spec used
+func (stat STAT) CSVSpecifications() []string {
+	return []string{"AEZ", Specification}
+}
+
+// CSVHeaders returns the header row
+func (stat STAT) CSVHeaders() []string {
+	var headers []string
+	headers = append(headers, "STATTIME")
+	val := reflect.Indirect(reflect.ValueOf(stat))
+	t := val.Type()
+	for i := 0; i < t.NumField(); i++ {
+		headers = append(headers, t.Field(i).Name)
+	}
+	return headers
+}
+
+// CSVRow returns the data row
+func (stat STAT) CSVRow() []string {
+	var row []string
+	gpsTime := time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
+	statTime := stat.Time(gpsTime)
+	row = append(row, statTime.Format(time.RFC3339Nano))
+	val := reflect.Indirect(reflect.ValueOf(stat))
+	for i := 0; i < val.NumField(); i++ {
+		valueField := val.Field(i)
+		row = append(row, fmt.Sprintf("%v", valueField.Uint()))
+	}
+	return row
 }

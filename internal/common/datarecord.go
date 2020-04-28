@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
@@ -12,7 +13,53 @@ type DataRecord struct {
 	RamsesSecure ramses.Secure              // Ramses secure header information
 	SourceHeader innosat.SourcePacketHeader // Source header from the innosat platform
 	TMHeader     innosat.TMDataFieldHeader  // Data header information
-	Data         PackageType                // The data payload itself, HK report, jpeg image etc.
+	Data         exports.Exportable         // The data payload itself, HK report, jpeg image etc.
 	Error        error                      // First propagated error from the decoding process
 	Buffer       []byte                     // Currently unprocessed data (payload)
+}
+
+// CSVSpecifications returns specifications used to generate content in CSV compatible format
+func (record DataRecord) CSVSpecifications() []string {
+	var specifications []string
+	specifications = append(
+		specifications,
+		record.RamsesHeader.CSVSpecifications()...,
+	)
+	specifications = append(
+		specifications,
+		record.SourceHeader.CSVSpecifications()...,
+	)
+	specifications = append(
+		specifications,
+		record.Data.CSVSpecifications()...,
+	)
+	return specifications
+}
+
+// CSVHeaders returns a header row for the data record
+func (record DataRecord) CSVHeaders() []string {
+	var headers []string
+	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
+	headers = append(headers, record.SourceHeader.CSVHeaders()...)
+	headers = append(headers, record.Data.CSVHeaders()...)
+	return headers
+}
+
+// CSVRow returns a data row for the record
+func (record DataRecord) CSVRow() []string {
+	var row []string
+	row = append(row, record.RamsesHeader.CSVRow()...)
+	row = append(row, record.SourceHeader.CSVRow()...)
+	row = append(row, record.Data.CSVRow()...)
+	return row
+}
+
+// AEZData returns the exportable aez data
+func (record DataRecord) AEZData() exports.Exportable {
+	return record.Data
+}
+
+// OriginName returns the name of file/key that is source of data record
+func (record DataRecord) OriginName() string {
+	return record.Origin.Name
 }

@@ -2,7 +2,9 @@ package aez
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
+	"reflect"
 )
 
 type pwr uint16
@@ -117,4 +119,31 @@ func (pwr *PWR) Report() PWRReport {
 		PWRP3V3: pwr.PWRP3V3.voltage(),
 		PWRP3C3: pwr.PWRP3C3.current(),
 	}
+}
+
+//CSVSpecifications returns the specs used in creating the struct
+func (pwr PWR) CSVSpecifications() []string {
+	return []string{"AEZ", Specification}
+}
+
+//CSVHeaders returns the field names
+func (pwr PWR) CSVHeaders() []string {
+	val := reflect.Indirect(reflect.ValueOf(pwr.Report()))
+	t := val.Type()
+	fields := make([]string, t.NumField())
+	for i := range fields {
+		fields[i] = t.Field(i).Name
+	}
+	return fields
+}
+
+//CSVRow returns the field values
+func (pwr PWR) CSVRow() []string {
+	val := reflect.Indirect(reflect.ValueOf(pwr.Report()))
+	values := make([]string, val.NumField())
+	for i := range values {
+		valueField := val.Field(i)
+		values[i] = fmt.Sprintf("%f", valueField.Float())
+	}
+	return values
 }

@@ -2,7 +2,9 @@ package aez
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
+	"reflect"
 )
 
 type htr uint16
@@ -68,4 +70,31 @@ func (htr *HTR) Report() HTRReport {
 		HTR8B:  htr.HTR8B.resistance(),
 		HTR8OD: htr.HTR8OD.voltage(),
 	}
+}
+
+//CSVHeaders returns the field names
+func (htr HTR) CSVHeaders() []string {
+	val := reflect.Indirect(reflect.ValueOf(htr.Report()))
+	t := val.Type()
+	fields := make([]string, t.NumField())
+	for i := range fields {
+		fields[i] = t.Field(i).Name
+	}
+	return fields
+}
+
+//CSVRow returns the field values
+func (htr HTR) CSVRow() []string {
+	val := reflect.Indirect(reflect.ValueOf(htr.Report()))
+	values := make([]string, val.NumField())
+	for i := range values {
+		valueField := val.Field(i)
+		values[i] = fmt.Sprintf("%f", valueField.Float())
+	}
+	return values
+}
+
+//CSVSpecifications returns the specs used in creating the struct
+func (htr HTR) CSVSpecifications() []string {
+	return []string{"AEZ", Specification}
 }

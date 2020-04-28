@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/innosat-mats/rac-extract-payload/internal/exports"
+
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
@@ -70,6 +72,6 @@ func Example() {
 
 }
 
-func simpleOutput(pkg DataRecord) {
+func simpleOutput(pkg exports.ExportablePackage) {
 	fmt.Println(pkg)
 }
