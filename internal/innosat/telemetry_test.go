@@ -144,3 +144,36 @@ func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 		})
 	}
 }
+
+func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
+	type fields struct {
+		PUS             uint8
+		ServiceType     SourcePackageServiceType
+		ServiceSubType  uint8
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		{"Service type 128 and sub 25 is", fields{ServiceType: 128, ServiceSubType: 25}, true},
+		{"ServiceSubType 25 is not", fields{ServiceSubType: 25}, false},
+		{"Service type 128 is not", fields{ServiceType: 128}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmdfh := &TMDataFieldHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			if got := tmdfh.IsTransparentData(); got != tt.want {
+				t.Errorf("TMDataFieldHeader.IsTransparentData() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
