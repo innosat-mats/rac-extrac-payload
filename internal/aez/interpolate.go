@@ -74,9 +74,13 @@ func interpolate(r [2]float64, t [2]float64, resistance float64) float64 {
 	return ((t[1]-t[0])/(r[1]-r[0]))*(resistance-r[0]) + t[0]
 }
 
-func interpolateTemperature(resistance float64, resistances []float64, temperatures []float64) (float64, error) {
+func interpolateTemperature(
+	resistance float64, resistances []float64, temperatures []float64,
+) (float64, error) {
 	if len(resistances) != len(temperatures) {
-		return -273.15, ErrResistancesTemperaturesMismatch{len(resistances), len(temperatures)}
+		return -273.15, ErrResistancesTemperaturesMismatch{
+			len(resistances), len(temperatures),
+		}
 	}
 	if len(resistances) < 2 {
 		return -273.15, ErrResistancesTemperaturesTooShort(len(resistances))
