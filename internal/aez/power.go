@@ -2,6 +2,7 @@ package aez
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 )
 
@@ -94,13 +95,12 @@ func (data pwrp3c3) current() float64 {
 	return 10.1 / 20 * pwr(data).voltageADC()
 }
 
-func (data pwrt) temperature() float64 {
-	temp, _ := interpolateTemperature(
+func (data pwrt) temperature() (float64, error) {
+	return interpolateTemperature(
 		data.resistance(),
 		pwrResistances[:],
 		pwrTemperatures[:],
 	)
-	return temp
 }
 
 //PWR structure 18 octext
@@ -118,15 +118,16 @@ type PWR struct {
 
 //PWRReport structure in useful units
 type PWRReport struct {
-	PWRT    float64 // Temp. sense ⁰C
-	PWRP32V float64 // +32V voltage sense voltage
-	PWRP32C float64 // +32V current sense current
-	PWRP16V float64 // +16V voltage sense voltage
-	PWRP16C float64 // +16V current sense current
-	PWRM16V float64 // -16V voltage sense voltage
-	PWRM16C float64 // -16V current sense current
-	PWRP3V3 float64 // +3V3 voltage sense voltage
-	PWRP3C3 float64 // +3V3 current sense current
+	PWRT     float64 // Temp. sense ⁰C
+	PWRP32V  float64 // +32V voltage sense voltage
+	PWRP32C  float64 // +32V current sense current
+	PWRP16V  float64 // +16V voltage sense voltage
+	PWRP16C  float64 // +16V current sense current
+	PWRM16V  float64 // -16V voltage sense voltage
+	PWRM16C  float64 // -16V current sense current
+	PWRP3V3  float64 // +3V3 voltage sense voltage
+	PWRP3C3  float64 // +3V3 current sense current
+	WARNINGS []error
 }
 
 // Read PWR
@@ -140,15 +141,22 @@ func pwrVoltageADC(data uint16) float64 {
 
 // Report returns a PWRReport with useful units
 func (pwr *PWR) Report() PWRReport {
+	temp, err := pwr.PWRT.temperature()
+	var warnings []error
+	if err != nil {
+		warning := fmt.Errorf("PWRT: %v", err.Error())
+		warnings = append(warnings, warning)
+	}
 	return PWRReport{
-		PWRT:    pwr.PWRT.temperature(),
-		PWRP32V: pwr.PWRP32V.voltage(),
-		PWRP32C: pwr.PWRP32C.current(),
-		PWRP16V: pwr.PWRP16V.voltage(),
-		PWRP16C: pwr.PWRP16C.current(),
-		PWRM16V: pwr.PWRM16V.voltage(),
-		PWRM16C: pwr.PWRM16C.current(),
-		PWRP3V3: pwr.PWRP3V3.voltage(),
-		PWRP3C3: pwr.PWRP3C3.current(),
+		PWRT:     temp,
+		PWRP32V:  pwr.PWRP32V.voltage(),
+		PWRP32C:  pwr.PWRP32C.current(),
+		PWRP16V:  pwr.PWRP16V.voltage(),
+		PWRP16C:  pwr.PWRP16C.current(),
+		PWRM16V:  pwr.PWRM16V.voltage(),
+		PWRM16C:  pwr.PWRM16C.current(),
+		PWRP3V3:  pwr.PWRP3V3.voltage(),
+		PWRP3C3:  pwr.PWRP3C3.current(),
+		WARNINGS: warnings,
 	}
 }

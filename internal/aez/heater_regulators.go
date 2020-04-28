@@ -2,6 +2,7 @@ package aez
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 )
 
@@ -34,13 +35,12 @@ func (data htr) resistance() float64 {
 	return 3.3*3900/data.voltage() - 3900
 }
 
-func (data htr) temperature() float64 {
-	temp, _ := interpolateTemperature(
+func (data htr) temperature() (float64, error) {
+	return interpolateTemperature(
 		data.resistance(),
 		htrResistances[:],
 		htrTemperatures[:],
 	)
-	return temp
 }
 
 //HTR housekeeping report returns data on all heater regulators.
@@ -61,18 +61,19 @@ type HTR struct {
 
 //HTRReport housekeeping report returns data on all heater regulators in useful units.
 type HTRReport struct {
-	HTR1A  float64 // Heater 1 Temperature sense A ⁰C
-	HTR1B  float64 // Heater 1 Temperature sense B ⁰C
-	HTR1OD float64 // Heater 1 Output Drive setting voltage
-	HTR2A  float64
-	HTR2B  float64
-	HTR2OD float64
-	HTR7A  float64
-	HTR7B  float64
-	HTR7OD float64
-	HTR8A  float64
-	HTR8B  float64
-	HTR8OD float64
+	HTR1A    float64 // Heater 1 Temperature sense A ⁰C
+	HTR1B    float64 // Heater 1 Temperature sense B ⁰C
+	HTR1OD   float64 // Heater 1 Output Drive setting voltage
+	HTR2A    float64
+	HTR2B    float64
+	HTR2OD   float64
+	HTR7A    float64
+	HTR7B    float64
+	HTR7OD   float64
+	HTR8A    float64
+	HTR8B    float64
+	HTR8OD   float64
+	WARNINGS []error
 }
 
 // Read HTR
@@ -82,18 +83,60 @@ func (htr *HTR) Read(buf io.Reader) error {
 
 // Report returns a HTRReport with useful units
 func (htr *HTR) Report() HTRReport {
+	temp1a, err1a := htr.HTR1A.temperature()
+	temp1b, err1b := htr.HTR1B.temperature()
+	temp2a, err2a := htr.HTR2A.temperature()
+	temp2b, err2b := htr.HTR2B.temperature()
+	temp7a, err7a := htr.HTR7A.temperature()
+	temp7b, err7b := htr.HTR7B.temperature()
+	temp8a, err8a := htr.HTR8A.temperature()
+	temp8b, err8b := htr.HTR8B.temperature()
+	var warnings []error
+	if err1a != nil {
+		warning := fmt.Errorf("HTR1A: %v", err1a.Error())
+		warnings = append(warnings, warning)
+	}
+	if err1b != nil {
+		warning := fmt.Errorf("HTR1B: %v", err1b.Error())
+		warnings = append(warnings, warning)
+	}
+	if err2a != nil {
+		warning := fmt.Errorf("HTR2A: %v", err2a.Error())
+		warnings = append(warnings, warning)
+	}
+	if err2b != nil {
+		warning := fmt.Errorf("HTR2B: %v", err2b.Error())
+		warnings = append(warnings, warning)
+	}
+	if err7a != nil {
+		warning := fmt.Errorf("HTR7A: %v", err7a.Error())
+		warnings = append(warnings, warning)
+	}
+	if err7b != nil {
+		warning := fmt.Errorf("HTR7B: %v", err7b.Error())
+		warnings = append(warnings, warning)
+	}
+	if err8a != nil {
+		warning := fmt.Errorf("HTR8A: %v", err8a.Error())
+		warnings = append(warnings, warning)
+	}
+	if err8b != nil {
+		warning := fmt.Errorf("HTR8B: %v", err8b.Error())
+		warnings = append(warnings, warning)
+	}
 	return HTRReport{
-		HTR1A:  htr.HTR1A.temperature(),
-		HTR1B:  htr.HTR1B.temperature(),
-		HTR1OD: htr.HTR1OD.voltage(),
-		HTR2A:  htr.HTR2A.temperature(),
-		HTR2B:  htr.HTR2B.temperature(),
-		HTR2OD: htr.HTR2OD.voltage(),
-		HTR7A:  htr.HTR7A.temperature(),
-		HTR7B:  htr.HTR7B.temperature(),
-		HTR7OD: htr.HTR7OD.voltage(),
-		HTR8A:  htr.HTR8A.temperature(),
-		HTR8B:  htr.HTR8B.temperature(),
-		HTR8OD: htr.HTR8OD.voltage(),
+		HTR1A:    temp1a,
+		HTR1B:    temp1b,
+		HTR1OD:   htr.HTR1OD.voltage(),
+		HTR2A:    temp2a,
+		HTR2B:    temp2b,
+		HTR2OD:   htr.HTR2OD.voltage(),
+		HTR7A:    temp7a,
+		HTR7B:    temp7b,
+		HTR7OD:   htr.HTR7OD.voltage(),
+		HTR8A:    temp8a,
+		HTR8B:    temp8b,
+		HTR8OD:   htr.HTR8OD.voltage(),
+		WARNINGS: warnings,
 	}
 }

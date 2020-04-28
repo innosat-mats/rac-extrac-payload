@@ -20,23 +20,24 @@ func TestHTR_Report(t *testing.T) {
 		HTR8B  htr
 		HTR8OD htr
 	}
+	temperature, _ := htr(10).temperature()
 	tests := []struct {
 		name   string
 		fields fields
 		field  string
 		want   float64
 	}{
-		{"HTR1A is temperature", fields{HTR1A: 10}, "HTR1A", htr(10).temperature()},
-		{"HTR1B is temperature", fields{HTR1B: 10}, "HTR1B", htr(10).temperature()},
+		{"HTR1A is temperature", fields{HTR1A: 10}, "HTR1A", temperature},
+		{"HTR1B is temperature", fields{HTR1B: 10}, "HTR1B", temperature},
 		{"HTR1OD is voltage", fields{HTR1OD: 10}, "HTR1OD", htr(10).voltage()},
-		{"HTR2A is temperature", fields{HTR2A: 10}, "HTR2A", htr(10).temperature()},
-		{"HTR2B is temperature", fields{HTR2B: 10}, "HTR2B", htr(10).temperature()},
+		{"HTR2A is temperature", fields{HTR2A: 10}, "HTR2A", temperature},
+		{"HTR2B is temperature", fields{HTR2B: 10}, "HTR2B", temperature},
 		{"HTR2OD is voltage", fields{HTR2OD: 10}, "HTR2OD", htr(10).voltage()},
-		{"HTR7A is temperature", fields{HTR7A: 10}, "HTR7A", htr(10).temperature()},
-		{"HTR7B is temperature", fields{HTR7B: 10}, "HTR7B", htr(10).temperature()},
+		{"HTR7A is temperature", fields{HTR7A: 10}, "HTR7A", temperature},
+		{"HTR7B is temperature", fields{HTR7B: 10}, "HTR7B", temperature},
 		{"HTR7OD is voltage", fields{HTR7OD: 10}, "HTR7OD", htr(10).voltage()},
-		{"HTR8A is temperature", fields{HTR8A: 10}, "HTR8A", htr(10).temperature()},
-		{"HTR8B is temperature", fields{HTR8B: 10}, "HTR8B", htr(10).temperature()},
+		{"HTR8A is temperature", fields{HTR8A: 10}, "HTR8A", temperature},
+		{"HTR8B is temperature", fields{HTR8B: 10}, "HTR8B", temperature},
 		{"HTR8OD is voltage", fields{HTR8OD: 10}, "HTR8OD", htr(10).voltage()},
 	}
 	for _, tt := range tests {
