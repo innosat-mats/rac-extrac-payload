@@ -5,33 +5,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 )
-
-func flattenDeepInternal(args []string, v reflect.Value) []string {
-
-	if v.Kind() == reflect.Interface {
-		v = v.Elem()
-	}
-
-	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
-		for i := 0; i < v.Len(); i++ {
-			args = flattenDeepInternal(args, v.Index(i))
-		}
-	} else {
-
-		args = append(args, v.String())
-	}
-
-	return args
-}
-
-func flatten(args [][]string) []string {
-	return flattenDeepInternal(nil, reflect.ValueOf(args))
-}
 
 type csvFile struct {
 	File    *os.File
@@ -43,8 +20,8 @@ type csvFile struct {
 type csvOutput interface {
 	close()
 	setSpecifications(specs []string)
-	setHeaderRow(columns ...[]string)
-	writeData(data ...[]string)
+	setHeaderRow(columns []string)
+	writeData(data []string)
 }
 
 func (csv *csvFile) close() {
@@ -60,22 +37,25 @@ func (csv *csvFile) setSpecifications(specs []string) {
 	csv.HasSpec = true
 }
 
-func (csv *csvFile) setHeaderRow(columns ...[]string) {
+func (csv *csvFile) setHeaderRow(columns []string) {
 	if !csv.HasSpec {
 		log.Fatal("Must first supply specifications for csv output")
 	}
 	if csv.HasHead {
 		log.Fatal("Header row already set for csv output")
 	}
-	csv.Writer.Write(flatten(columns))
+	csv.Writer.Write(columns)
 	csv.HasHead = true
 }
 
-func (csv *csvFile) writeData(data ...[]string) {
-	csv.Writer.Write(flatten(data))
+func (csv *csvFile) writeData(data []string) {
+	if !csv.HasSpec || !csv.HasHead {
+		log.Fatal("Specifications and/or Headers missing for csv output")
+	}
+	csv.Writer.Write(data)
 }
 
-func csvOutputFactory(dir string, originName string, packetType string) csvOutput {
+func csvOutputFactory(dir string, originName string, packetType string, pkg *ExportablePackage) csvOutput {
 	nameParts := strings.Split(filepath.Base(originName), ".")
 	name := strings.Join(nameParts[:len(nameParts)-1], ".") + "_" + packetType + ".csv"
 	outPath := filepath.Join(
@@ -90,7 +70,10 @@ func csvOutputFactory(dir string, originName string, packetType string) csvOutpu
 	if err != nil {
 		log.Fatalf("Could not create output file '%v'", outPath)
 	}
-	return &csvFile{File: out, Writer: csv.NewWriter(out)}
+	file := csvFile{File: out, Writer: csv.NewWriter(out)}
+	file.setSpecifications((*pkg).CSVSpecifications())
+	file.setHeaderRow((*pkg).CSVHeaders())
+	return &file
 }
 
 // DiskCallbackFactory returns a callback for disk writes
@@ -98,11 +81,14 @@ func DiskCallbackFactory(
 	output string,
 	writeImages bool,
 	writeTimeseries bool,
-) Callback {
+) (Callback, CallbackTeardown) {
 	var currentOrigin string = ""
 	var htrOut csvOutput = nil
 	var pwrOut csvOutput = nil
-	return func(pkg ExportablePackage) {
+	var cpruOut csvOutput = nil
+	var statOut csvOutput = nil
+
+	callback := func(pkg ExportablePackage) {
 		// Close streams from previous file
 		if pkg.OriginName() != currentOrigin {
 			if pwrOut != nil {
@@ -113,20 +99,55 @@ func DiskCallbackFactory(
 				htrOut.close()
 				htrOut = nil
 			}
+			if statOut != nil {
+				statOut.close()
+				statOut = nil
+			}
+			if cpruOut != nil {
+				cpruOut.close()
+				cpruOut = nil
+			}
 			currentOrigin = pkg.OriginName()
 		}
 		if pkg.AEZData() == nil {
 			return
 		}
 		switch pkg.AEZData().(type) {
+		case aez.STAT:
+			if statOut == nil {
+				statOut = csvOutputFactory(output, currentOrigin, "STAT", &pkg)
+			}
+			statOut.writeData(pkg.CSVRow())
 		case aez.HTR:
 			if htrOut == nil {
-				htrOut = csvOutputFactory(output, currentOrigin, "HTR")
-				defer htrOut.close()
-				htrOut.setSpecifications(pkg.CSVSpecifications())
-				htrOut.setHeaderRow(pkg.CSVHeaders())
+				htrOut = csvOutputFactory(output, currentOrigin, "HTR", &pkg)
 			}
 			htrOut.writeData(pkg.CSVRow())
+		case aez.PWR:
+			if pwrOut == nil {
+				pwrOut = csvOutputFactory(output, currentOrigin, "PWR", &pkg)
+			}
+			pwrOut.writeData(pkg.CSVRow())
+		case aez.CPRU:
+			if cpruOut == nil {
+				cpruOut = csvOutputFactory(output, currentOrigin, "CPRU", &pkg)
+			}
+			cpruOut.writeData(pkg.CSVRow())
 		}
 	}
+	teardown := func() {
+		if statOut != nil {
+			statOut.close()
+		}
+		if htrOut != nil {
+			htrOut.close()
+		}
+		if pwrOut != nil {
+			pwrOut.close()
+		}
+		if cpruOut != nil {
+			cpruOut.close()
+		}
+	}
+	return callback, teardown
 }

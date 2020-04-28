@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
@@ -13,6 +14,7 @@ type DataRecord struct {
 	RamsesSecure ramses.Secure              // Ramses secure header information
 	SourceHeader innosat.SourcePacketHeader // Source header from the innosat platform
 	TMHeader     innosat.TMDataFieldHeader  // Data header information
+	SID          aez.SID                    // SID of the Data if any
 	Data         exports.Exportable         // The data payload itself, HK report, jpeg image etc.
 	Error        error                      // First propagated error from the decoding process
 	Buffer       []byte                     // Currently unprocessed data (payload)
@@ -41,7 +43,10 @@ func (record DataRecord) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
 	headers = append(headers, record.SourceHeader.CSVHeaders()...)
+	headers = append(headers, record.TMHeader.CSVHeaders()...)
+	headers = append(headers, "SID")
 	headers = append(headers, record.Data.CSVHeaders()...)
+	headers = append(headers, "Error")
 	return headers
 }
 
@@ -50,7 +55,14 @@ func (record DataRecord) CSVRow() []string {
 	var row []string
 	row = append(row, record.RamsesHeader.CSVRow()...)
 	row = append(row, record.SourceHeader.CSVRow()...)
+	row = append(row, record.TMHeader.CSVRow()...)
+	row = append(row, record.SID.String())
 	row = append(row, record.Data.CSVRow()...)
+	if record.Error != nil {
+		row = append(row, record.Error.Error())
+	} else {
+		row = append(row, "")
+	}
 	return row
 }
 

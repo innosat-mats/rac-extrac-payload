@@ -31,24 +31,26 @@ func getCallback(
 	outputDirectory string,
 	skipImages bool,
 	skipTimeseries bool,
-) (exports.Callback, error) {
+) (exports.Callback, exports.CallbackTeardown, error) {
 	if outputDirectory == "" && !stdout {
 		flag.Usage()
 		fmt.Println("\nExpected an output directory")
-		return nil, errors.New("Invalid arguments")
+		return nil, nil, errors.New("Invalid arguments")
 	}
 	if skipTimeseries && (skipImages || stdout) {
 		fmt.Println("Nothing will be extracted, only validating integrity of rac-file(s)")
 	}
 
 	if stdout {
-		return exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries), nil
+		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
+		return callback, teardown, nil
 	}
-	return exports.DiskCallbackFactory(
+	callback, teardown := exports.DiskCallbackFactory(
 		outputDirectory,
 		!skipImages,
 		!skipTimeseries,
-	), nil
+	)
+	return callback, teardown, nil
 }
 
 func processFiles(
@@ -93,7 +95,7 @@ func main() {
 		fmt.Println("\nNo rac-files supplied")
 		os.Exit(1)
 	}
-	callback, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries)
+	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries)
 	if err != nil {
 		os.Exit(1)
 	}
@@ -101,4 +103,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	teardown()
 }

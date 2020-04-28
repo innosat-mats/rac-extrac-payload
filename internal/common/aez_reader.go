@@ -30,6 +30,7 @@ func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
 				binary.Read(reader, binary.BigEndian, &sid)
 				targetPacket, err := instrumentHK(sid, reader)
 				sourcePacket.Data = targetPacket
+				sourcePacket.SID = sid
 				sourcePacket.Error = err
 				if reader.Len() == 0 {
 					sourcePacket.Buffer = []byte{}

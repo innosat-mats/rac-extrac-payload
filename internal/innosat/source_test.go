@@ -10,9 +10,9 @@ func TestVersion(t *testing.T) {
 		0,
 		0}
 
-	ans := sph.Version()
+	ans := sph.PacketID.Version()
 	if ans != 0b111 {
-		t.Errorf("Version() = %03b; want 111", ans)
+		t.Errorf("SourcePacketHeader.PacketID.Version() = %03b; want 111", ans)
 	}
 }
 
@@ -22,9 +22,9 @@ func TestType(t *testing.T) {
 		0,
 		0}
 
-	ans := sph.Type()
+	ans := sph.PacketID.Type()
 	if ans != TC {
-		t.Errorf("Type() = %b; want 1", ans)
+		t.Errorf("SourcePacketHeader.PacketID.Type() = %b; want 1", ans)
 	}
 }
 func TestHeaderType(t *testing.T) {
@@ -33,9 +33,9 @@ func TestHeaderType(t *testing.T) {
 		0,
 		0}
 
-	ans := sph.HeaderType()
+	ans := sph.PacketID.HeaderType()
 	if ans != 1 {
-		t.Errorf("HeaderType() = %b; want 1", ans)
+		t.Errorf("SourcePacketHeader.PacketID.HeaderType() = %b; want 1", ans)
 	}
 }
 
@@ -45,9 +45,9 @@ func TestGroupingFlags(t *testing.T) {
 		0b1100000000000000,
 		0}
 
-	ans := sph.GroupingFlags()
+	ans := sph.PacketSequenceControl.GroupingFlags()
 	if ans != 0b11 {
-		t.Errorf("GroupingFlags() = %02b; want 11", ans)
+		t.Errorf("SourcePacketHeader.PacketSequenceControl.GroupingFlags() = %02b; want 11", ans)
 	}
 }
 
@@ -57,16 +57,16 @@ func TestSequenceCount(t *testing.T) {
 		0b0011111111111111,
 		0}
 
-	ans := sph.SequenceCount()
+	ans := sph.PacketSequenceControl.SequenceCount()
 	if ans != 0b11111111111111 {
-		t.Errorf("SequenceCount() = %02b; want 11111111111111", ans)
+		t.Errorf("SourcePacketHeader.PacketSequenceControl.SequenceCount() = %02b; want 11111111111111", ans)
 	}
 }
 
 func TestSourcePacketHeader_APID(t *testing.T) {
 	type fields struct {
-		PacketID              uint16
-		PacketSequenceControl uint16
+		PacketID              packetID
+		PacketSequenceControl packetSequenceControl
 		PacketLength          uint16
 	}
 	tests := []struct {
@@ -84,8 +84,8 @@ func TestSourcePacketHeader_APID(t *testing.T) {
 				PacketSequenceControl: tt.fields.PacketSequenceControl,
 				PacketLength:          tt.fields.PacketLength,
 			}
-			if got := sph.APID(); got != tt.want {
-				t.Errorf("SourcePacketHeader.IsMainApplication() = %v, want %v", got, tt.want)
+			if got := sph.PacketID.APID(); got != tt.want {
+				t.Errorf("SourcePacketHeader.PackedID.APID() = %v, want %v", got, tt.want)
 			}
 		})
 	}

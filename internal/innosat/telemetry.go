@@ -2,15 +2,23 @@ package innosat
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
+type pus uint8
+
+// Version ...
+func (pus pus) Version() uint8 {
+	return uint8((pus << 1) >> 5)
+}
+
 //TMDataFieldHeader (9 octets)
 type TMDataFieldHeader struct {
-	PUS             uint8
+	PUS             pus
 	ServiceType     SourcePackageServiceType
 	ServiceSubType  uint8
 	CUCTimeSeconds  uint32
@@ -20,11 +28,6 @@ type TMDataFieldHeader struct {
 // Read TMDataFieldHeader
 func (tmdfh *TMDataFieldHeader) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.BigEndian, tmdfh)
-}
-
-// PUSVersion ...
-func (tmdfh *TMDataFieldHeader) PUSVersion() uint8 {
-	return (tmdfh.PUS << 1) >> 5
 }
 
 // Time returns the telemetry data time in UTC
@@ -45,4 +48,30 @@ func (tmdfh *TMDataFieldHeader) IsHousekeeping() bool {
 // IsTransparentData can be either CCD or Photometer data
 func (tmdfh *TMDataFieldHeader) IsTransparentData() bool {
 	return tmdfh.ServiceType == 128 && tmdfh.ServiceSubType == 25
+}
+
+// CSVHeaders returns the header row
+func (tmdfh TMDataFieldHeader) CSVHeaders() []string {
+	return []string{
+		"TMHeaderTime",
+		"TMHeaderPUSVersion",
+		"TMHeaderServiceType",
+		"TMHeaderServiceSubType",
+		"TMHeaderCUCTimeSeconds",
+		"TMHeaderCUCTimeFraction",
+	}
+}
+
+// CSVRow returns the data row
+func (tmdfh TMDataFieldHeader) CSVRow() []string {
+	gpsTime := time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
+	tmTime := tmdfh.Time(gpsTime)
+	return []string{
+		tmTime.Format(time.RFC3339Nano),
+		fmt.Sprintf("%v", tmdfh.PUS.Version()),
+		fmt.Sprintf("%v", tmdfh.ServiceType),
+		fmt.Sprintf("%v", tmdfh.ServiceSubType),
+		fmt.Sprintf("%v", tmdfh.CUCTimeSeconds),
+		fmt.Sprintf("%v", tmdfh.CUCTimeFraction),
+	}
 }

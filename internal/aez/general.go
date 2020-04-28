@@ -29,6 +29,25 @@ const (
 	SIDCPRUB SID = 31
 )
 
+func (sid SID) String() string {
+	switch sid {
+	case 0:
+		return ""
+	case SIDSTAT:
+		return "STAT"
+	case SIDHTR:
+		return "HTR"
+	case SIDPWR:
+		return "PWR"
+	case SIDCPRUA:
+		return "CPRUA"
+	case SIDCPRUB:
+		return "CPRUB"
+	default:
+		return fmt.Sprintf("Unknown SID: %v", int(sid))
+	}
+}
+
 // RID is Report Identification
 type RID uint16
 

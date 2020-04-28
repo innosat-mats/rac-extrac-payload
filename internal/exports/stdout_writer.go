@@ -9,11 +9,11 @@ import (
 func StdoutCallbackFactory(
 	out io.Writer,
 	writeTimeseries bool,
-) Callback {
+) (Callback, CallbackTeardown) {
 
 	return func(pkg ExportablePackage) {
 		if writeTimeseries {
 			fmt.Fprintf(out, "%+v\n", pkg)
 		}
-	}
+	}, func() {}
 }

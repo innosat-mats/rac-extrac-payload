@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 )
 
 func Test_getCallback(t *testing.T) {
@@ -30,7 +31,7 @@ func Test_getCallback(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := getCallback(tt.args.stdout, tt.args.outputDirectory, tt.args.skipImages, tt.args.skipTimeseries)
+			_, _, err := getCallback(tt.args.stdout, tt.args.outputDirectory, tt.args.skipImages, tt.args.skipTimeseries)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getCallback() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -42,7 +43,7 @@ func Test_getCallback(t *testing.T) {
 func Test_processFiles(t *testing.T) {
 	type args struct {
 		inputFiles []string
-		callback   common.ExtractCallback
+		callback   exports.Callback
 	}
 	type fixtures struct {
 		files []string
@@ -90,7 +91,7 @@ func Test_processFiles(t *testing.T) {
 				file.Close()
 			}
 			updatedFilenames := mapFilenamesToDirectory(dir, tt.args.inputFiles)
-			extractor := func(callback common.ExtractCallback, streamBatch ...common.StreamBatch) {
+			extractor := func(callback exports.Callback, streamBatch ...common.StreamBatch) {
 				ptCallback := reflect.ValueOf(callback).Pointer()
 				ptArgsCallback := reflect.ValueOf(tt.args.callback).Pointer()
 				if ptCallback != ptArgsCallback {
