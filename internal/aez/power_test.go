@@ -23,7 +23,7 @@ func TestPWR_Report(t *testing.T) {
 		field  string
 		want   float64
 	}{
-		{"PWRT is resistance", fields{PWRT: 10}, "PWRT", pwrt(10).resistance()},
+		{"PWRT is temperature", fields{PWRT: 10}, "PWRT", pwrt(10).temperature()},
 		{"PWRP32V is voltage", fields{PWRP32V: 10}, "PWRP32V", pwrp32v(10).voltage()},
 		{"PWRP32C is current", fields{PWRP32C: 10}, "PWRP32C", pwrp32c(10).current()},
 		{"PWRP16V is voltage", fields{PWRP16V: 10}, "PWRP16V", pwrp16v(10).voltage()},

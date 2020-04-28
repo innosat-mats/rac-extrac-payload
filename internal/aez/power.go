@@ -7,6 +7,31 @@ import (
 
 type pwr uint16
 
+var pwrTemperatures = []float64{
+	-55, -50, -45, -40, -35, -30, -25, -20, -15, -10,
+	-5, 0, 5, 10, 15, 20, 25, 30, 35, 40,
+	45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
+	95, 100, 105, 110, 115, 120, 125, 130, 135, 140,
+	145, 150, 155, 160, 165, 170, 175, 180, 185, 190,
+	195, 200, 205, 210, 215, 220, 225, 230, 235, 240,
+	245, 250,
+} // ⁰C
+var pwrResistances = []float64{
+	1.06208e+05, 7.86360e+04, 5.86500e+04, 4.40600e+04, 3.33320e+04,
+	2.53920e+04, 1.94502e+04, 1.50342e+04, 1.16706e+04, 9.13720e+03,
+	7.21000e+03, 5.73300e+03, 4.58140e+03, 3.68760e+03, 2.98400e+03,
+	2.43080e+03, 2.00000e+03, 1.65952e+03, 1.37270e+03, 1.14206e+03,
+	9.60300e+02, 8.10900e+02, 6.83400e+02, 5.79040e+02, 4.94280e+02,
+	4.23660e+02, 3.63880e+02, 3.13600e+02, 2.71840e+02, 2.36440e+02,
+	2.06800e+02, 1.81482e+02, 1.59284e+02, 1.40204e+02, 1.23778e+02,
+	1.09570e+02, 9.74120e+01, 8.68300e+01, 7.74440e+01, 6.92300e+01,
+	6.20960e+01, 5.58200e+01, 5.03860e+01, 4.55800e+01, 4.13340e+01,
+	3.75600e+01, 3.41800e+01, 3.11640e+01, 2.84540e+01, 2.60240e+01,
+	2.38680e+01, 2.19280e+01, 2.02000e+01, 1.86382e+01, 1.71898e+01,
+	1.58768e+01, 1.46822e+01, 1.35960e+01, 1.26174e+01, 1.17246e+01,
+	1.08974e+01, 1.01410e+01,
+} // Ohm
+
 func (data pwr) voltageADC() float64 {
 	return voltageConstant * float64(data)
 }
@@ -69,6 +94,11 @@ func (data pwrp3c3) current() float64 {
 	return 10.1 / 20 * pwr(data).voltageADC()
 }
 
+func (data pwrt) temperature() float64 {
+	temp, _ := interpolateTemperature(data.resistance(), pwrResistances[:], pwrTemperatures[:])
+	return temp
+}
+
 //PWR structure 18 octext
 type PWR struct {
 	PWRT    pwrt    // Temp. sense 0..4095
@@ -84,7 +114,7 @@ type PWR struct {
 
 //PWRReport structure in useful units
 type PWRReport struct {
-	PWRT    float64 // Temp. sense resistance
+	PWRT    float64 // Temp. sense ⁰C
 	PWRP32V float64 // +32V voltage sense voltage
 	PWRP32C float64 // +32V current sense current
 	PWRP16V float64 // +16V voltage sense voltage
@@ -107,7 +137,7 @@ func pwrVoltageADC(data uint16) float64 {
 // Report returns a PWRReport with useful units
 func (pwr *PWR) Report() PWRReport {
 	return PWRReport{
-		PWRT:    pwr.PWRT.resistance(),
+		PWRT:    pwr.PWRT.temperature(),
 		PWRP32V: pwr.PWRP32V.voltage(),
 		PWRP32C: pwr.PWRP32C.current(),
 		PWRP16V: pwr.PWRP16V.voltage(),
