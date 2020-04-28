@@ -10,58 +10,16 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 )
 
-type csvFile struct {
-	File    *os.File
-	Writer  *csv.Writer
-	HasSpec bool
-	HasHead bool
-}
-
-type csvOutput interface {
-	close()
-	setSpecifications(specs []string)
-	setHeaderRow(columns []string)
-	writeData(data []string)
-}
-
-func (csv *csvFile) close() {
-	csv.Writer.Flush()
-	csv.File.Close()
-}
-
-func (csv *csvFile) setSpecifications(specs []string) {
-	if csv.HasSpec {
-		log.Fatal("Specifications already set for csv output")
-	}
-	csv.Writer.Write(specs)
-	csv.HasSpec = true
-}
-
-func (csv *csvFile) setHeaderRow(columns []string) {
-	if !csv.HasSpec {
-		log.Fatal("Must first supply specifications for csv output")
-	}
-	if csv.HasHead {
-		log.Fatal("Header row already set for csv output")
-	}
-	csv.Writer.Write(columns)
-	csv.HasHead = true
-}
-
-func (csv *csvFile) writeData(data []string) {
-	if !csv.HasSpec || !csv.HasHead {
-		log.Fatal("Specifications and/or Headers missing for csv output")
-	}
-	csv.Writer.Write(data)
+func csvName(dir string, originName string, packetType string) string {
+	nameParts := strings.Split(filepath.Base(originName), ".")
+	name := strings.Join(nameParts[:len(nameParts)-1], ".") + "_" + packetType + ".csv"
+	return filepath.Join(dir, name)
 }
 
 func csvOutputFactory(dir string, originName string, packetType string, pkg *ExportablePackage) csvOutput {
-	nameParts := strings.Split(filepath.Base(originName), ".")
-	name := strings.Join(nameParts[:len(nameParts)-1], ".") + "_" + packetType + ".csv"
-	outPath := filepath.Join(
-		dir,
-		name,
-	)
+	outPath := csvName(dir, originName, packetType)
+
+	// Create Directory and File
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		log.Fatalf("Could not create output directory '%v'", dir)
@@ -70,6 +28,8 @@ func csvOutputFactory(dir string, originName string, packetType string, pkg *Exp
 	if err != nil {
 		log.Fatalf("Could not create output file '%v'", outPath)
 	}
+
+	// Make a csvFile and produce specs and header row
 	file := csvFile{File: out, Writer: csv.NewWriter(out)}
 	file.setSpecifications((*pkg).CSVSpecifications())
 	file.setHeaderRow((*pkg).CSVHeaders())
@@ -109,9 +69,13 @@ func DiskCallbackFactory(
 			}
 			currentOrigin = pkg.OriginName()
 		}
+
+		// We have nowhere to write partial extraction of record so we discard
 		if pkg.AEZData() == nil {
 			return
 		}
+
+		// Write to the dedicated target stream
 		switch pkg.AEZData().(type) {
 		case aez.STAT:
 			if statOut == nil {
@@ -135,6 +99,7 @@ func DiskCallbackFactory(
 			cpruOut.writeData(pkg.CSVRow())
 		}
 	}
+
 	teardown := func() {
 		if statOut != nil {
 			statOut.close()
@@ -149,5 +114,6 @@ func DiskCallbackFactory(
 			cpruOut.close()
 		}
 	}
+
 	return callback, teardown
 }
