@@ -1,7 +1,7 @@
 package main
 
-// #cgo CFLAGS: -I${SRCDIR}/include
-// #cgo LDFLAGS: ${SRCDIR}/lib/libjpeg.a
+// #cgo CFLAGS: -I${SRCDIR}/jpeglib-8bit/include
+// #cgo LDFLAGS: ${SRCDIR}/jpeglib-8bit/lib/libjpeg.a
 // #include <stdio.h>
 // #include <stdlib.h>
 // int read_JPEG_file (char*);
