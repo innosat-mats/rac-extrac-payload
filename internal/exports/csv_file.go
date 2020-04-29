@@ -7,10 +7,11 @@ import (
 )
 
 type csvFile struct {
-	File    *os.File
-	Writer  *csv.Writer
-	HasSpec bool
-	HasHead bool
+	File     *os.File
+	Writer   *csv.Writer
+	HasSpec  bool
+	HasHead  bool
+	NHeaders int
 }
 
 type csvOutput interface {
@@ -42,11 +43,15 @@ func (csv *csvFile) setHeaderRow(columns []string) {
 	}
 	csv.Writer.Write(columns)
 	csv.HasHead = true
+	csv.NHeaders = len(columns)
 }
 
 func (csv *csvFile) writeData(data []string) {
 	if !csv.HasSpec || !csv.HasHead {
 		log.Fatal("Specifications and/or Headers missing for csv output")
+	}
+	if csv.NHeaders != len(data) {
+		log.Fatalf("Irregular column width, expected %v columns but got %v", csv.NHeaders, len(data))
 	}
 	csv.Writer.Write(data)
 }
