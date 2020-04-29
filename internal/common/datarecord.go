@@ -67,7 +67,7 @@ func (record DataRecord) CSVRow() []string {
 }
 
 // AEZData returns the exportable aez data
-func (record DataRecord) AEZData() exports.Exportable {
+func (record DataRecord) AEZData() interface{} {
 	return record.Data
 }
 

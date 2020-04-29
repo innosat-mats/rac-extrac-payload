@@ -32,7 +32,7 @@ func Test_StdoutCallbackFactory(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			buf := &bytes.Buffer{}
-			callback := StdoutCallbackFactory(buf, tt.args.writeTimeseries)
+			callback, _ := StdoutCallbackFactory(buf, tt.args.writeTimeseries)
 			callback(tt.innerArgs.dataRecord)
 			if got := buf.String(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("StdoutCallbackFactory() = %v, want %v", got, tt.want)

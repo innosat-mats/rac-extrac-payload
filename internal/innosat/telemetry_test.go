@@ -22,7 +22,7 @@ func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.h.PUSVersion(); got != tt.want {
+			if got := tt.h.PUS.Version(); got != tt.want {
 				t.Errorf("TMDataFieldHeader.PUSVersion() = %v, want %v", got, tt.want)
 			}
 		})
@@ -31,7 +31,7 @@ func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
 
 func TestTMDataFieldHeader_Time(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
@@ -77,7 +77,7 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 
 func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
@@ -109,7 +109,7 @@ func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 
 func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
@@ -147,7 +147,7 @@ func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 
 func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32

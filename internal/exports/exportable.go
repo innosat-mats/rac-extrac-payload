@@ -13,5 +13,5 @@ type ExportablePackage interface {
 	CSVRow() []string
 	CSVSpecifications() []string
 	OriginName() string
-	AEZData() Exportable
+	AEZData() interface{}
 }
