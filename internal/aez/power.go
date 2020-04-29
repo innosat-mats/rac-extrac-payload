@@ -143,7 +143,7 @@ func (pwr PWR) CSVRow() []string {
 	values := make([]string, val.NumField())
 	for i := range values {
 		valueField := val.Field(i)
-		values[i] = fmt.Sprintf("%f", valueField.Float())
+		values[i] = fmt.Sprintf("%v", valueField.Float())
 	}
 	return values
 }

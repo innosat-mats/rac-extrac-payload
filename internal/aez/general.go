@@ -113,11 +113,14 @@ func (stat STAT) CSVSpecifications() []string {
 // CSVHeaders returns the header row
 func (stat STAT) CSVHeaders() []string {
 	var headers []string
-	headers = append(headers, "STATTIME")
+	headers = append(headers, "STATTIME", "STATNANO")
 	val := reflect.Indirect(reflect.ValueOf(stat))
 	t := val.Type()
 	for i := 0; i < t.NumField(); i++ {
-		headers = append(headers, t.Field(i).Name)
+		name := t.Field(i).Name
+		if name != "TS" && name != "TSS" {
+			headers = append(headers, t.Field(i).Name)
+		}
 	}
 	return headers
 }
@@ -127,11 +130,15 @@ func (stat STAT) CSVRow() []string {
 	var row []string
 	gpsTime := time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
 	statTime := stat.Time(gpsTime)
-	row = append(row, statTime.Format(time.RFC3339Nano))
+	row = append(row, statTime.Format(time.RFC3339Nano), fmt.Sprintf("%v", stat.Nanoseconds()))
 	val := reflect.Indirect(reflect.ValueOf(stat))
+	t := val.Type()
 	for i := 0; i < val.NumField(); i++ {
-		valueField := val.Field(i)
-		row = append(row, fmt.Sprintf("%v", valueField.Uint()))
+		name := t.Field(i).Name
+		if name != "TS" && name != "TSS" {
+			valueField := val.Field(i)
+			row = append(row, fmt.Sprintf("%v", valueField.Uint()))
+		}
 	}
 	return row
 }
