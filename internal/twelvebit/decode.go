@@ -2,44 +2,42 @@ package main
 
 // #cgo CFLAGS: -I${SRCDIR}/jpeglib-8bit/include
 // #cgo LDFLAGS: ${SRCDIR}/jpeglib-8bit/lib/libjpeg.a
-// #include <stdio.h>
 // #include <stdlib.h>
-// int read_JPEG_file (char*);
+// char* read_JPEG_file (char*, size_t);
 import "C"
 import (
-	"bytes"
 	"image"
 	"image/png"
+	"io/ioutil"
 	"log"
 	"os"
 	"unsafe"
 )
 
-var row = 20
-var col = 20
-
-var buffer = make([]byte, 0, 20*20)
-var imageData = bytes.NewBuffer(buffer)
-
 func main() {
-	cs := C.CString(os.Args[1])
-	C.read_JPEG_file(cs)
-	C.free(unsafe.Pointer(cs))
-	img := image.NewGray(image.Rect(0, 0, row, col))
-	img.Pix = imageData.Bytes()
+	width := 20
+	height := 20
+	imageFile, err := ioutil.ReadFile(os.Args[1])
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	rawData := C.CString(string(imageFile))
+	defer C.free(unsafe.Pointer(rawData))
+
+	pixelData := C.read_JPEG_file(rawData, C.size_t(len(imageFile)))
+	defer C.free(unsafe.Pointer(pixelData))
+
+	img := image.NewGray(image.Rect(0, 0, width, height))
+	img.Pix = C.GoBytes(unsafe.Pointer(pixelData), C.int(width)*C.int(height))
+
 	f, err := os.Create("image.png")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f.Close()
 
 	if err := png.Encode(f, img); err != nil {
-		f.Close()
 		log.Fatal(err)
 	}
-}
-
-//export callback
-func callback(buf unsafe.Pointer, length C.int) {
-	scanline := C.GoBytes(buf, length)
-	imageData.Write(scanline)
 }
