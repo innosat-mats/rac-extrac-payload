@@ -78,22 +78,23 @@ func (pid packetID) APID() SourcePacketAPIDType {
 	return SourcePacketAPIDType(pid & 0x07FF)
 }
 
-type packetSequenceControl uint16
+// PacketSequenceControl is the encoding of the sequence value
+type PacketSequenceControl uint16
 
 // GroupingFlags ...
-func (psc packetSequenceControl) GroupingFlags() SourcePackageContinuationFlagType {
+func (psc PacketSequenceControl) GroupingFlags() SourcePackageContinuationFlagType {
 	return SourcePackageContinuationFlagType(psc >> 14)
 }
 
 // SequenceCount ...
-func (psc packetSequenceControl) SequenceCount() uint16 {
+func (psc PacketSequenceControl) SequenceCount() uint16 {
 	return uint16((psc << 2) >> 2)
 }
 
 // SourcePacketHeader Source Packet Header
 type SourcePacketHeader struct {
 	PacketID              packetID
-	PacketSequenceControl packetSequenceControl
+	PacketSequenceControl PacketSequenceControl
 	PacketLength          uint16
 }
 
@@ -110,15 +111,13 @@ func (sph SourcePacketHeader) CSVSpecifications() []string {
 // CSVHeaders returns the header row
 func (sph SourcePacketHeader) CSVHeaders() []string {
 	return []string{
-		"SourcePacketVersion",
-		"SourcePacketSequenceCount",
+		"SPSequenceCount",
 	}
 }
 
 // CSVRow returns the data row
 func (sph SourcePacketHeader) CSVRow() []string {
 	return []string{
-		fmt.Sprintf("%v", sph.PacketID.Version()),
 		fmt.Sprintf("%v", sph.PacketSequenceControl.SequenceCount()),
 	}
 }

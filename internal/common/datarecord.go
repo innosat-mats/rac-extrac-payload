@@ -30,10 +30,13 @@ func (record DataRecord) CSVSpecifications() []string {
 		specifications,
 		record.SourceHeader.CSVSpecifications()...,
 	)
-	specifications = append(
-		specifications,
-		record.Data.CSVSpecifications()...,
-	)
+
+	if record.Data != nil {
+		specifications = append(
+			specifications,
+			record.Data.CSVSpecifications()...,
+		)
+	}
 	return specifications
 }
 
@@ -45,7 +48,9 @@ func (record DataRecord) CSVHeaders() []string {
 	headers = append(headers, record.SourceHeader.CSVHeaders()...)
 	headers = append(headers, record.TMHeader.CSVHeaders()...)
 	headers = append(headers, "SID")
-	headers = append(headers, record.Data.CSVHeaders()...)
+	if record.Data != nil {
+		headers = append(headers, record.Data.CSVHeaders()...)
+	}
 	headers = append(headers, "Error")
 	return headers
 }
@@ -58,7 +63,9 @@ func (record DataRecord) CSVRow() []string {
 	row = append(row, record.SourceHeader.CSVRow()...)
 	row = append(row, record.TMHeader.CSVRow()...)
 	row = append(row, record.SID.String())
-	row = append(row, record.Data.CSVRow()...)
+	if record.Data != nil {
+		row = append(row, record.Data.CSVRow()...)
+	}
 	if record.Error != nil {
 		row = append(row, record.Error.Error())
 	} else {

@@ -66,7 +66,7 @@ func TestSequenceCount(t *testing.T) {
 func TestSourcePacketHeader_APID(t *testing.T) {
 	type fields struct {
 		PacketID              packetID
-		PacketSequenceControl packetSequenceControl
+		PacketSequenceControl PacketSequenceControl
 		PacketLength          uint16
 	}
 	tests := []struct {
