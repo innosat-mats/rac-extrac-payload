@@ -47,9 +47,6 @@ func (ramses Ramses) CSVSpecifications() []string {
 //CSVHeaders returns the field names
 func (ramses Ramses) CSVHeaders() []string {
 	return []string{
-		"RamsesPort",
-		"RamsesType",
-		"RamsesSecure",
 		"RamsesTime",
 	}
 }
@@ -58,9 +55,6 @@ func (ramses Ramses) CSVHeaders() []string {
 func (ramses Ramses) CSVRow() []string {
 	ramsesTime := time.Date(2000, time.January, 1, 1, 0, 0, 0, time.UTC).Add(time.Hour * 24 * time.Duration(ramses.Date)).Add(time.Millisecond * time.Duration(ramses.Time))
 	return []string{
-		fmt.Sprintf("%v", ramses.Port),
-		fmt.Sprintf("%v", ramses.Type),
-		fmt.Sprintf("%v", ramses.Secure),
 		fmt.Sprintf("%v", ramsesTime.Format(time.RFC3339)),
 	}
 }

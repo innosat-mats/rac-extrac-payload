@@ -40,6 +40,7 @@ func (record DataRecord) CSVSpecifications() []string {
 // CSVHeaders returns a header row for the data record
 func (record DataRecord) CSVHeaders() []string {
 	var headers []string
+	headers = append(headers, record.Origin.CSVHeaders()...)
 	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
 	headers = append(headers, record.SourceHeader.CSVHeaders()...)
 	headers = append(headers, record.TMHeader.CSVHeaders()...)
@@ -52,6 +53,7 @@ func (record DataRecord) CSVHeaders() []string {
 // CSVRow returns a data row for the record
 func (record DataRecord) CSVRow() []string {
 	var row []string
+	row = append(row, record.Origin.CSVRow()...)
 	row = append(row, record.RamsesHeader.CSVRow()...)
 	row = append(row, record.SourceHeader.CSVRow()...)
 	row = append(row, record.TMHeader.CSVRow()...)

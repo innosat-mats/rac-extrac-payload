@@ -111,12 +111,7 @@ func (sph SourcePacketHeader) CSVSpecifications() []string {
 func (sph SourcePacketHeader) CSVHeaders() []string {
 	return []string{
 		"SourcePacketVersion",
-		"SourcePacketType",
-		"SourcePacketHeaderType",
-		"SourcePacketAPID",
-		"SourcePacketGroupingFlags",
 		"SourcePacketSequenceCount",
-		"SourcePacketLength",
 	}
 }
 
@@ -124,11 +119,6 @@ func (sph SourcePacketHeader) CSVHeaders() []string {
 func (sph SourcePacketHeader) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", sph.PacketID.Version()),
-		sph.PacketID.Type().String(),
-		fmt.Sprintf("%v", sph.PacketID.HeaderType()),
-		fmt.Sprintf("%v", sph.PacketID.APID()),
-		sph.PacketSequenceControl.GroupingFlags().String(),
 		fmt.Sprintf("%v", sph.PacketSequenceControl.SequenceCount()),
-		fmt.Sprintf("%v", sph.PacketLength),
 	}
 }

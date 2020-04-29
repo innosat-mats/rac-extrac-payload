@@ -54,11 +54,7 @@ func (tmdfh *TMDataFieldHeader) IsTransparentData() bool {
 func (tmdfh TMDataFieldHeader) CSVHeaders() []string {
 	return []string{
 		"TMHeaderTime",
-		"TMHeaderPUSVersion",
-		"TMHeaderServiceType",
-		"TMHeaderServiceSubType",
-		"TMHeaderCUCTimeSeconds",
-		"TMHeaderCUCTimeFraction",
+		"TMHeaderNanoseconds",
 	}
 }
 
@@ -68,10 +64,6 @@ func (tmdfh TMDataFieldHeader) CSVRow() []string {
 	tmTime := tmdfh.Time(gpsTime)
 	return []string{
 		tmTime.Format(time.RFC3339Nano),
-		fmt.Sprintf("%v", tmdfh.PUS.Version()),
-		fmt.Sprintf("%v", tmdfh.ServiceType),
-		fmt.Sprintf("%v", tmdfh.ServiceSubType),
-		fmt.Sprintf("%v", tmdfh.CUCTimeSeconds),
-		fmt.Sprintf("%v", tmdfh.CUCTimeFraction),
+		fmt.Sprintf("%v", tmdfh.Nanoseconds()),
 	}
 }
