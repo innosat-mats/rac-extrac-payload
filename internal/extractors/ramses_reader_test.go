@@ -1,10 +1,12 @@
-package common
+package extractors
 
 import (
 	"bytes"
 	"io"
 	"reflect"
 	"testing"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/common"
 )
 
 func TestDecodeRamses(t *testing.T) {
@@ -48,7 +50,7 @@ func TestDecodeRamses(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			packs := make(chan DataRecord)
+			packs := make(chan common.DataRecord)
 			go DecodeRamses(packs, StreamBatch{Buf: tt.args.buf})
 			got := <-packs
 			if !reflect.DeepEqual(got.Buffer, tt.want) {

@@ -1,4 +1,4 @@
-package exports
+package common
 
 // Callback is the type of the callback function
 type Callback func(data ExportablePackage)

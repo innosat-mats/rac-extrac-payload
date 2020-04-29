@@ -1,11 +1,10 @@
-package common
+package extractors
 
 import (
 	"bytes"
 	"fmt"
 
-	"github.com/innosat-mats/rac-extract-payload/internal/exports"
-
+	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
@@ -60,7 +59,10 @@ func Example() {
 	}
 	byteStream1 := bytes.NewReader(data)
 	byteStream2 := bytes.NewReader(data)
-	ExtractData(simpleOutput, StreamBatch{byteStream1, OriginDescription{"Set1", innosat.Epoch}}, StreamBatch{byteStream2, OriginDescription{"Set2", innosat.Epoch}})
+	ExtractData(
+		simpleOutput,
+		StreamBatch{byteStream1, common.OriginDescription{Name: "Set1", ProcessingDate: innosat.Epoch}},
+		StreamBatch{byteStream2, common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}})
 
 	// Output:
 	// {{Set1 1980-01-06 00:00:01 +0000 UTC} {60304 56 55417 0 0 80260603 7386} {36569088 0 100 0 52224 0} {2148 51352 49} {16 3 25 4633 58169} STAT {32516 2 33284 2 2 6 1 420610048 3299 2 0 0 16777216 1090519040 0 0} <nil> []}
@@ -72,6 +74,6 @@ func Example() {
 
 }
 
-func simpleOutput(pkg exports.ExportablePackage) {
+func simpleOutput(pkg common.ExportablePackage) {
 	fmt.Println(pkg)
 }

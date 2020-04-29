@@ -2,7 +2,6 @@ package common
 
 import (
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
-	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
@@ -15,7 +14,7 @@ type DataRecord struct {
 	SourceHeader innosat.SourcePacketHeader // Source header from the innosat platform
 	TMHeader     innosat.TMDataFieldHeader  // Data header information
 	SID          aez.SID                    // SID of the Data if any
-	Data         exports.Exportable         // The data payload itself, HK report, jpeg image etc.
+	Data         Exportable                 // The data payload itself, HK report, jpeg image etc.
 	Error        error                      // First propagated error from the decoding process
 	Buffer       []byte                     // Currently unprocessed data (payload)
 }

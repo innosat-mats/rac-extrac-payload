@@ -10,6 +10,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/exports"
+	"github.com/innosat-mats/rac-extract-payload/internal/extractors"
 )
 
 var skipImages *bool
@@ -31,7 +32,7 @@ func getCallback(
 	outputDirectory string,
 	skipImages bool,
 	skipTimeseries bool,
-) (exports.Callback, exports.CallbackTeardown, error) {
+) (common.Callback, common.CallbackTeardown, error) {
 	if outputDirectory == "" && !stdout {
 		flag.Usage()
 		fmt.Println("\nExpected an output directory")
@@ -54,11 +55,11 @@ func getCallback(
 }
 
 func processFiles(
-	extractor common.ExtractFunction,
+	extractor extractors.ExtractFunction,
 	inputFiles []string,
-	callback exports.Callback,
+	callback common.Callback,
 ) error {
-	batch := make([]common.StreamBatch, len(inputFiles))
+	batch := make([]extractors.StreamBatch, len(inputFiles))
 	for n, filename := range inputFiles {
 		f, err := os.Open(filename)
 		defer f.Close()
@@ -66,7 +67,7 @@ func processFiles(
 			return err
 		}
 
-		batch[n] = common.StreamBatch{
+		batch[n] = extractors.StreamBatch{
 			Buf: f,
 			Origin: common.OriginDescription{
 				Name:           filename,
@@ -99,7 +100,7 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-	err = processFiles(common.ExtractData, inputFiles, callback)
+	err = processFiles(extractors.ExtractData, inputFiles, callback)
 	if err != nil {
 		log.Fatal(err)
 	}

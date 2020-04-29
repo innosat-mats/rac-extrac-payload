@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
+	"github.com/innosat-mats/rac-extract-payload/internal/common"
 )
 
 func csvName(dir string, originName string, packetType string) string {
@@ -16,7 +17,7 @@ func csvName(dir string, originName string, packetType string) string {
 	return filepath.Join(dir, name)
 }
 
-func csvOutputFactory(dir string, originName string, packetType string, pkg *ExportablePackage) csvOutput {
+func csvOutputFactory(dir string, originName string, packetType string, pkg *common.ExportablePackage) csvOutput {
 	outPath := csvName(dir, originName, packetType)
 
 	// Create Directory and File
@@ -41,14 +42,14 @@ func DiskCallbackFactory(
 	output string,
 	writeImages bool,
 	writeTimeseries bool,
-) (Callback, CallbackTeardown) {
+) (common.Callback, common.CallbackTeardown) {
 	var currentOrigin string = ""
 	var htrOut csvOutput = nil
 	var pwrOut csvOutput = nil
 	var cpruOut csvOutput = nil
 	var statOut csvOutput = nil
 
-	callback := func(pkg ExportablePackage) {
+	callback := func(pkg common.ExportablePackage) {
 		// Close streams from previous file
 		if pkg.OriginName() != currentOrigin {
 			if pwrOut != nil {

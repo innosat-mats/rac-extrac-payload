@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
-	"github.com/innosat-mats/rac-extract-payload/internal/exports"
+	"github.com/innosat-mats/rac-extract-payload/internal/extractors"
 )
 
 func Test_getCallback(t *testing.T) {
@@ -43,7 +43,7 @@ func Test_getCallback(t *testing.T) {
 func Test_processFiles(t *testing.T) {
 	type args struct {
 		inputFiles []string
-		callback   exports.Callback
+		callback   common.Callback
 	}
 	type fixtures struct {
 		files []string
@@ -91,7 +91,7 @@ func Test_processFiles(t *testing.T) {
 				file.Close()
 			}
 			updatedFilenames := mapFilenamesToDirectory(dir, tt.args.inputFiles)
-			extractor := func(callback exports.Callback, streamBatch ...common.StreamBatch) {
+			extractor := func(callback common.Callback, streamBatch ...extractors.StreamBatch) {
 				ptCallback := reflect.ValueOf(callback).Pointer()
 				ptArgsCallback := reflect.ValueOf(tt.args.callback).Pointer()
 				if ptCallback != ptArgsCallback {

@@ -1,4 +1,4 @@
-package common
+package extractors
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
-	"github.com/innosat-mats/rac-extract-payload/internal/exports"
+	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
@@ -15,7 +15,7 @@ type PackageType interface {
 }
 
 // DecodeAEZ processes data packages
-func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
+func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord) {
 	defer close(target)
 	for sourcePacket := range source {
 		if sourcePacket.Error != nil {
@@ -41,8 +41,8 @@ func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
 	}
 }
 
-func instrumentHK(sid aez.SID, buf io.Reader) (exports.Exportable, error) {
-	var dataPackage exports.Exportable
+func instrumentHK(sid aez.SID, buf io.Reader) (common.Exportable, error) {
+	var dataPackage common.Exportable
 	var err error
 	switch sid {
 	case aez.SIDSTAT:
