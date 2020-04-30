@@ -2,6 +2,7 @@ package exports
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,32 +13,38 @@ import (
 )
 
 func csvName(dir string, originName string, packetType string) string {
-	nameParts := strings.Split(filepath.Base(originName), ".")
-	name := strings.Join(nameParts[:len(nameParts)-1], ".") + "_" + packetType + ".csv"
+	name := fmt.Sprintf(
+		"%v_%v.csv",
+		strings.TrimSuffix(filepath.Base(originName), filepath.Ext(originName)),
+		packetType,
+	)
 	return filepath.Join(dir, name)
 }
 
-func csvOutputFactory(dir string, originName string, packetType string, pkg *common.ExportablePackage) csvOutput {
+func csvOutputFactory(dir string, originName string, packetType string, pkg *common.ExportablePackage) (csvOutput, error) {
 	outPath := csvName(dir, originName, packetType)
 
 	// Create Directory and File
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
-		log.Fatalf("Could not create output directory '%v'", dir)
+		return nil, fmt.Errorf("Could not create output directory '%v'", dir)
 	}
 	out, err := os.Create(outPath)
 	if err != nil {
-		log.Fatalf("Could not create output file '%v'", outPath)
+		return nil, fmt.Errorf("Could not create output file '%v'", outPath)
 	}
 
 	// Make a csvFile and produce specs and header row
 	csvFile := csvFile{File: out, Writer: csv.NewWriter(out)}
 	err = csvFile.setSpecifications((*pkg).CSVSpecifications())
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
-	csvFile.setHeaderRow((*pkg).CSVHeaders())
-	return &csvFile
+	err = csvFile.setHeaderRow((*pkg).CSVHeaders())
+	if err != nil {
+		return nil, err
+	}
+	return &csvFile, nil
 }
 
 // DiskCallbackFactory returns a callback for disk writes
@@ -47,12 +54,20 @@ func DiskCallbackFactory(
 	writeTimeseries bool,
 ) (common.Callback, common.CallbackTeardown) {
 	var currentOrigin string = ""
+	var err error
 	var htrOut csvOutput = nil
 	var pwrOut csvOutput = nil
 	var cpruOut csvOutput = nil
 	var statOut csvOutput = nil
 
 	callback := func(pkg common.ExportablePackage) {
+		if writeImages {
+			// TODO: Add image writing here
+		}
+
+		if !writeTimeseries {
+			return
+		}
 		// Close streams from previous file
 		if pkg.OriginName() != currentOrigin {
 			if pwrOut != nil {
@@ -83,24 +98,41 @@ func DiskCallbackFactory(
 		switch pkg.AEZData().(type) {
 		case aez.STAT:
 			if statOut == nil {
-				statOut = csvOutputFactory(output, currentOrigin, "STAT", &pkg)
+				statOut, err = csvOutputFactory(output, currentOrigin, "STAT", &pkg)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
-			statOut.writeData(pkg.CSVRow())
+			err = statOut.writeData(pkg.CSVRow())
 		case aez.HTR:
 			if htrOut == nil {
-				htrOut = csvOutputFactory(output, currentOrigin, "HTR", &pkg)
+				htrOut, err = csvOutputFactory(output, currentOrigin, "HTR", &pkg)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
-			htrOut.writeData(pkg.CSVRow())
+			err = htrOut.writeData(pkg.CSVRow())
 		case aez.PWR:
 			if pwrOut == nil {
-				pwrOut = csvOutputFactory(output, currentOrigin, "PWR", &pkg)
+				pwrOut, err = csvOutputFactory(output, currentOrigin, "PWR", &pkg)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
-			pwrOut.writeData(pkg.CSVRow())
+			err = pwrOut.writeData(pkg.CSVRow())
 		case aez.CPRU:
 			if cpruOut == nil {
-				cpruOut = csvOutputFactory(output, currentOrigin, "CPRU", &pkg)
+				cpruOut, err = csvOutputFactory(output, currentOrigin, "CPRU", &pkg)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
-			cpruOut.writeData(pkg.CSVRow())
+			err = cpruOut.writeData(pkg.CSVRow())
+		}
+		// This error comes from writing a line and most probably would be a column missmatch
+		// that means we should be able to continue and just report the error
+		if err != nil {
+			log.Println(err)
 		}
 	}
 
