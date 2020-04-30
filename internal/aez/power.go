@@ -170,7 +170,7 @@ func (pwr PWR) CSVSpecifications() []string {
 
 //CSVHeaders returns the field names
 func (pwr PWR) CSVHeaders() []string {
-	return csvHeader(pwr)
+	return csvHeader(pwr.Report())
 }
 
 //CSVRow returns the field values
