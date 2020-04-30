@@ -31,10 +31,13 @@ func csvOutputFactory(dir string, originName string, packetType string, pkg *com
 	}
 
 	// Make a csvFile and produce specs and header row
-	file := csvFile{File: out, Writer: csv.NewWriter(out)}
-	file.setSpecifications((*pkg).CSVSpecifications())
-	file.setHeaderRow((*pkg).CSVHeaders())
-	return &file
+	csvFile := csvFile{File: out, Writer: csv.NewWriter(out)}
+	err = csvFile.setSpecifications((*pkg).CSVSpecifications())
+	if err != nil {
+		log.Println(err)
+	}
+	csvFile.setHeaderRow((*pkg).CSVHeaders())
+	return &csvFile
 }
 
 // DiskCallbackFactory returns a callback for disk writes
