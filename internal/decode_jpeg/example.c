@@ -9,6 +9,7 @@ read_JPEG_file(char *inbuffer, size_t size)
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
 
+  const int BYTES_PER_SAMPLE = 2;
   JSAMPARRAY buffer; /* Output row buffer */
   char *image;
   int row_stride; /* physical row width in output buffer */
@@ -22,15 +23,15 @@ read_JPEG_file(char *inbuffer, size_t size)
   (void)jpeg_read_header(&cinfo, TRUE);
 
   (void)jpeg_start_decompress(&cinfo);
-  image = (char *)malloc(cinfo.output_height * cinfo.output_width * cinfo.output_components);
+  image = (char *)malloc(cinfo.output_height * cinfo.output_width * cinfo.output_components * BYTES_PER_SAMPLE);
 
-  row_stride = cinfo.output_width * cinfo.output_components;
+  row_stride = cinfo.output_width * cinfo.output_components * BYTES_PER_SAMPLE;
   buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
 
   while (cinfo.output_scanline < cinfo.output_height)
   {
     (void)jpeg_read_scanlines(&cinfo, buffer, 1);
-    memcpy(&image[(cinfo.output_scanline - 1) * row_stride], buffer[0], row_stride);
+    memcpy(&image[(cinfo.output_scanline - 1) * row_stride], buffer[0], row_stride * BYTES_PER_SAMPLE);
   }
   (void)jpeg_finish_decompress(&cinfo);
 
