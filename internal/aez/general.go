@@ -114,15 +114,8 @@ func (stat STAT) CSVSpecifications() []string {
 func (stat STAT) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, "STATTIME", "STATNANO")
-	val := reflect.Indirect(reflect.ValueOf(stat))
-	t := val.Type()
-	for i := 0; i < t.NumField(); i++ {
-		name := t.Field(i).Name
-		if name != "TS" && name != "TSS" {
-			headers = append(headers, t.Field(i).Name)
-		}
-	}
-	return headers
+	// We don't need the raw CUC Time fields, instead the iso date and nanoseconds are included above.
+	return append(headers, csvHeader(stat, "TS", "TSS")...)
 }
 
 // CSVRow returns the data row
@@ -135,6 +128,7 @@ func (stat STAT) CSVRow() []string {
 	t := val.Type()
 	for i := 0; i < val.NumField(); i++ {
 		name := t.Field(i).Name
+		// We don't need the raw CUC Time fields, instead the iso date and nanoseconds are included above.
 		if name != "TS" && name != "TSS" {
 			valueField := val.Field(i)
 			row = append(row, fmt.Sprintf("%v", valueField.Uint()))

@@ -170,13 +170,7 @@ func (pwr PWR) CSVSpecifications() []string {
 
 //CSVHeaders returns the field names
 func (pwr PWR) CSVHeaders() []string {
-	val := reflect.Indirect(reflect.ValueOf(pwr.Report()))
-	t := val.Type()
-	fields := make([]string, t.NumField())
-	for i := range fields {
-		fields[i] = t.Field(i).Name
-	}
-	return fields
+	return csvHeader(pwr)
 }
 
 //CSVRow returns the field values

@@ -93,12 +93,11 @@ func main() {
 	inputFiles := flag.Args()
 	if len(inputFiles) == 0 {
 		flag.Usage()
-		fmt.Println("\nNo rac-files supplied")
-		os.Exit(1)
+		log.Fatal("\nNo rac-files supplied")
 	}
 	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries)
 	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	err = processFiles(extractors.ExtractData, inputFiles, callback)
 	if err != nil {
