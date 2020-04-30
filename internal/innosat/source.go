@@ -23,7 +23,7 @@ func (headerType SourcePacketHeaderType) String() string {
 	case TC:
 		return "TC"
 	default:
-		return fmt.Sprintf("Unknown %v", uint(headerType))
+		return fmt.Sprintf("Unknown HeaderType %v", uint(headerType))
 	}
 }
 
@@ -52,7 +52,7 @@ func (continuationFlag SourcePackageContinuationFlagType) String() string {
 	case SPStandalone:
 		return "Standalone"
 	default:
-		return fmt.Sprintf("Unknown %v", uint(continuationFlag))
+		return fmt.Sprintf("Unknown ContinuationFlag %v", uint(continuationFlag))
 	}
 }
 

@@ -53,8 +53,7 @@ func (ramses Ramses) CSVHeaders() []string {
 
 //CSVRow returns the field values
 func (ramses Ramses) CSVRow() []string {
-	ramsesTime := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC).Add(time.Hour * 24 * time.Duration(ramses.Date)).Add(time.Millisecond * time.Duration(ramses.Time))
 	return []string{
-		fmt.Sprintf("%v", ramsesTime.Format(time.RFC3339)),
+		fmt.Sprintf("%v", ramses.Created().Format(time.RFC3339Nano)),
 	}
 }
