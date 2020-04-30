@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"strings"
 )
 
 var htrTemperatures = [...]float64{
@@ -157,9 +158,24 @@ func (htr HTR) CSVHeaders() []string {
 func (htr HTR) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(htr.Report()))
 	values := make([]string, val.NumField())
+	t := val.Type()
 	for i := range values {
 		valueField := val.Field(i)
-		values[i] = fmt.Sprintf("%v", valueField.Float())
+		if t.Field(i).Name == "WARNINGS" {
+			if valueField.Len() == 0 {
+				values[i] = ""
+			} else {
+				var errs = make([]string, valueField.Len())
+				for j, l := 0, valueField.Len(); j < l; j++ {
+					errs[j] = fmt.Sprintf("%v", valueField.Index(j).Elem())
+				}
+				values[i] = strings.Join(errs, "|")
+			}
+
+		} else {
+			values[i] = fmt.Sprintf("%v", valueField.Float())
+		}
+
 	}
 	return values
 }

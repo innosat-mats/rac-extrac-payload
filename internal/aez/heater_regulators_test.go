@@ -1,7 +1,6 @@
 package aez
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -140,6 +139,7 @@ func TestHTR_CSVHeaders(t *testing.T) {
 				"HTR2A", "HTR2B", "HTR2OD",
 				"HTR7A", "HTR7B", "HTR7OD",
 				"HTR8A", "HTR8B", "HTR8OD",
+				"WARNINGS",
 			},
 		},
 	}
@@ -195,18 +195,19 @@ func TestHTR_CSVRow(t *testing.T) {
 				HTR8A: 10, HTR8B: 11, HTR8OD: 12,
 			},
 			[]string{
-				fmt.Sprintf("%v", htr(1).voltage()),
-				fmt.Sprintf("%v", htr(2).resistance()),
-				fmt.Sprintf("%v", htr(3).voltage()),
-				fmt.Sprintf("%v", htr(4).voltage()),
-				fmt.Sprintf("%v", htr(5).resistance()),
-				fmt.Sprintf("%v", htr(6).voltage()),
-				fmt.Sprintf("%v", htr(7).voltage()),
-				fmt.Sprintf("%v", htr(8).resistance()),
-				fmt.Sprintf("%v", htr(9).voltage()),
-				fmt.Sprintf("%v", htr(10).voltage()),
-				fmt.Sprintf("%v", htr(11).resistance()),
-				fmt.Sprintf("%v", htr(12).voltage()),
+				"-55",
+				"-55",
+				"0.0018315018315018315",
+				"-55",
+				"-55",
+				"0.003663003663003663",
+				"-55",
+				"-55",
+				"0.005494505494505494",
+				"-55",
+				"-55",
+				"0.007326007326007326",
+				"HTR1A: Resistance 2.107716e+07 is too large for interpolator. Returning value for maximum.|HTR1B: Resistance 1.053663e+07 is too large for interpolator. Returning value for maximum.|HTR2A: Resistance 5.266365e+06 is too large for interpolator. Returning value for maximum.|HTR2B: Resistance 4.212312e+06 is too large for interpolator. Returning value for maximum.|HTR7A: Resistance 3.0076799999999995e+06 is too large for interpolator. Returning value for maximum.|HTR7B: Resistance 2.6312325e+06 is too large for interpolator. Returning value for maximum.|HTR8A: Resistance 2.104206e+06 is too large for interpolator. Returning value for maximum.|HTR8B: Resistance 1.9125599999999998e+06 is too large for interpolator. Returning value for maximum.",
 			},
 		},
 	}

@@ -123,6 +123,7 @@ func TestPWR_CSVHeaders(t *testing.T) {
 				"PWRP16V", "PWRP16C",
 				"PWRM16V", "PWRM16C",
 				"PWRP3V3", "PWRP3C3",
+				"WARNINGS",
 			},
 		},
 	}
@@ -177,7 +178,7 @@ func TestPWR_CSVRow(t *testing.T) {
 				PWRP3C3: pwrp3c3(9),
 			},
 			[]string{
-				fmt.Sprintf("%v", pwrt(1).resistance()),
+				"-55",
 				fmt.Sprintf("%v", pwrp32v(2).voltage()),
 				fmt.Sprintf("%v", pwrp32c(3).current()),
 				fmt.Sprintf("%v", pwrp16v(4).voltage()),
@@ -186,6 +187,7 @@ func TestPWR_CSVRow(t *testing.T) {
 				fmt.Sprintf("%v", pwrm16c(7).current()),
 				fmt.Sprintf("%v", pwrp3v3(8).voltage()),
 				fmt.Sprintf("%v", pwrp3c3(9).current()),
+				"PWRT: Resistance 5.4044e+06 is too large for interpolator. Returning value for maximum.",
 			},
 		},
 	}
