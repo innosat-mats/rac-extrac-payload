@@ -1,21 +1,20 @@
-package common
+package extractors
 
 import (
 	"sync"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/common"
 )
 
-// ExtractCallback is the type of the callback function
-type ExtractCallback func(data DataRecord)
-
 // ExtractFunction is the type of the ExtractData function
-type ExtractFunction func(callback ExtractCallback, streamBatch ...StreamBatch)
+type ExtractFunction func(callback common.Callback, streamBatch ...StreamBatch)
 
 // ExtractData reads Ramses data packages and extract the instrument data.
-func ExtractData(callback ExtractCallback, streamBatch ...StreamBatch) {
+func ExtractData(callback common.Callback, streamBatch ...StreamBatch) {
 	var waitGroup sync.WaitGroup
-	ramsesChannel := make(chan DataRecord)
-	innosatChannel := make(chan DataRecord)
-	aezChannel := make(chan DataRecord)
+	ramsesChannel := make(chan common.DataRecord)
+	innosatChannel := make(chan common.DataRecord)
+	aezChannel := make(chan common.DataRecord)
 
 	go DecodeRamses(ramsesChannel, streamBatch...)
 	go DecodeAEZ(aezChannel, innosatChannel)

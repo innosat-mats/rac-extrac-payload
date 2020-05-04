@@ -1,6 +1,7 @@
 package innosat
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -10,9 +11,9 @@ func TestVersion(t *testing.T) {
 		0,
 		0}
 
-	ans := sph.Version()
+	ans := sph.PacketID.Version()
 	if ans != 0b111 {
-		t.Errorf("Version() = %03b; want 111", ans)
+		t.Errorf("SourcePacketHeader.PacketID.Version() = %03b; want 111", ans)
 	}
 }
 
@@ -22,9 +23,9 @@ func TestType(t *testing.T) {
 		0,
 		0}
 
-	ans := sph.Type()
+	ans := sph.PacketID.Type()
 	if ans != TC {
-		t.Errorf("Type() = %b; want 1", ans)
+		t.Errorf("SourcePacketHeader.PacketID.Type() = %b; want 1", ans)
 	}
 }
 func TestHeaderType(t *testing.T) {
@@ -33,9 +34,9 @@ func TestHeaderType(t *testing.T) {
 		0,
 		0}
 
-	ans := sph.HeaderType()
+	ans := sph.PacketID.HeaderType()
 	if ans != 1 {
-		t.Errorf("HeaderType() = %b; want 1", ans)
+		t.Errorf("SourcePacketHeader.PacketID.HeaderType() = %b; want 1", ans)
 	}
 }
 
@@ -45,9 +46,9 @@ func TestGroupingFlags(t *testing.T) {
 		0b1100000000000000,
 		0}
 
-	ans := sph.GroupingFlags()
+	ans := sph.PacketSequenceControl.GroupingFlags()
 	if ans != 0b11 {
-		t.Errorf("GroupingFlags() = %02b; want 11", ans)
+		t.Errorf("SourcePacketHeader.PacketSequenceControl.GroupingFlags() = %02b; want 11", ans)
 	}
 }
 
@@ -57,16 +58,16 @@ func TestSequenceCount(t *testing.T) {
 		0b0011111111111111,
 		0}
 
-	ans := sph.SequenceCount()
+	ans := sph.PacketSequenceControl.SequenceCount()
 	if ans != 0b11111111111111 {
-		t.Errorf("SequenceCount() = %02b; want 11111111111111", ans)
+		t.Errorf("SourcePacketHeader.PacketSequenceControl.SequenceCount() = %02b; want 11111111111111", ans)
 	}
 }
 
 func TestSourcePacketHeader_APID(t *testing.T) {
 	type fields struct {
-		PacketID              uint16
-		PacketSequenceControl uint16
+		PacketID              packetID
+		PacketSequenceControl PacketSequenceControl
 		PacketLength          uint16
 	}
 	tests := []struct {
@@ -84,8 +85,133 @@ func TestSourcePacketHeader_APID(t *testing.T) {
 				PacketSequenceControl: tt.fields.PacketSequenceControl,
 				PacketLength:          tt.fields.PacketLength,
 			}
-			if got := sph.APID(); got != tt.want {
-				t.Errorf("SourcePacketHeader.IsMainApplication() = %v, want %v", got, tt.want)
+			if got := sph.PacketID.APID(); got != tt.want {
+				t.Errorf("SourcePacketHeader.PackedID.APID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSourcePacketHeaderType_String(t *testing.T) {
+	tests := []struct {
+		name       string
+		headerType SourcePacketHeaderType
+		want       string
+	}{
+		{"TM is TM", TM, "TM"},
+		{"TC is TC", TC, "TC"},
+		{"5 is Unknown", SourcePacketHeaderType(5), "Unknown HeaderType 5"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.headerType.String(); got != tt.want {
+				t.Errorf("SourcePacketHeaderType.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSourcePackageContinuationFlagType_String(t *testing.T) {
+	tests := []struct {
+		name             string
+		continuationFlag SourcePackageContinuationFlagType
+		want             string
+	}{
+		{"SPCont", SPCont, "Continuation"},
+		{"SPStart", SPStart, "Start"},
+		{"SPCont", SPStop, "Stop"},
+		{"SPCont", SPStandalone, "Standalone"},
+		{"10 is Unkown", SourcePackageContinuationFlagType(10), "Unknown ContinuationFlag 10"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.continuationFlag.String(); got != tt.want {
+				t.Errorf("SourcePackageContinuationFlagType.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSourcePacketHeader_CSVSpecifications(t *testing.T) {
+	type fields struct {
+		PacketID              packetID
+		PacketSequenceControl PacketSequenceControl
+		PacketLength          uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{"Creates spec", fields{}, []string{"INNOSAT", Specification}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sph := SourcePacketHeader{
+				PacketID:              tt.fields.PacketID,
+				PacketSequenceControl: tt.fields.PacketSequenceControl,
+				PacketLength:          tt.fields.PacketLength,
+			}
+			if got := sph.CSVSpecifications(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SourcePacketHeader.CSVSpecifications() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSourcePacketHeader_CSVHeaders(t *testing.T) {
+	type fields struct {
+		PacketID              packetID
+		PacketSequenceControl PacketSequenceControl
+		PacketLength          uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{"Generates headers", fields{}, []string{"SPSequenceCount"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sph := SourcePacketHeader{
+				PacketID:              tt.fields.PacketID,
+				PacketSequenceControl: tt.fields.PacketSequenceControl,
+				PacketLength:          tt.fields.PacketLength,
+			}
+			if got := sph.CSVHeaders(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SourcePacketHeader.CSVHeaders() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSourcePacketHeader_CSVRow(t *testing.T) {
+	type fields struct {
+		PacketID              packetID
+		PacketSequenceControl PacketSequenceControl
+		PacketLength          uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			"Generates data",
+			fields{PacketSequenceControl: PacketSequenceControl(0xc003)},
+			[]string{"3"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sph := SourcePacketHeader{
+				PacketID:              tt.fields.PacketID,
+				PacketSequenceControl: tt.fields.PacketSequenceControl,
+				PacketLength:          tt.fields.PacketLength,
+			}
+			if got := sph.CSVRow(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SourcePacketHeader.CSVRow() = %v, want %v", got, tt.want)
 			}
 		})
 	}

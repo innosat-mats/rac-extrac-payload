@@ -22,7 +22,7 @@ func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.h.PUSVersion(); got != tt.want {
+			if got := tt.h.PUS.Version(); got != tt.want {
 				t.Errorf("TMDataFieldHeader.PUSVersion() = %v, want %v", got, tt.want)
 			}
 		})
@@ -31,7 +31,7 @@ func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
 
 func TestTMDataFieldHeader_Time(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
@@ -77,7 +77,7 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 
 func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
@@ -109,7 +109,7 @@ func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 
 func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
@@ -147,7 +147,7 @@ func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 
 func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
 	type fields struct {
-		PUS             uint8
+		PUS             pus
 		ServiceType     SourcePackageServiceType
 		ServiceSubType  uint8
 		CUCTimeSeconds  uint32
@@ -173,6 +173,72 @@ func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
 			}
 			if got := tmdfh.IsTransparentData(); got != tt.want {
 				t.Errorf("TMDataFieldHeader.IsTransparentData() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTMDataFieldHeader_CSVHeaders(t *testing.T) {
+	type fields struct {
+		PUS             pus
+		ServiceType     SourcePackageServiceType
+		ServiceSubType  uint8
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{"Generates headers", fields{}, []string{"TMHeaderTime", "TMHeaderNanoseconds"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmdfh := TMDataFieldHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			if got := tmdfh.CSVHeaders(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TMDataFieldHeader.CSVHeaders() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTMDataFieldHeader_CSVRow(t *testing.T) {
+	type fields struct {
+		PUS             pus
+		ServiceType     SourcePackageServiceType
+		ServiceSubType  uint8
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			"Generates a data row",
+			fields{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
+			[]string{"1980-01-06T00:00:42.75Z", "42750000000"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmdfh := TMDataFieldHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			if got := tmdfh.CSVRow(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TMDataFieldHeader.CSVRow() = %v, want %v", got, tt.want)
 			}
 		})
 	}

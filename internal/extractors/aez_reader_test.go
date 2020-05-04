@@ -1,4 +1,4 @@
-package common
+package extractors
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
+	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
@@ -14,20 +15,20 @@ func TestDecodeAEZ(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		arg     DataRecord
+		arg     common.DataRecord
 		want    PackageType
 		wantErr bool
 	}{
 		{
 			"Package with error",
-			DataRecord{Error: io.EOF},
+			common.DataRecord{Error: io.EOF},
 			nil,
 			true,
 		},
 
 		{
 			"STAT package",
-			DataRecord{
+			common.DataRecord{
 				SourceHeader: innosat.SourcePacketHeader{PacketID: 0x0864, PacketSequenceControl: 0xc89a, PacketLength: 0x31},
 				TMHeader:     innosat.TMDataFieldHeader{PUS: 16, ServiceType: 3, ServiceSubType: 0x19, CUCTimeSeconds: 0, CUCTimeFraction: 0},
 				Buffer: []byte{0x00, 0x01, 0x7f, 0x04, 0x02, 0x82,
@@ -41,7 +42,7 @@ func TestDecodeAEZ(t *testing.T) {
 		},
 		{
 			"Bad package",
-			DataRecord{
+			common.DataRecord{
 				SourceHeader: innosat.SourcePacketHeader{PacketID: 0x0864, PacketSequenceControl: 0xc89a, PacketLength: 0x31},
 				TMHeader:     innosat.TMDataFieldHeader{PUS: 16, ServiceType: 3, ServiceSubType: 0x19, CUCTimeSeconds: 0, CUCTimeFraction: 0},
 				Buffer: []byte{0x00, 0x01, 0x7f, 0x04, 0x02, 0x82,
@@ -55,8 +56,8 @@ func TestDecodeAEZ(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			source := make(chan DataRecord)
-			target := make(chan DataRecord)
+			source := make(chan common.DataRecord)
+			target := make(chan common.DataRecord)
 			go DecodeAEZ(target, source)
 			source <- tt.arg
 			close(source)
