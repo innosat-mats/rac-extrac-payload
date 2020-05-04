@@ -25,6 +25,7 @@ func myUsage() {
 	fmt.Printf("Usage: %s [OPTIONS] rac-file ...\n", os.Args[0])
 	fmt.Println()
 	flag.PrintDefaults()
+	fmt.Println()
 }
 
 func getCallback(
@@ -93,7 +94,7 @@ func main() {
 	inputFiles := flag.Args()
 	if len(inputFiles) == 0 {
 		flag.Usage()
-		log.Fatal("\nNo rac-files supplied")
+		log.Fatal("No rac-files supplied")
 	}
 	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries)
 	if err != nil {
