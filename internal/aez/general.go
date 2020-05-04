@@ -70,6 +70,29 @@ const (
 	PM RID = 30
 )
 
+func (rid RID) String() string {
+	switch rid {
+	case 0:
+		return ""
+	case CCD1:
+		return "CCD1"
+	case CCD2:
+		return "CCD2"
+	case CCD3:
+		return "CCD3"
+	case CCD4:
+		return "CCD4"
+	case CCD5:
+		return "CCD5"
+	case CCD6:
+		return "CCD6"
+	case CCD7:
+		return "CCD7"
+	default:
+		return fmt.Sprintf("Unknown RID: %v", int(rid))
+	}
+}
+
 //STAT General status housekeeping report of the payload instrument.
 type STAT struct { //(34 octets)
 	SPID    uint16 // Software Part ID

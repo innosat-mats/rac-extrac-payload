@@ -165,3 +165,20 @@ func (ccdImagePackData *CCDImagePackData) Time(epoch time.Time) time.Time {
 func (ccdImagePackData *CCDImagePackData) Nanoseconds() int64 {
 	return ccsds.UnsegmentedTimeNanoseconds(ccdImagePackData.EXPTS, ccdImagePackData.EXPTSS)
 }
+
+type CCDImage struct {
+	PackData   CCDImagePackData
+	BadColumns []uint16
+}
+
+func (ccd CCDImage) CSVSpecifications() []string {
+	return []string{"Specification", Specification}
+}
+
+func (ccd CCDImage) CSVHeaders() []string {
+	return []string{}
+}
+
+func (ccd CCDImage) CSVRow() []string {
+	return []string{}
+}
