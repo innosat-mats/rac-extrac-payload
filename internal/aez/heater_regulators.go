@@ -36,7 +36,7 @@ func (data htr) resistance() float64 {
 }
 
 func (data htr) temperature() (float64, error) {
-	return interpolateTemperature(
+	return Interpolate(
 		data.resistance(),
 		htrResistances[:],
 		htrTemperatures[:],
