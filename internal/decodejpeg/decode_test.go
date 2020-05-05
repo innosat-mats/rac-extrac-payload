@@ -12,10 +12,6 @@ import (
 	pnm "github.com/jbuchbinder/gopnm"
 )
 
-func unWindowTrunc(pixValue uint16) uint16 {
-	return pixValue << 4
-}
-
 func Example() {
 	fileContents, err := ioutil.ReadFile("testdata/3166_4052_5.jpg")
 	if err != nil {
