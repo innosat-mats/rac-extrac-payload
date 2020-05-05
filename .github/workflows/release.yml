@@ -35,14 +35,8 @@ jobs:
     - name: Build
       run: go build ./internal/cli
     
-    - name: Uploading artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: raccli
-        path: cli
-
     - name: Creating release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "raccli"
+        artifacts: "cli"
         token: ${{ secrets.GITHUB_TOKEN }}
