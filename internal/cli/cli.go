@@ -4,35 +4,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/exports"
+	"github.com/innosat-mats/rac-extract-payload/internal/extractors"
 )
-
-func generateDiskWriterCallback(
-	output string,
-	writeImages bool,
-	writeTimeseries bool,
-) common.ExtractCallback {
-	return func(pkg common.DataRecord) {
-		// This is just a placeholder, should write to output directory
-	}
-}
-
-func generateStdoutCallback(
-	out io.Writer,
-	writeTimeseries bool,
-) common.ExtractCallback {
-
-	return func(pkg common.DataRecord) {
-		if writeTimeseries {
-			fmt.Fprintf(out, "%+v\n", pkg)
-		}
-	}
-}
 
 var skipImages *bool
 var skipTimeseries *bool
@@ -46,6 +25,7 @@ func myUsage() {
 	fmt.Printf("Usage: %s [OPTIONS] rac-file ...\n", os.Args[0])
 	fmt.Println()
 	flag.PrintDefaults()
+	fmt.Println()
 }
 
 func getCallback(
@@ -53,32 +33,34 @@ func getCallback(
 	outputDirectory string,
 	skipImages bool,
 	skipTimeseries bool,
-) (common.ExtractCallback, error) {
+) (common.Callback, common.CallbackTeardown, error) {
 	if outputDirectory == "" && !stdout {
 		flag.Usage()
 		fmt.Println("\nExpected an output directory")
-		return nil, errors.New("Invalid arguments")
+		return nil, nil, errors.New("Invalid arguments")
 	}
 	if skipTimeseries && (skipImages || stdout) {
 		fmt.Println("Nothing will be extracted, only validating integrity of rac-file(s)")
 	}
 
 	if stdout {
-		return generateStdoutCallback(os.Stdout, !skipTimeseries), nil
+		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
+		return callback, teardown, nil
 	}
-	return generateDiskWriterCallback(
+	callback, teardown := exports.DiskCallbackFactory(
 		outputDirectory,
 		!skipImages,
 		!skipTimeseries,
-	), nil
+	)
+	return callback, teardown, nil
 }
 
 func processFiles(
-	extractor common.ExtractFunction,
+	extractor extractors.ExtractFunction,
 	inputFiles []string,
-	callback common.ExtractCallback,
+	callback common.Callback,
 ) error {
-	batch := make([]common.StreamBatch, len(inputFiles))
+	batch := make([]extractors.StreamBatch, len(inputFiles))
 	for n, filename := range inputFiles {
 		f, err := os.Open(filename)
 		defer f.Close()
@@ -86,7 +68,7 @@ func processFiles(
 			return err
 		}
 
-		batch[n] = common.StreamBatch{
+		batch[n] = extractors.StreamBatch{
 			Buf: f,
 			Origin: common.OriginDescription{
 				Name:           filename,
@@ -112,15 +94,15 @@ func main() {
 	inputFiles := flag.Args()
 	if len(inputFiles) == 0 {
 		flag.Usage()
-		fmt.Println("\nNo rac-files supplied")
-		os.Exit(1)
+		log.Fatal("No rac-files supplied")
 	}
-	callback, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries)
-	if err != nil {
-		os.Exit(1)
-	}
-	err = processFiles(common.ExtractData, inputFiles, callback)
+	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries)
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = processFiles(extractors.ExtractData, inputFiles, callback)
+	if err != nil {
+		log.Fatal(err)
+	}
+	teardown()
 }

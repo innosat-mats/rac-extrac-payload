@@ -2,8 +2,10 @@ package aez
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 	"math"
+	"reflect"
 )
 
 type gate uint16
@@ -100,4 +102,25 @@ func (cpru *CPRU) Report() CPRUReport {
 		VRD3:   cpru.VRD3.voltage(),
 		VOD3:   cpru.VOD3.voltage(),
 	}
+}
+
+//CSVSpecifications returns the specs used in creating the struct
+func (cpru CPRU) CSVSpecifications() []string {
+	return []string{"AEZ", Specification}
+}
+
+//CSVHeaders returns the field names
+func (cpru CPRU) CSVHeaders() []string {
+	return csvHeader(cpru.Report())
+}
+
+//CSVRow returns the field values
+func (cpru CPRU) CSVRow() []string {
+	val := reflect.Indirect(reflect.ValueOf(cpru.Report()))
+	values := make([]string, val.NumField())
+	for i := range values {
+		valueField := val.Field(i)
+		values[i] = fmt.Sprintf("%v", valueField.Float())
+	}
+	return values
 }

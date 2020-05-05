@@ -86,3 +86,112 @@ func TestRamses_SecureTrans(t *testing.T) {
 		})
 	}
 }
+
+func TestRamses_CSVSpecifications(t *testing.T) {
+	type fields struct {
+		Synch  uint16
+		Length uint16
+		Port   uint16
+		Type   uint8
+		Secure uint8
+		Time   uint32
+		Date   int32
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{"Creates spec", fields{}, []string{"RAMSES", Specification}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := Ramses{
+				Synch:  tt.fields.Synch,
+				Length: tt.fields.Length,
+				Port:   tt.fields.Port,
+				Type:   tt.fields.Type,
+				Secure: tt.fields.Secure,
+				Time:   tt.fields.Time,
+				Date:   tt.fields.Date,
+			}
+			if got := ramses.CSVSpecifications(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Ramses.CSVSpecifications() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRamses_CSVHeaders(t *testing.T) {
+	type fields struct {
+		Synch  uint16
+		Length uint16
+		Port   uint16
+		Type   uint8
+		Secure uint8
+		Time   uint32
+		Date   int32
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{"Creates headers", fields{}, []string{"RamsesTime"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := Ramses{
+				Synch:  tt.fields.Synch,
+				Length: tt.fields.Length,
+				Port:   tt.fields.Port,
+				Type:   tt.fields.Type,
+				Secure: tt.fields.Secure,
+				Time:   tt.fields.Time,
+				Date:   tt.fields.Date,
+			}
+			if got := ramses.CSVHeaders(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Ramses.CSVHeaders() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRamses_CSVRow(t *testing.T) {
+	type fields struct {
+		Synch  uint16
+		Length uint16
+		Port   uint16
+		Type   uint8
+		Secure uint8
+		Time   uint32
+		Date   int32
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			"Generates data row",
+			fields{Date: 24, Time: 42},
+			[]string{"2000-01-25T00:00:00.042Z"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := Ramses{
+				Synch:  tt.fields.Synch,
+				Length: tt.fields.Length,
+				Port:   tt.fields.Port,
+				Type:   tt.fields.Type,
+				Secure: tt.fields.Secure,
+				Time:   tt.fields.Time,
+				Date:   tt.fields.Date,
+			}
+			if got := ramses.CSVRow(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Ramses.CSVRow() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

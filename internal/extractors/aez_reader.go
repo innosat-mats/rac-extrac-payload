@@ -1,4 +1,4 @@
-package common
+package extractors
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
+	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
@@ -14,7 +15,7 @@ type PackageType interface {
 }
 
 // DecodeAEZ processes data packages
-func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
+func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord) {
 	defer close(target)
 	for sourcePacket := range source {
 		if sourcePacket.Error != nil {
@@ -22,13 +23,14 @@ func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
 			continue
 		}
 		reader := bytes.NewReader(sourcePacket.Buffer)
-		if sourcePacket.SourceHeader.GroupingFlags() == innosat.SPStandalone {
+		if sourcePacket.SourceHeader.PacketSequenceControl.GroupingFlags() == innosat.SPStandalone {
 			switch {
 			case sourcePacket.TMHeader.IsHousekeeping():
 				var sid aez.SID
 				binary.Read(reader, binary.BigEndian, &sid)
 				targetPacket, err := instrumentHK(sid, reader)
 				sourcePacket.Data = targetPacket
+				sourcePacket.SID = sid
 				sourcePacket.Error = err
 				if reader.Len() == 0 {
 					sourcePacket.Buffer = []byte{}
@@ -39,8 +41,8 @@ func DecodeAEZ(target chan<- DataRecord, source <-chan DataRecord) {
 	}
 }
 
-func instrumentHK(sid aez.SID, buf io.Reader) (PackageType, error) {
-	var dataPackage PackageType
+func instrumentHK(sid aez.SID, buf io.Reader) (common.Exportable, error) {
+	var dataPackage common.Exportable
 	var err error
 	switch sid {
 	case aez.SIDSTAT:
