@@ -8,7 +8,7 @@ GOINSTALL=$(GOCMD) install
 BIN_DIR=bin
 
 
-all: build install
+all: build test install
 build:
 		$(GOBUILD) ./...
 test:
