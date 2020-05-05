@@ -31,12 +31,7 @@ jobs:
         fi
 
     - name: Test
-      run: go test ./...
+      run: make test
       
     - name: Build
-      run: go build ./internal/cli
-    
-    - uses: actions/upload-artifact@v2
-      with:
-        name: raccli
-        path: cli
+      run: make build
