@@ -57,7 +57,7 @@ func TestDecodeAEZ(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			source := make(chan common.DataRecord)
 			target := make(chan common.DataRecord)
-			go DecodeAEZ(target, source)
+			go Aggregator(target, source)
 			source <- tt.arg
 			close(source)
 			got := <-target
