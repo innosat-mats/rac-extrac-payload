@@ -95,10 +95,12 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 	}
 
 	// Report attemmpt at parsing dangling multipack
-	err := fmt.Errorf("dangling final multipacket with %v bytes", multiPackBuffer.Len())
-	multiPackStart.Buffer = multiPackBuffer.Bytes()
-	multiPackStart.Error = err
-	target <- multiPackStart
+	if multiPackBuffer != nil {
+		err := fmt.Errorf("dangling final multipacket with %v bytes", multiPackBuffer.Len())
+		multiPackStart.Buffer = multiPackBuffer.Bytes()
+		multiPackStart.Error = err
+		target <- multiPackStart
+	}
 }
 
 func makeUnfinishedMultiPackError(multiPackBuffer *bytes.Buffer, sourcePacket common.DataRecord) common.DataRecord {
