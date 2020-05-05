@@ -1,5 +1,13 @@
 package aez
 
+import (
+	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+)
+
+type pm uint32
+
 var pm1Voltages = [...]float64{
 	0.002, 0.199, 0.396, 0.593, 0.798,
 	0.994, 0.191, 1.405, 1.593, 1.798,
@@ -64,3 +72,31 @@ var pm2SValues = [...]float64{
 	3275.1, 3444.8, 3606.4, 3774.9, 3935.0,
 	4095.0, 4095.0, 4095.0,
 } // a.u. (photo diode)
+
+// PMData data from photometers
+type PMData struct {
+	EXPTS    uint32 // Exposure start time, seconds (CUC time format)
+	EXPTSS   uint16 // Exposure start time, subseconds (CUC time format)
+	PM1A     pm     // Photometer 1, thermistor input A sum
+	PM1ACNTR pm     // Photometer 1, thermistor input A counter
+	PM1B     pm     // Photometer 1, thermistor input B sum
+	PM1BCNTR pm     // Photometer 1, thermistor input B counter
+	PM1S     pm     // Photometer 1, photo diode input SIG sum
+	PM1SCNTR pm     // Photometer 1, photo diode input SIG counter
+	PM2A     pm     // Photometer 2, thermistor input A sum
+	PM2ACNTR pm     // Photometer 2, thermistor input A counter
+	PM2B     pm     // Photometer 2, thermistor input B sum
+	PM2BCNTR pm     // Photometer 2, thermistor input B counter
+	PM2S     pm     // Photometer 2, photo diode input SIG sum
+	PM2SCNTR pm     // Photometer 2, photo diode input SIG counter
+}
+
+// Time returns the measurement time in UTC
+func (pm *PMData) Time(epoch time.Time) time.Time {
+	return ccsds.UnsegmentedTimeDate(pm.EXPTS, pm.EXPTSS, epoch)
+}
+
+// Nanoseconds returns the measurement time in nanoseconds since epoch
+func (pm *PMData) Nanoseconds() int64 {
+	return ccsds.UnsegmentedTimeNanoseconds(pm.EXPTS, pm.EXPTSS)
+}
