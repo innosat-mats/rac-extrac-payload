@@ -26,7 +26,7 @@ func Test_StdoutCallbackFactory(t *testing.T) {
 			"Prints something when asked to",
 			args{true},
 			innerArgs{common.DataRecord{}},
-			"{Origin:{Name: ProcessingDate:0001-01-01 00:00:00 +0000 UTC} RamsesHeader:{Synch:0 Length:0 Port:0 Type:0 Secure:0 Time:0 Date:0} RamsesSecure:{IPAddress:0 Port:0 Seq:0 Retransmission:0 Ack:0 _:0} SourceHeader:{PacketID:0 PacketSequenceControl:0 PacketLength:0} TMHeader:{PUS:0 ServiceType:0 ServiceSubType:0 CUCTimeSeconds:0 CUCTimeFraction:0} SID: Data:<nil> Error:<nil> Buffer:[]}\n",
+			"{Origin:{Name: ProcessingDate:0001-01-01 00:00:00 +0000 UTC} RamsesHeader:{Synch:0 Length:0 Port:0 Type:0 Secure:0 Time:0 Date:0} RamsesSecure:{IPAddress:0 Port:0 Seq:0 Retransmission:0 Ack:0 _:0} SourceHeader:{PacketID:0 PacketSequenceControl:0 PacketLength:0} TMHeader:{PUS:0 ServiceType:0 ServiceSubType:0 CUCTimeSeconds:0 CUCTimeFraction:0} SID: RID: Data:<nil> Error:<nil> Buffer:[]}\n",
 		},
 	}
 	for _, tt := range tests {
