@@ -42,7 +42,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			multiPackBuffer = bytes.NewBuffer([]byte{})
 			multiPackStart = sourcePacket
 			_, err := io.Copy(multiPackBuffer, reader)
-			if err != nil {
+			if err != nil && err != io.EOF {
 				sourcePacket.Error = err
 				target <- sourcePacket
 			}
@@ -58,7 +58,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 
 			// Concat SPCont packet
 			_, err := io.Copy(multiPackBuffer, reader)
-			if err != nil {
+			if err != nil && err != io.EOF {
 				sourcePacketCopy := sourcePacket
 				sourcePacketCopy.Error = err
 				target <- sourcePacketCopy
@@ -78,7 +78,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 
 			// Concat SPStop and report parsed packet
 			_, err := io.Copy(multiPackBuffer, reader)
-			if err != nil {
+			if err != nil && err != io.EOF {
 				sourcePacket.Error = err
 				target <- sourcePacket
 			}

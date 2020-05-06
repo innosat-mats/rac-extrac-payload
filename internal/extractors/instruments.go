@@ -46,8 +46,8 @@ func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exportable, e
 		ccdIPD := aez.CCDImagePackData{}
 		var badColumns []uint16
 		badColumns, err = ccdIPD.Read(buf)
-		ccdI := aez.CCDImage{PackData: ccdIPD, BadColumns: badColumns}
-		dataPackage = ccdI
+		ccdImg := aez.CCDImage{PackData: ccdIPD, BadColumns: badColumns}
+		dataPackage = ccdImg
 	default:
 		err = fmt.Errorf("unhandled RID %v", rid)
 	}
