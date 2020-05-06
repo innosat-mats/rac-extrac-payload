@@ -1,15 +1,14 @@
-name: Go
+name: Releases
 
-on:
+on: 
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+    - 'v*'
 
 jobs:
 
   build:
-    name: Build
+    name: Release
     runs-on: ubuntu-latest
     steps:
 
@@ -30,8 +29,14 @@ jobs:
             dep ensure
         fi
 
-    - name: Test
-      run: make test
-      
-    - name: Build
-      run: make build
+    - name: Build windows
+      run: GOOS=windows GOARCH=amd64 go build -o rac.exe ./cmd/rac  
+
+    - name: Build linux 
+      run: go build -o rac ./cmd/rac 
+    
+    - name: Creating release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "rac,rac.exe"
+        token: ${{ secrets.GITHUB_TOKEN }}

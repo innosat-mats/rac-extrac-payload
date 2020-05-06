@@ -23,9 +23,18 @@ func myUsage() {
 	fmt.Println("Extracts information from Innosat-MATS rac-files")
 	fmt.Println()
 	fmt.Printf("Usage: %s [OPTIONS] rac-file ...\n", os.Args[0])
-	fmt.Println()
 	flag.PrintDefaults()
-	fmt.Println()
+	fmt.Println(`
+The tool can be used to scan rac files for contents. Use the -stdout flag and
+use command line tools to scan for interesting information, e.g.:
+	rac -stdout my.rac  | grep STAT
+
+Tip for finding parsing errors:
+	rac -stdout my.rac | grep -E -e".*Error:[^<:]+" -o
+
+or if you want the Buffer contents which can be rather large if you are unlucky:
+	rac -stdout my.rac | grep -E -e".*Error:[^<]+" -o
+	`)
 }
 
 func getCallback(
