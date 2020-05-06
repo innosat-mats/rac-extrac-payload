@@ -75,7 +75,7 @@ func TestDecodeAEZ(t *testing.T) {
 			true,
 		},
 		{
-			"Transparnt Data package",
+			"Transparent Data package",
 			common.DataRecord{
 				TMHeader: innosat.TMDataFieldHeader{ServiceType: 128, ServiceSubType: 25},
 				Buffer: makeInstrumentData(

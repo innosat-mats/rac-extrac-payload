@@ -71,7 +71,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			if !multiPackStarted {
 				// Report error
 				sourcePacketCopy := sourcePacket
-				sourcePacketCopy.Error = errors.New("got stop packed without a start packet")
+				sourcePacketCopy.Error = errors.New("got stop packet without a start packet")
 				target <- sourcePacketCopy
 
 				multiPackStart = sourcePacket

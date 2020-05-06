@@ -25,7 +25,7 @@ func Test_makeUnfinishedMultiPackError(t *testing.T) {
 		want common.DataRecord
 	}{
 		{
-			"Adds error an buffer to DataRecord",
+			"Adds error and buffer to DataRecord",
 			args{
 				multiPackBuffer: bytes.NewBuffer([]byte("Hello")),
 				sourcePacket:    common.DataRecord{RID: aez.CCD4},
