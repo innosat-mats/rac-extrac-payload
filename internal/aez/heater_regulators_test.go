@@ -207,7 +207,7 @@ func TestHTR_CSVRow(t *testing.T) {
 				"-55",
 				"-55",
 				"0.007326007326007326",
-				"HTR1A: Resistance 2.107716e+07 is too large for interpolator. Returning value for maximum.|HTR1B: Resistance 1.053663e+07 is too large for interpolator. Returning value for maximum.|HTR2A: Resistance 5.266365e+06 is too large for interpolator. Returning value for maximum.|HTR2B: Resistance 4.212312e+06 is too large for interpolator. Returning value for maximum.|HTR7A: Resistance 3.0076799999999995e+06 is too large for interpolator. Returning value for maximum.|HTR7B: Resistance 2.6312325e+06 is too large for interpolator. Returning value for maximum.|HTR8A: Resistance 2.104206e+06 is too large for interpolator. Returning value for maximum.|HTR8B: Resistance 1.9125599999999998e+06 is too large for interpolator. Returning value for maximum.",
+				"HTR1A: 2.107716e+07 is too large for interpolator. Returning value for maximum.|HTR1B: 1.053663e+07 is too large for interpolator. Returning value for maximum.|HTR2A: 5.266365e+06 is too large for interpolator. Returning value for maximum.|HTR2B: 4.212312e+06 is too large for interpolator. Returning value for maximum.|HTR7A: 3.0076799999999995e+06 is too large for interpolator. Returning value for maximum.|HTR7B: 2.6312325e+06 is too large for interpolator. Returning value for maximum.|HTR8A: 2.104206e+06 is too large for interpolator. Returning value for maximum.|HTR8B: 1.9125599999999998e+06 is too large for interpolator. Returning value for maximum.",
 			},
 		},
 	}
