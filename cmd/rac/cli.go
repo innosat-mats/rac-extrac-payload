@@ -26,7 +26,7 @@ func myUsage() {
 	flag.PrintDefaults()
 	fmt.Println(`
 The tool can be used to scan rac files for contents. Use the -stdout flag and
-use command line tools to scan for interesting information.
+use command line tools to scan for interesting information, e.g.:
 	rac -stdout my.rac  | grep STAT
 
 Tip finding parsing errors:
