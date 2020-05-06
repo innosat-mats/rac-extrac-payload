@@ -13,7 +13,8 @@ import (
 // Aggregator sorts and accumulates standalone and multi-packets
 func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord) {
 	defer close(target)
-	var multiPackBuffer *bytes.Buffer
+	multiPackBuffer := bytes.NewBuffer([]byte{})
+	var multiPackStarted bool
 	var multiPackStart common.DataRecord
 
 	for sourcePacket := range source {
@@ -25,21 +26,23 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		switch sourcePacket.SourceHeader.PacketSequenceControl.GroupingFlags() {
 		case innosat.SPStandalone:
 			// Produce error for unfinished multipack lingering
-			if multiPackBuffer != nil {
+			if multiPackStarted {
 				target <- makeUnfinishedMultiPackError(multiPackBuffer, sourcePacket)
-				multiPackBuffer = nil
+				multiPackBuffer.Reset()
+				multiPackStarted = false
 			}
 
 			// Report standalone pack
 			target <- sourcePacket
 		case innosat.SPStart:
 			// Produce error for unfinished multipack lingering
-			if multiPackBuffer != nil {
+			if multiPackStarted {
 				target <- makeUnfinishedMultiPackError(multiPackBuffer, sourcePacket)
 			}
 
 			// Start new multipack
-			multiPackBuffer = bytes.NewBuffer([]byte{})
+			multiPackStarted = true
+			multiPackBuffer.Reset()
 			multiPackStart = sourcePacket
 			_, err := io.Copy(multiPackBuffer, reader)
 			if err != nil && err != io.EOF {
@@ -48,16 +51,16 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			}
 		case innosat.SPCont:
 			// Report error missing start packet
-			if multiPackBuffer == nil {
+			if !multiPackStarted {
 				sourcePacket.Error = errors.New("got continuation packet without a start packet")
 				target <- sourcePacket
-				// Create a new one to capture remaining SPCont and attempt parse
-				multiPackBuffer = bytes.NewBuffer([]byte{})
+
 				multiPackStart = sourcePacket
+				multiPackStarted = true
 			}
 
 			// Concat SPCont packet
-			_, err := io.Copy(multiPackBuffer, reader)
+			_, err := multiPackBuffer.ReadFrom(reader)
 			if err != nil && err != io.EOF {
 				sourcePacketCopy := sourcePacket
 				sourcePacketCopy.Error = err
@@ -65,27 +68,26 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			}
 		case innosat.SPStop:
 			// Report error missing start pack
-			if multiPackBuffer == nil {
-				// Create a new one to capture the output and attempt to parse
-				multiPackBuffer = bytes.NewBuffer([]byte{})
-				multiPackStart = sourcePacket
-
+			if !multiPackStarted {
 				// Report error
 				sourcePacketCopy := sourcePacket
 				sourcePacketCopy.Error = errors.New("got stop packed without a start packet")
 				target <- sourcePacketCopy
+
+				multiPackStart = sourcePacket
 			}
 
 			// Concat SPStop and report parsed packet
-			_, err := io.Copy(multiPackBuffer, reader)
+			_, err := multiPackBuffer.ReadFrom(reader)
 			if err != nil && err != io.EOF {
 				sourcePacket.Error = err
 				target <- sourcePacket
 			}
 			multiPackStart.Buffer = multiPackBuffer.Bytes()
 			target <- multiPackStart
-			multiPackBuffer = nil
+			multiPackBuffer.Reset()
 			multiPackStart = common.DataRecord{}
+			multiPackStarted = false
 
 		default:
 			// Report unknown grouping flag error
@@ -95,7 +97,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 	}
 
 	// Report attemmpt at parsing dangling multipack
-	if multiPackBuffer != nil {
+	if multiPackStarted {
 		err := fmt.Errorf("dangling final multipacket with %v bytes", multiPackBuffer.Len())
 		multiPackStart.Buffer = multiPackBuffer.Bytes()
 		multiPackStart.Error = err
