@@ -29,7 +29,7 @@ The tool can be used to scan rac files for contents. Use the -stdout flag and
 use command line tools to scan for interesting information, e.g.:
 	rac -stdout my.rac  | grep STAT
 
-Tip finding parsing errors:
+Tip for finding parsing errors:
 	rac -stdout my.rac | grep -E -e".*Error:[^<:]+" -o
 
 or if you want the Buffer conents which can be rather large if you are unlucky:
