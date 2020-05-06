@@ -25,7 +25,7 @@ func myUsage() {
 	fmt.Printf("Usage: %s [OPTIONS] rac-file ...\n", os.Args[0])
 	flag.PrintDefaults()
 	fmt.Println(`
-The tool can be used to scan rac files for contents use the -stdout flag and
+The tool can be used to scan rac files for contents. Use the -stdout flag and
 use command line tools to scan for interesting information.
 	rac -stdout my.rac  | grep STAT
 
