@@ -15,24 +15,24 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 	for sourcePacket := range source {
 		var exportable common.Exportable
 		var err error
-		reader := bytes.NewBuffer(sourcePacket.Buffer)
+		buffer := bytes.NewBuffer(sourcePacket.Buffer)
 		switch {
 		case sourcePacket.TMHeader.IsHousekeeping():
 			var sid aez.SID
-			binary.Read(reader, binary.BigEndian, &sid)
+			binary.Read(buffer, binary.BigEndian, &sid)
 			sourcePacket.SID = sid
-			exportable, err = instrumentHK(sid, reader)
+			exportable, err = instrumentHK(sid, buffer)
 		case sourcePacket.TMHeader.IsTransparentData():
 			var rid aez.RID
-			binary.Read(reader, binary.BigEndian, &rid)
+			binary.Read(buffer, binary.BigEndian, &rid)
 			sourcePacket.RID = rid
-			exportable, err = instrumentTransparentData(rid, reader)
+			exportable, err = instrumentTransparentData(rid, buffer)
 		default:
 			err = errors.New("the TMHeader isn't recognized as either housekeeping or tranparent data")
 		}
 		sourcePacket.Error = err
 		sourcePacket.Data = exportable
-		sourcePacket.Buffer = reader.Bytes()
+		sourcePacket.Buffer = buffer.Bytes()
 		target <- sourcePacket
 	}
 }
