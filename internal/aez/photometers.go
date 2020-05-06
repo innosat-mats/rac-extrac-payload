@@ -30,7 +30,7 @@ type PMData struct {
 
 // Read PM
 func (pm *PMData) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, pm)
+	return binary.Read(buf, binary.LittleEndian, pm)
 }
 
 // Time returns the measurement time in UTC
