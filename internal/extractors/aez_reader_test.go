@@ -55,7 +55,7 @@ func TestDecodeAEZ(t *testing.T) {
 			aez.STAT{SPID: 32516, SPREV: 2, FPID: 33284, FPREV: 2, SVNA: 2, SVNB: 6, SVNC: 1, TS: 454164480, TSS: 61344, MODE: 2, EDACE: 0, EDACCE: 0, EDACN: 16777216, SPWEOP: 1090519040, SPWEEP: 0, ANOMALY: 0},
 			aez.SIDSTAT,
 			aez.RID(0),
-			0,
+			2,
 			false,
 		},
 		{
