@@ -2,6 +2,7 @@ package ramses
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 	"time"
 )
@@ -36,4 +37,23 @@ func (ramses *Ramses) Valid() bool {
 //SecureTrans always true?
 func (ramses *Ramses) SecureTrans() bool {
 	return true
+}
+
+// CSVSpecifications returns the specs used in creating the struct
+func (ramses Ramses) CSVSpecifications() []string {
+	return []string{"RAMSES", Specification}
+}
+
+//CSVHeaders returns the field names
+func (ramses Ramses) CSVHeaders() []string {
+	return []string{
+		"RamsesTime",
+	}
+}
+
+//CSVRow returns the field values
+func (ramses Ramses) CSVRow() []string {
+	return []string{
+		fmt.Sprintf("%v", ramses.Created().Format(time.RFC3339Nano)),
+	}
 }

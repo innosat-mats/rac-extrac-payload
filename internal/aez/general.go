@@ -2,7 +2,9 @@ package aez
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
+	"reflect"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
@@ -26,6 +28,25 @@ const (
 	// SIDCPRUB is the SID of CPRUB.
 	SIDCPRUB SID = 31
 )
+
+func (sid SID) String() string {
+	switch sid {
+	case 0:
+		return ""
+	case SIDSTAT:
+		return "STAT"
+	case SIDHTR:
+		return "HTR"
+	case SIDPWR:
+		return "PWR"
+	case SIDCPRUA:
+		return "CPRUA"
+	case SIDCPRUB:
+		return "CPRUB"
+	default:
+		return fmt.Sprintf("Unknown SID: %v", int(sid))
+	}
+}
 
 // RID is Report Identification
 type RID uint16
@@ -82,4 +103,36 @@ func (stat *STAT) Time(epoch time.Time) time.Time {
 // Nanoseconds returns the measurement time in nanoseconds since epoch
 func (stat *STAT) Nanoseconds() int64 {
 	return ccsds.UnsegmentedTimeNanoseconds(stat.TS, stat.TSS)
+}
+
+// CSVSpecifications returns the version of the spec used
+func (stat STAT) CSVSpecifications() []string {
+	return []string{"AEZ", Specification}
+}
+
+// CSVHeaders returns the header row
+func (stat STAT) CSVHeaders() []string {
+	var headers []string
+	headers = append(headers, "STATTIME", "STATNANO")
+	// We don't need the raw CUC Time fields, instead the iso date and nanoseconds are included above.
+	return append(headers, csvHeader(stat, "TS", "TSS")...)
+}
+
+// CSVRow returns the data row
+func (stat STAT) CSVRow() []string {
+	var row []string
+	gpsTime := time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
+	statTime := stat.Time(gpsTime)
+	row = append(row, statTime.Format(time.RFC3339Nano), fmt.Sprintf("%v", stat.Nanoseconds()))
+	val := reflect.Indirect(reflect.ValueOf(stat))
+	t := val.Type()
+	for i := 0; i < val.NumField(); i++ {
+		name := t.Field(i).Name
+		// We don't need the raw CUC Time fields, instead the iso date and nanoseconds are included above.
+		if name != "TS" && name != "TSS" {
+			valueField := val.Field(i)
+			row = append(row, fmt.Sprintf("%v", valueField.Uint()))
+		}
+	}
+	return row
 }

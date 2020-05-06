@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"reflect"
+	"strings"
 )
 
 type pwr uint16
@@ -159,4 +161,39 @@ func (pwr *PWR) Report() PWRReport {
 		PWRP3C3:  pwr.PWRP3C3.current(),
 		WARNINGS: warnings,
 	}
+}
+
+//CSVSpecifications returns the specs used in creating the struct
+func (pwr PWR) CSVSpecifications() []string {
+	return []string{"AEZ", Specification}
+}
+
+//CSVHeaders returns the field names
+func (pwr PWR) CSVHeaders() []string {
+	return csvHeader(pwr.Report())
+}
+
+//CSVRow returns the field values
+func (pwr PWR) CSVRow() []string {
+	val := reflect.Indirect(reflect.ValueOf(pwr.Report()))
+	values := make([]string, val.NumField())
+	t := val.Type()
+	for i := range values {
+		valueField := val.Field(i)
+		if t.Field(i).Name == "WARNINGS" {
+			if valueField.Len() == 0 {
+				values[i] = ""
+			} else {
+				var errs = make([]string, valueField.Len())
+				for j, l := 0, valueField.Len(); j < l; j++ {
+					errs[j] = fmt.Sprintf("%v", valueField.Index(j).Elem())
+				}
+				values[i] = strings.Join(errs, "|")
+			}
+
+		} else {
+			values[i] = fmt.Sprintf("%v", valueField.Float())
+		}
+	}
+	return values
 }

@@ -1,6 +1,7 @@
 package aez
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -68,6 +69,207 @@ func TestCPRU_Report(t *testing.T) {
 			}
 			if got := cpru.Report(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CPRU.Report() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCPRU_CSVHeaders(t *testing.T) {
+	type fields struct {
+		STAT   uint8
+		VGATE0 gate
+		VSUBS0 subs
+		VRD0   rd
+		VOD0   od
+		VGATE1 gate
+		VSUBS1 subs
+		VRD1   rd
+		VOD1   od
+		VGATE2 gate
+		VSUBS2 subs
+		VRD2   rd
+		VOD2   od
+		VGATE3 gate
+		VSUBS3 subs
+		VRD3   rd
+		VOD3   od
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			"Produces headers",
+			fields{},
+			[]string{
+				"VGATE0", "VSUBS0", "VRD0", "VOD0",
+				"VGATE1", "VSUBS1", "VRD1", "VOD1",
+				"VGATE2", "VSUBS2", "VRD2", "VOD2",
+				"VGATE3", "VSUBS3", "VRD3", "VOD3",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cpru := CPRU{
+				STAT:   tt.fields.STAT,
+				VGATE0: tt.fields.VGATE0,
+				VSUBS0: tt.fields.VSUBS0,
+				VRD0:   tt.fields.VRD0,
+				VOD0:   tt.fields.VOD0,
+				VGATE1: tt.fields.VGATE1,
+				VSUBS1: tt.fields.VSUBS1,
+				VRD1:   tt.fields.VRD1,
+				VOD1:   tt.fields.VOD1,
+				VGATE2: tt.fields.VGATE2,
+				VSUBS2: tt.fields.VSUBS2,
+				VRD2:   tt.fields.VRD2,
+				VOD2:   tt.fields.VOD2,
+				VGATE3: tt.fields.VGATE3,
+				VSUBS3: tt.fields.VSUBS3,
+				VRD3:   tt.fields.VRD3,
+				VOD3:   tt.fields.VOD3,
+			}
+			if got := cpru.CSVHeaders(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CPRU.CSVHeaders() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCPRU_CSVRow(t *testing.T) {
+	type fields struct {
+		STAT   uint8
+		VGATE0 gate
+		VSUBS0 subs
+		VRD0   rd
+		VOD0   od
+		VGATE1 gate
+		VSUBS1 subs
+		VRD1   rd
+		VOD1   od
+		VGATE2 gate
+		VSUBS2 subs
+		VRD2   rd
+		VOD2   od
+		VGATE3 gate
+		VSUBS3 subs
+		VRD3   rd
+		VOD3   od
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			"Generates data row",
+			fields{
+				STAT:   1,
+				VGATE0: 2, VSUBS0: 3, VRD0: 4, VOD0: 5,
+				VGATE1: 6, VSUBS1: 7, VRD1: 8, VOD1: 9,
+				VGATE2: 10, VSUBS2: 11, VRD2: 12, VOD2: 13,
+				VGATE3: 14, VSUBS3: 15, VRD3: 16, VOD3: 17,
+			},
+			[]string{
+				fmt.Sprintf("%v", gate(2).voltage()),
+				fmt.Sprintf("%v", subs(3).voltage()),
+				fmt.Sprintf("%v", rd(4).voltage()),
+				fmt.Sprintf("%v", od(5).voltage()),
+				fmt.Sprintf("%v", gate(6).voltage()),
+				fmt.Sprintf("%v", subs(7).voltage()),
+				fmt.Sprintf("%v", rd(8).voltage()),
+				fmt.Sprintf("%v", od(9).voltage()),
+				fmt.Sprintf("%v", gate(10).voltage()),
+				fmt.Sprintf("%v", subs(11).voltage()),
+				fmt.Sprintf("%v", rd(12).voltage()),
+				fmt.Sprintf("%v", od(13).voltage()),
+				fmt.Sprintf("%v", gate(14).voltage()),
+				fmt.Sprintf("%v", subs(15).voltage()),
+				fmt.Sprintf("%v", rd(16).voltage()),
+				fmt.Sprintf("%v", od(17).voltage()),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cpru := CPRU{
+				STAT:   tt.fields.STAT,
+				VGATE0: tt.fields.VGATE0,
+				VSUBS0: tt.fields.VSUBS0,
+				VRD0:   tt.fields.VRD0,
+				VOD0:   tt.fields.VOD0,
+				VGATE1: tt.fields.VGATE1,
+				VSUBS1: tt.fields.VSUBS1,
+				VRD1:   tt.fields.VRD1,
+				VOD1:   tt.fields.VOD1,
+				VGATE2: tt.fields.VGATE2,
+				VSUBS2: tt.fields.VSUBS2,
+				VRD2:   tt.fields.VRD2,
+				VOD2:   tt.fields.VOD2,
+				VGATE3: tt.fields.VGATE3,
+				VSUBS3: tt.fields.VSUBS3,
+				VRD3:   tt.fields.VRD3,
+				VOD3:   tt.fields.VOD3,
+			}
+			if got := cpru.CSVRow(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CPRU.CSVRow() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCPRU_CSVSpecifications(t *testing.T) {
+	type fields struct {
+		STAT   uint8
+		VGATE0 gate
+		VSUBS0 subs
+		VRD0   rd
+		VOD0   od
+		VGATE1 gate
+		VSUBS1 subs
+		VRD1   rd
+		VOD1   od
+		VGATE2 gate
+		VSUBS2 subs
+		VRD2   rd
+		VOD2   od
+		VGATE3 gate
+		VSUBS3 subs
+		VRD3   rd
+		VOD3   od
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{"Genereates spec", fields{}, []string{"AEZ", Specification}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cpru := CPRU{
+				STAT:   tt.fields.STAT,
+				VGATE0: tt.fields.VGATE0,
+				VSUBS0: tt.fields.VSUBS0,
+				VRD0:   tt.fields.VRD0,
+				VOD0:   tt.fields.VOD0,
+				VGATE1: tt.fields.VGATE1,
+				VSUBS1: tt.fields.VSUBS1,
+				VRD1:   tt.fields.VRD1,
+				VOD1:   tt.fields.VOD1,
+				VGATE2: tt.fields.VGATE2,
+				VSUBS2: tt.fields.VSUBS2,
+				VRD2:   tt.fields.VRD2,
+				VOD2:   tt.fields.VOD2,
+				VGATE3: tt.fields.VGATE3,
+				VSUBS3: tt.fields.VSUBS3,
+				VRD3:   tt.fields.VRD3,
+				VOD3:   tt.fields.VOD3,
+			}
+			if got := cpru.CSVSpecifications(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CPRU.CSVSpecifications() = %v, want %v", got, tt.want)
 			}
 		})
 	}

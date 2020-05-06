@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"reflect"
+	"strings"
 )
 
 var htrTemperatures = [...]float64{
@@ -139,4 +141,40 @@ func (htr *HTR) Report() HTRReport {
 		HTR8OD:   htr.HTR8OD.voltage(),
 		WARNINGS: warnings,
 	}
+}
+
+//CSVHeaders returns the field names
+func (htr HTR) CSVHeaders() []string {
+	return csvHeader(htr.Report())
+}
+
+//CSVRow returns the field values
+func (htr HTR) CSVRow() []string {
+	val := reflect.Indirect(reflect.ValueOf(htr.Report()))
+	values := make([]string, val.NumField())
+	t := val.Type()
+	for i := range values {
+		valueField := val.Field(i)
+		if t.Field(i).Name == "WARNINGS" {
+			if valueField.Len() == 0 {
+				values[i] = ""
+			} else {
+				var errs = make([]string, valueField.Len())
+				for j, l := 0, valueField.Len(); j < l; j++ {
+					errs[j] = fmt.Sprintf("%v", valueField.Index(j).Elem())
+				}
+				values[i] = strings.Join(errs, "|")
+			}
+
+		} else {
+			values[i] = fmt.Sprintf("%v", valueField.Float())
+		}
+
+	}
+	return values
+}
+
+//CSVSpecifications returns the specs used in creating the struct
+func (htr HTR) CSVSpecifications() []string {
+	return []string{"AEZ", Specification}
 }

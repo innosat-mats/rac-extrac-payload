@@ -1,4 +1,6 @@
 github.com/howeyc/crc16 v0.0.0-20171223171357-2b2a61e366a6 h1:IIVxLyDUYErC950b8kecjoqDet8P5S4lcVRUOM6rdkU=
 github.com/howeyc/crc16 v0.0.0-20171223171357-2b2a61e366a6/go.mod h1:JslaLRrzGsOKJgFEPBP65Whn+rdwDQSk0I0MCRFe2Zw=
+github.com/jbuchbinder/gopnm v0.0.0-20150223212718-5176c556b9ce h1:SHuC5z27u3lD7x5aybCGdCMN9U01n1+bsaTGfJUPvlc=
+github.com/jbuchbinder/gopnm v0.0.0-20150223212718-5176c556b9ce/go.mod h1:k4IRLYBcpoQAIqDzFcBFY3eSoVnCvN5nfq3Wqm0ZLp8=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
