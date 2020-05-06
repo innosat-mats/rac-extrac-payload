@@ -395,12 +395,12 @@ func TestCCDImagePackData_Read(t *testing.T) {
 				NBC:     tt.fields.NBC,
 			}
 			buf := new(bytes.Buffer)
-			err := binary.Write(buf, binary.BigEndian, tt.fields)
+			err := binary.Write(buf, binary.LittleEndian, tt.fields)
 			if err != nil {
 				t.Errorf("Could not inject struct data into buffer")
 				return
 			}
-			err = binary.Write(buf, binary.BigEndian, tt.extraData)
+			err = binary.Write(buf, binary.LittleEndian, tt.extraData)
 			if err != nil {
 				t.Errorf("Could not inject extra data into buffer")
 				return
