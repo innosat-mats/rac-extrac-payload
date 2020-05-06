@@ -32,7 +32,7 @@ use command line tools to scan for interesting information.
 Tip finding parsing errors:
 	rac -stdout my.rac | grep -E -e".*Error:[^<:]+" -o
 
-or if you want the Buffer conents which can be rather large if you are unlucky
+or if you want the Buffer conents which can be rather large if you are unlucky:
 	rac -stdout my.rac | grep -E -e".*Error:[^<]+" -o
 	`)
 }
