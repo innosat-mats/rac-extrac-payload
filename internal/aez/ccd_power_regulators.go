@@ -4,9 +4,9 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"reflect"
-	"strings"
 )
 
 type gate uint16
@@ -37,22 +37,20 @@ func (data od) voltage() float64 {
 
 type cpruStat uint8
 
-func (stat cpruStat) overvoltageFault() [4]bool {
-	return [4]bool{
-		stat&0x80 != 0,
-		stat&0x40 != 0,
-		stat&0x20 != 0,
-		stat&0x10 != 0,
+func (stat cpruStat) overvoltageFault(ccd uint8) bool {
+	if ccd > 3 {
+		log.Fatalf("overvoltageFault got illegal ccd %v", ccd)
 	}
+	var mask uint8 = 0x80 >> ccd
+	return uint8(stat)&mask != 0
 }
 
-func (stat cpruStat) powerEnabled() [4]bool {
-	return [4]bool{
-		stat&0x08 != 0,
-		stat&0x04 != 0,
-		stat&0x02 != 0,
-		stat&0x01 != 0,
+func (stat cpruStat) powerEnabled(ccd uint8) bool {
+	if ccd > 3 {
+		log.Fatalf("powerEnabled got illegal ccd %v", ccd)
 	}
+	var mask uint8 = 0x08 >> ccd
+	return uint8(stat)&mask != 0
 }
 
 //CPRU structure
@@ -80,24 +78,30 @@ type CPRU struct {
 
 //CPRUReport structure
 type CPRUReport struct {
-	VGATE0      float64 // CCD0 Gate Voltage
-	VSUBS0      float64 // CCD0 Substrate Voltage
-	VRD0        float64 // CCD0 Reset transistor Drain Voltage
-	VOD0        float64 // CCD0 Output Drain Voltage
-	VGATE1      float64 // CCD1 Gate Voltage
-	VSUBS1      float64 // CCD1 Substrate Voltage
-	VRD1        float64 // CCD1 Reset transistor Drain Voltage
-	VOD1        float64 // CCD1 Output Drain Voltage
-	VGATE2      float64 // CCD2 Gate Voltage
-	VSUBS2      float64 // CCD2 Substrate Voltage
-	VRD2        float64 // CCD2 Reset transistor Drain Voltage
-	VOD2        float64 // CCD2 Output Drain Voltage
-	VGATE3      float64 // CCD3 Gate Voltage
-	VSUBS3      float64 // CCD3 Substrate Voltage
-	VRD3        float64 // CCD3 Reset transistor Drain Voltage
-	VOD3        float64 // CCD3 Output Drain Voltage
-	Overvoltage [4]bool // CCD overvoltage fault, one bit per CCD
-	Power       [4]bool // CCD overvoltage fault, one bit per CCD
+	VGATE0       float64 // CCD0 Gate Voltage
+	VSUBS0       float64 // CCD0 Substrate Voltage
+	VRD0         float64 // CCD0 Reset transistor Drain Voltage
+	VOD0         float64 // CCD0 Output Drain Voltage
+	Overvoltage0 bool    // CCD0 overvoltage fault
+	Power0       bool    // CCD0 overvoltage fault
+	VGATE1       float64 // CCD1 Gate Voltage
+	VSUBS1       float64 // CCD1 Substrate Voltage
+	VRD1         float64 // CCD1 Reset transistor Drain Voltage
+	VOD1         float64 // CCD1 Output Drain Voltage
+	Overvoltage1 bool    // CCD1 overvoltage fault
+	Power1       bool    // CCD1 overvoltage fault
+	VGATE2       float64 // CCD2 Gate Voltage
+	VSUBS2       float64 // CCD2 Substrate Voltage
+	VRD2         float64 // CCD2 Reset transistor Drain Voltage
+	VOD2         float64 // CCD2 Output Drain Voltage
+	Overvoltage2 bool    // CCD2 overvoltage fault
+	Power2       bool    // CCD2 overvoltage fault
+	VGATE3       float64 // CCD3 Gate Voltage
+	VSUBS3       float64 // CCD3 Substrate Voltage
+	VRD3         float64 // CCD3 Reset transistor Drain Voltage
+	VOD3         float64 // CCD3 Output Drain Voltage
+	Overvoltage3 bool    // CCD3 overvoltage fault
+	Power3       bool    // CCD3 overvoltage fault
 
 }
 
@@ -109,24 +113,30 @@ func (cpru *CPRU) Read(buf io.Reader) error {
 // Report transforms CPRU data to useful units
 func (cpru *CPRU) Report() CPRUReport {
 	return CPRUReport{
-		VGATE0:      cpru.VGATE0.voltage(),
-		VSUBS0:      cpru.VSUBS0.voltage(),
-		VRD0:        cpru.VRD0.voltage(),
-		VOD0:        cpru.VOD0.voltage(),
-		VGATE1:      cpru.VGATE1.voltage(),
-		VSUBS1:      cpru.VSUBS1.voltage(),
-		VRD1:        cpru.VRD1.voltage(),
-		VOD1:        cpru.VOD1.voltage(),
-		VGATE2:      cpru.VGATE2.voltage(),
-		VSUBS2:      cpru.VSUBS2.voltage(),
-		VRD2:        cpru.VRD2.voltage(),
-		VOD2:        cpru.VOD2.voltage(),
-		VGATE3:      cpru.VGATE3.voltage(),
-		VSUBS3:      cpru.VSUBS3.voltage(),
-		VRD3:        cpru.VRD3.voltage(),
-		VOD3:        cpru.VOD3.voltage(),
-		Overvoltage: cpru.STAT.overvoltageFault(),
-		Power:       cpru.STAT.powerEnabled(),
+		VGATE0:       cpru.VGATE0.voltage(),
+		VSUBS0:       cpru.VSUBS0.voltage(),
+		VRD0:         cpru.VRD0.voltage(),
+		VOD0:         cpru.VOD0.voltage(),
+		Overvoltage0: cpru.STAT.overvoltageFault(0),
+		Power0:       cpru.STAT.powerEnabled(0),
+		VGATE1:       cpru.VGATE1.voltage(),
+		VSUBS1:       cpru.VSUBS1.voltage(),
+		VRD1:         cpru.VRD1.voltage(),
+		VOD1:         cpru.VOD1.voltage(),
+		Overvoltage1: cpru.STAT.overvoltageFault(1),
+		Power1:       cpru.STAT.powerEnabled(1),
+		VGATE2:       cpru.VGATE2.voltage(),
+		VSUBS2:       cpru.VSUBS2.voltage(),
+		VRD2:         cpru.VRD2.voltage(),
+		VOD2:         cpru.VOD2.voltage(),
+		Overvoltage2: cpru.STAT.overvoltageFault(2),
+		Power2:       cpru.STAT.powerEnabled(2),
+		VGATE3:       cpru.VGATE3.voltage(),
+		VSUBS3:       cpru.VSUBS3.voltage(),
+		VRD3:         cpru.VRD3.voltage(),
+		VOD3:         cpru.VOD3.voltage(),
+		Overvoltage3: cpru.STAT.overvoltageFault(3),
+		Power3:       cpru.STAT.powerEnabled(3),
 	}
 }
 
@@ -144,21 +154,12 @@ func (cpru CPRU) CSVHeaders() []string {
 func (cpru CPRU) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(cpru.Report()))
 	values := make([]string, val.NumField())
-	t := val.Type()
 	for i := range values {
 		valueField := val.Field(i)
-		name := t.Field(i).Name
-		if name == "Overvoltage" || name == "Power" {
-			if valueField.Len() == 0 {
-				values[i] = ""
-			} else {
-				var stats = make([]string, valueField.Len())
-				for j, l := 0, valueField.Len(); j < l; j++ {
-					stats[j] = fmt.Sprintf("%v", valueField.Index(j))
-				}
-				values[i] = strings.Join(stats, "|")
-			}
-		} else {
+		switch valueField.Interface().(type) {
+		case bool:
+			values[i] = fmt.Sprintf("%v", valueField.Bool())
+		default:
 			values[i] = fmt.Sprintf("%v", valueField.Float())
 		}
 	}

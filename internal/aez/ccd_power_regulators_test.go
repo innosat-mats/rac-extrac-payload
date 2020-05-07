@@ -103,11 +103,10 @@ func TestCPRU_CSVHeaders(t *testing.T) {
 			"Produces headers",
 			fields{},
 			[]string{
-				"VGATE0", "VSUBS0", "VRD0", "VOD0",
-				"VGATE1", "VSUBS1", "VRD1", "VOD1",
-				"VGATE2", "VSUBS2", "VRD2", "VOD2",
-				"VGATE3", "VSUBS3", "VRD3", "VOD3",
-				"Overvoltage", "Power",
+				"VGATE0", "VSUBS0", "VRD0", "VOD0", "Overvoltage0", "Power0",
+				"VGATE1", "VSUBS1", "VRD1", "VOD1", "Overvoltage1", "Power1",
+				"VGATE2", "VSUBS2", "VRD2", "VOD2", "Overvoltage2", "Power2",
+				"VGATE3", "VSUBS3", "VRD3", "VOD3", "Overvoltage3", "Power3",
 			},
 		},
 	}
@@ -178,20 +177,26 @@ func TestCPRU_CSVRow(t *testing.T) {
 				fmt.Sprintf("%v", subs(3).voltage()),
 				fmt.Sprintf("%v", rd(4).voltage()),
 				fmt.Sprintf("%v", od(5).voltage()),
+				fmt.Sprintf("%v", cpruStat(1).overvoltageFault(0)),
+				fmt.Sprintf("%v", cpruStat(1).powerEnabled(0)),
 				fmt.Sprintf("%v", gate(6).voltage()),
 				fmt.Sprintf("%v", subs(7).voltage()),
 				fmt.Sprintf("%v", rd(8).voltage()),
 				fmt.Sprintf("%v", od(9).voltage()),
+				fmt.Sprintf("%v", cpruStat(1).overvoltageFault(1)),
+				fmt.Sprintf("%v", cpruStat(1).powerEnabled(1)),
 				fmt.Sprintf("%v", gate(10).voltage()),
 				fmt.Sprintf("%v", subs(11).voltage()),
 				fmt.Sprintf("%v", rd(12).voltage()),
 				fmt.Sprintf("%v", od(13).voltage()),
+				fmt.Sprintf("%v", cpruStat(1).overvoltageFault(2)),
+				fmt.Sprintf("%v", cpruStat(1).powerEnabled(2)),
 				fmt.Sprintf("%v", gate(14).voltage()),
 				fmt.Sprintf("%v", subs(15).voltage()),
 				fmt.Sprintf("%v", rd(16).voltage()),
 				fmt.Sprintf("%v", od(17).voltage()),
-				"false|false|false|false",
-				"false|false|false|true",
+				fmt.Sprintf("%v", cpruStat(1).overvoltageFault(3)),
+				fmt.Sprintf("%v", cpruStat(1).powerEnabled(3)),
 			},
 		},
 	}
@@ -273,6 +278,62 @@ func TestCPRU_CSVSpecifications(t *testing.T) {
 			}
 			if got := cpru.CSVSpecifications(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CPRU.CSVSpecifications() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_cpruStat_overvoltageFault(t *testing.T) {
+	type args struct {
+		ccd uint8
+	}
+	tests := []struct {
+		name string
+		stat cpruStat
+		args args
+		want bool
+	}{
+		{"overvoltageFault true for CCD0", cpruStat(0x80), args{0}, true},
+		{"overvoltageFault false for CCD0", cpruStat(0x7F), args{0}, false},
+		{"overvoltageFault true for CCD1", cpruStat(0x40), args{1}, true},
+		{"overvoltageFault false for CCD1", cpruStat(0xBF), args{1}, false},
+		{"overvoltageFault true for CCD2", cpruStat(0x20), args{2}, true},
+		{"overvoltageFault false for CCD2", cpruStat(0xDF), args{2}, false},
+		{"overvoltageFault true for CCD3", cpruStat(0x10), args{3}, true},
+		{"overvoltageFault false for CCD3", cpruStat(0xEF), args{3}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.stat.overvoltageFault(tt.args.ccd); got != tt.want {
+				t.Errorf("cpruStat.overvoltageFault() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_cpruStat_powerEnabled(t *testing.T) {
+	type args struct {
+		ccd uint8
+	}
+	tests := []struct {
+		name string
+		stat cpruStat
+		args args
+		want bool
+	}{
+		{"powerEnabled true for CCD0", cpruStat(0x08), args{0}, true},
+		{"powerEnabled false for CCD0", cpruStat(0xF7), args{0}, false},
+		{"powerEnabled true for CCD1", cpruStat(0x04), args{1}, true},
+		{"powerEnabled false for CCD1", cpruStat(0xFB), args{1}, false},
+		{"powerEnabled true for CCD2", cpruStat(0x02), args{2}, true},
+		{"powerEnabled false for CCD2", cpruStat(0xFD), args{2}, false},
+		{"powerEnabled true for CCD3", cpruStat(0x01), args{3}, true},
+		{"powerEnabled false for CCD3", cpruStat(0xFE), args{3}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.stat.powerEnabled(tt.args.ccd); got != tt.want {
+				t.Errorf("cpruStat.powerEnabled() = %v, want %v", got, tt.want)
 			}
 		})
 	}
