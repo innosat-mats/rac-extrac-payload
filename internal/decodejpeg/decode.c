@@ -34,7 +34,7 @@ read_JPEG_file(char *inbuffer, size_t size)
     (void)jpeg_read_scanlines(&cinfo, buffer, 1);
     memcpy(&(result.pix)[(cinfo.output_scanline - 1) * row_stride],
            buffer[0],
-           row_stride * BYTES_PER_SAMPLE);
+           row_stride);
   }
   (void)jpeg_finish_decompress(&cinfo);
 
