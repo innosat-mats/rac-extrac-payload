@@ -90,6 +90,7 @@ func DiskCallbackFactory(
 					int(ccdImage.PackData.NCOL)+1, // Because SPEC says so we believe
 					int(ccdImage.PackData.NROW),
 					rightShift,
+					imgFileName,
 				)
 				imgFile, err := os.Create(imgFileName)
 				if err != nil {
@@ -98,6 +99,7 @@ func DiskCallbackFactory(
 				}
 				defer imgFile.Close()
 				png.Encode(imgFile, img)
+				//imgFile.Write(pkg.RemainingBuffer())
 			}
 		}
 

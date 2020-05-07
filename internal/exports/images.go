@@ -13,7 +13,7 @@ import (
 )
 
 func getGrayscaleImage(
-	pixels []uint16, width int, height int, shift int,
+	pixels []uint16, width int, height int, shift int, filename string,
 ) image.Image {
 	nPixels := len(pixels)
 	/*
@@ -36,7 +36,8 @@ func getGrayscaleImage(
 
 	if nPixels != width*height {
 		log.Printf(
-			"Found %v pixels, but dimension %v x %v says it should be %v",
+			"%v Found %v pixels, but dimension %v x %v says it should be %v",
+			filename,
 			nPixels,
 			width,
 			height,
@@ -86,6 +87,7 @@ func getImageData(
 	var imgData []uint16
 	var err error
 	if packData.JPEGQ != aez.JPEGQUncompressed16bit {
+		log.Println("Compressed image")
 		var height int
 		var width int
 		imgData, height, width, err = decodejpeg.JpegImageData(buf)
@@ -93,7 +95,7 @@ func getImageData(
 			log.Print(err)
 			return imgData
 		}
-		if uint16(height) != packData.NROW || uint16(width) != packData.NCOL {
+		if uint16(height) != packData.NROW || uint16(width) != packData.NCOL+1 {
 			log.Printf(
 				"CCDImage %v has either width %v != %v and/or height %v != %v\n",
 				outFileName,
@@ -104,6 +106,7 @@ func getImageData(
 			)
 		}
 	} else {
+		log.Println("Raw image")
 		reader := bytes.NewReader(buf)
 		imgData = make([]uint16, reader.Len()/2)
 		binary.Read(reader, binary.LittleEndian, &imgData)
