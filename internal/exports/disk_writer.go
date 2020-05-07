@@ -74,24 +74,25 @@ func DiskCallbackFactory(
 			case aez.CCDImage:
 				ccdImage, ok := pkg.AEZData().(aez.CCDImage)
 				if !ok {
-					log.Print("Could not understand CCDImage, this should be impossible.")
+					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
 				}
 				imgFileName := getGrayscaleImageName(output, ccdImage.PackData)
+
 				imgData := getImageData(
 					pkg.RemainingBuffer(),
 					ccdImage.PackData,
 					imgFileName,
 				)
-
 				_, rightShift, _ := ccdImage.PackData.WDW.InputDataWindow()
 				img := getGrayscaleImage(
 					imgData,
-					int(ccdImage.PackData.NCOL)+1, // Because SPEC says so we believe
+					int(ccdImage.PackData.NCOL+aez.NCOLStartOffset),
 					int(ccdImage.PackData.NROW),
 					rightShift,
 					imgFileName,
 				)
+
 				imgFile, err := os.Create(imgFileName)
 				if err != nil {
 					log.Printf("failed creating %s: %s", imgFileName, err)
@@ -99,7 +100,6 @@ func DiskCallbackFactory(
 				}
 				defer imgFile.Close()
 				png.Encode(imgFile, img)
-				//imgFile.Write(pkg.RemainingBuffer())
 			}
 		}
 

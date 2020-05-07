@@ -16,17 +16,6 @@ func getGrayscaleImage(
 	pixels []uint16, width int, height int, shift int, filename string,
 ) image.Image {
 	nPixels := len(pixels)
-	/*
-		if nPixels == 1048572 {
-			log.Printf(
-				"changing widht %v => 1026 and height %v => 1022",
-				width,
-				height,
-			)
-			width = 1026
-			height = 1022
-		}
-	*/
 	img := image.NewGray16(
 		image.Rectangle{
 			image.Point{0, 0},
@@ -36,7 +25,7 @@ func getGrayscaleImage(
 
 	if nPixels != width*height {
 		log.Printf(
-			"%v Found %v pixels, but dimension %v x %v says it should be %v",
+			"%v: Found %v pixels, but dimension %v x %v says it should be %v\n",
 			filename,
 			nPixels,
 			width,
@@ -51,24 +40,10 @@ func getGrayscaleImage(
 	buf := bytes.NewBuffer([]byte{})
 	err := binary.Write(buf, binary.BigEndian, shifted)
 	if err != nil {
-		log.Print("Could not write image data")
+		log.Printf("could not write image data for %v to stream\n", filename)
 		return img
 	}
 	img.Pix = buf.Bytes()
-
-	/*
-
-		nPixels := len(pixels)
-		for x := 0; x < width; x++ {
-			for y := 0; y < height; y++ {
-				idx := x*height + y
-				if idx < nPixels {
-					pixel := pixels[idx] << shift
-					img.Set(x, y, color.Gray16{pixel})
-				}
-			}
-		}
-	*/
 	return img
 }
 
@@ -87,7 +62,7 @@ func getImageData(
 	var imgData []uint16
 	var err error
 	if packData.JPEGQ != aez.JPEGQUncompressed16bit {
-		log.Println("Compressed image")
+		log.Println("Compressed image", outFileName)
 		var height int
 		var width int
 		imgData, height, width, err = decodejpeg.JpegImageData(buf)
@@ -95,18 +70,18 @@ func getImageData(
 			log.Print(err)
 			return imgData
 		}
-		if uint16(height) != packData.NROW || uint16(width) != packData.NCOL+1 {
+		if uint16(height) != packData.NROW || uint16(width) != packData.NCOL+aez.NCOLStartOffset {
 			log.Printf(
 				"CCDImage %v has either width %v != %v and/or height %v != %v\n",
 				outFileName,
 				height,
 				packData.NROW,
 				width,
-				packData.NCOL,
+				packData.NCOL+aez.NCOLStartOffset,
 			)
 		}
 	} else {
-		log.Println("Raw image")
+		log.Println("Raw image", outFileName)
 		reader := bytes.NewReader(buf)
 		imgData = make([]uint16, reader.Len()/2)
 		binary.Read(reader, binary.LittleEndian, &imgData)
