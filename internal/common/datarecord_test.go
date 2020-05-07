@@ -359,3 +359,87 @@ func TestDataRecord_OriginName(t *testing.T) {
 		})
 	}
 }
+
+func TestDataRecord_RemainingBuffer(t *testing.T) {
+	type fields struct {
+		Origin       OriginDescription
+		RamsesHeader ramses.Ramses
+		RamsesSecure ramses.Secure
+		SourceHeader innosat.SourcePacketHeader
+		TMHeader     innosat.TMDataFieldHeader
+		SID          aez.SID
+		RID          aez.RID
+		Data         Exportable
+		Error        error
+		Buffer       []byte
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []byte
+	}{
+		{
+			"Returns the buffer", fields{Buffer: []byte("42")}, []byte("42"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			record := DataRecord{
+				Origin:       tt.fields.Origin,
+				RamsesHeader: tt.fields.RamsesHeader,
+				RamsesSecure: tt.fields.RamsesSecure,
+				SourceHeader: tt.fields.SourceHeader,
+				TMHeader:     tt.fields.TMHeader,
+				SID:          tt.fields.SID,
+				RID:          tt.fields.RID,
+				Data:         tt.fields.Data,
+				Error:        tt.fields.Error,
+				Buffer:       tt.fields.Buffer,
+			}
+			if got := record.RemainingBuffer(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DataRecord.RemainingBuffer() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDataRecord_ParsingError(t *testing.T) {
+	type fields struct {
+		Origin       OriginDescription
+		RamsesHeader ramses.Ramses
+		RamsesSecure ramses.Secure
+		SourceHeader innosat.SourcePacketHeader
+		TMHeader     innosat.TMDataFieldHeader
+		SID          aez.SID
+		RID          aez.RID
+		Data         Exportable
+		Error        error
+		Buffer       []byte
+	}
+	tests := []struct {
+		name       string
+		fields     fields
+		wantErrMsg string
+	}{
+		{"Returns the Error", fields{Error: errors.New("42")}, "42"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			record := DataRecord{
+				Origin:       tt.fields.Origin,
+				RamsesHeader: tt.fields.RamsesHeader,
+				RamsesSecure: tt.fields.RamsesSecure,
+				SourceHeader: tt.fields.SourceHeader,
+				TMHeader:     tt.fields.TMHeader,
+				SID:          tt.fields.SID,
+				RID:          tt.fields.RID,
+				Data:         tt.fields.Data,
+				Error:        tt.fields.Error,
+				Buffer:       tt.fields.Buffer,
+			}
+			if errMsg := record.ParsingError().Error(); errMsg != tt.wantErrMsg {
+				t.Errorf("DataRecord.ParsingError() error = %v, wantErr %v", errMsg, tt.wantErrMsg)
+			}
+		})
+	}
+}

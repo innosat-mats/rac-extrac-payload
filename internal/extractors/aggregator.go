@@ -16,6 +16,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 	multiPackBuffer := bytes.NewBuffer([]byte{})
 	var multiPackStarted bool
 	var multiPackStart common.DataRecord
+	var sidRidLength = 2
 
 	for sourcePacket := range source {
 		if sourcePacket.Error != nil {
@@ -60,7 +61,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			}
 
 			// Concat SPCont packet
-			buffer := bytes.NewBuffer(sourcePacket.Buffer[2:len(sourcePacket.Buffer)])
+			buffer := bytes.NewBuffer(sourcePacket.Buffer[sidRidLength:len(sourcePacket.Buffer)])
 			_, err := multiPackBuffer.ReadFrom(buffer)
 			if err != nil && err != io.EOF {
 				sourcePacketCopy := sourcePacket
@@ -79,7 +80,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			}
 
 			// Concat SPStop and report parsed packet
-			buffer := bytes.NewBuffer(sourcePacket.Buffer[2:len(sourcePacket.Buffer)])
+			buffer := bytes.NewBuffer(sourcePacket.Buffer[sidRidLength:len(sourcePacket.Buffer)])
 			_, err := multiPackBuffer.ReadFrom(buffer)
 			if err != nil && err != io.EOF {
 				sourcePacket.Error = err

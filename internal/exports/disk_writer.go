@@ -84,12 +84,12 @@ func DiskCallbackFactory(
 					ccdImage.PackData,
 					imgFileName,
 				)
-				_, rightShift, _ := ccdImage.PackData.WDW.InputDataWindow()
+				_, shift, _ := ccdImage.PackData.WDW.InputDataWindow()
 				img := getGrayscaleImage(
 					imgData,
 					int(ccdImage.PackData.NCOL+aez.NCOLStartOffset),
 					int(ccdImage.PackData.NROW),
-					rightShift,
+					shift,
 					imgFileName,
 				)
 

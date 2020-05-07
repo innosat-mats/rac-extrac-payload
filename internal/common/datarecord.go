@@ -85,10 +85,12 @@ func (record DataRecord) OriginName() string {
 	return record.Origin.Name
 }
 
+// RemainingBuffer returns the buffer in the packet not yet parsed
 func (record DataRecord) RemainingBuffer() []byte {
 	return record.Buffer
 }
 
+// ParsingError returns the error if any
 func (record DataRecord) ParsingError() error {
 	return record.Error
 }

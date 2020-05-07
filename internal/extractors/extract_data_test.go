@@ -66,12 +66,12 @@ func Example() {
 
 	// Output:
 	// CCD3  got stop packet without a start packet
-	// CCD3  <nil>
+	// Unknown RID: 303  unhandled RID Unknown RID: 303
 	//  STAT <nil>
 	//   the TMHeader isn't recognized as either housekeeping or transparent data
 	//   the TMHeader isn't recognized as either housekeeping or transparent data
 	// CCD3  got stop packet without a start packet
-	// CCD3  <nil>
+	// Unknown RID: 303  unhandled RID Unknown RID: 303
 	//  STAT <nil>
 	//   the TMHeader isn't recognized as either housekeeping or transparent data
 	//   the TMHeader isn't recognized as either housekeeping or transparent data

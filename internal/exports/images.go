@@ -14,7 +14,7 @@ import (
 
 func getGrayscaleImage(
 	pixels []uint16, width int, height int, shift int, filename string,
-) image.Image {
+) *image.Gray16 {
 	nPixels := len(pixels)
 	img := image.NewGray16(
 		image.Rectangle{
@@ -33,12 +33,13 @@ func getGrayscaleImage(
 			width*height,
 		)
 	}
-	shifted := make([]uint16, nPixels)
-	for idx := 0; idx < nPixels; idx++ {
-		shifted[idx] = pixels[idx] << shift
-	}
 	buf := bytes.NewBuffer([]byte{})
-	err := binary.Write(buf, binary.BigEndian, shifted)
+	if shift > 0 {
+		for idx := 0; idx < nPixels; idx++ {
+			pixels[idx] = pixels[idx] << shift
+		}
+	}
+	err := binary.Write(buf, binary.BigEndian, pixels)
 	if err != nil {
 		log.Printf("could not write image data for %v to stream\n", filename)
 		return img
@@ -62,7 +63,6 @@ func getImageData(
 	var imgData []uint16
 	var err error
 	if packData.JPEGQ != aez.JPEGQUncompressed16bit {
-		log.Println("Compressed image", outFileName)
 		var height int
 		var width int
 		imgData, height, width, err = decodejpeg.JpegImageData(buf)
@@ -74,16 +74,24 @@ func getImageData(
 			log.Printf(
 				"CCDImage %v has either width %v != %v and/or height %v != %v\n",
 				outFileName,
-				height,
-				packData.NROW,
 				width,
 				packData.NCOL+aez.NCOLStartOffset,
+				height,
+				packData.NROW,
 			)
 		}
 	} else {
-		log.Println("Raw image", outFileName)
 		reader := bytes.NewReader(buf)
 		imgData = make([]uint16, reader.Len()/2)
+		if len(imgData) != int(packData.NROW*(packData.NCOL+aez.NCOLStartOffset)) {
+			log.Printf(
+				"CCDImage %v has %v pixels, but dimensions %v x %v\n",
+				outFileName,
+				len(imgData),
+				packData.NCOL+aez.NCOLStartOffset,
+				packData.NROW,
+			)
+		}
 		binary.Read(reader, binary.LittleEndian, &imgData)
 	}
 	return imgData
