@@ -14,10 +14,12 @@ func ExtractData(callback common.Callback, streamBatch ...StreamBatch) {
 	var waitGroup sync.WaitGroup
 	ramsesChannel := make(chan common.DataRecord)
 	innosatChannel := make(chan common.DataRecord)
+	aggregatorChannel := make(chan common.DataRecord)
 	aezChannel := make(chan common.DataRecord)
 
 	go DecodeRamses(ramsesChannel, streamBatch...)
-	go DecodeAEZ(aezChannel, innosatChannel)
+	go Aggregator(aggregatorChannel, innosatChannel)
+	go DecodeAEZ(aezChannel, aggregatorChannel)
 
 	go func() {
 		waitGroup.Add(1)

@@ -19,6 +19,7 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 		SourceHeader innosat.SourcePacketHeader
 		TMHeader     innosat.TMDataFieldHeader
 		SID          aez.SID
+		RID          aez.RID
 		Data         Exportable
 		Error        error
 		Buffer       []byte
@@ -56,6 +57,7 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 				SourceHeader: tt.fields.SourceHeader,
 				TMHeader:     tt.fields.TMHeader,
 				SID:          tt.fields.SID,
+				RID:          tt.fields.RID,
 				Data:         tt.fields.Data,
 				Error:        tt.fields.Error,
 				Buffer:       tt.fields.Buffer,
@@ -77,6 +79,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 		SourceHeader innosat.SourcePacketHeader
 		TMHeader     innosat.TMDataFieldHeader
 		SID          aez.SID
+		RID          aez.RID
 		Data         Exportable
 		Error        error
 		Buffer       []byte
@@ -97,6 +100,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 				"TMHeaderTime",
 				"TMHeaderNanoseconds",
 				"SID",
+				"RID",
 				"Error",
 			},
 		},
@@ -111,6 +115,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 				"TMHeaderTime",
 				"TMHeaderNanoseconds",
 				"SID",
+				"RID",
 				"STATTIME",
 				"STATNANO",
 				"SPID",
@@ -140,6 +145,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 				SourceHeader: tt.fields.SourceHeader,
 				TMHeader:     tt.fields.TMHeader,
 				SID:          tt.fields.SID,
+				RID:          tt.fields.RID,
 				Data:         tt.fields.Data,
 				Error:        tt.fields.Error,
 				Buffer:       tt.fields.Buffer,
@@ -161,6 +167,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 		SourceHeader innosat.SourcePacketHeader
 		TMHeader     innosat.TMDataFieldHeader
 		SID          aez.SID
+		RID          aez.RID
 		Data         Exportable
 		Error        error
 		Buffer       []byte
@@ -178,6 +185,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 				SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
 				TMHeader:     innosat.TMDataFieldHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
 				SID:          aez.SIDSTAT,
+				RID:          aez.CCD1,
 				Error:        errors.New("Test"),
 			},
 			[]string{
@@ -188,6 +196,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 				"1980-01-06T00:00:42.75Z",
 				"42750000000",
 				"STAT",
+				"CCD1",
 				"Test",
 			},
 		},
@@ -226,6 +235,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 				"1980-01-06T00:00:42.75Z",
 				"42750000000",
 				"STAT",
+				"",
 				"1980-01-06T00:00:08.000137329Z",
 				"8000137329",
 				"1",
@@ -255,6 +265,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 				SourceHeader: tt.fields.SourceHeader,
 				TMHeader:     tt.fields.TMHeader,
 				SID:          tt.fields.SID,
+				RID:          tt.fields.RID,
 				Data:         tt.fields.Data,
 				Error:        tt.fields.Error,
 				Buffer:       tt.fields.Buffer,
@@ -274,6 +285,7 @@ func TestDataRecord_AEZData(t *testing.T) {
 		SourceHeader innosat.SourcePacketHeader
 		TMHeader     innosat.TMDataFieldHeader
 		SID          aez.SID
+		RID          aez.RID
 		Data         Exportable
 		Error        error
 		Buffer       []byte
@@ -295,6 +307,7 @@ func TestDataRecord_AEZData(t *testing.T) {
 				SourceHeader: tt.fields.SourceHeader,
 				TMHeader:     tt.fields.TMHeader,
 				SID:          tt.fields.SID,
+				RID:          tt.fields.RID,
 				Data:         tt.fields.Data,
 				Error:        tt.fields.Error,
 				Buffer:       tt.fields.Buffer,
@@ -314,6 +327,7 @@ func TestDataRecord_OriginName(t *testing.T) {
 		SourceHeader innosat.SourcePacketHeader
 		TMHeader     innosat.TMDataFieldHeader
 		SID          aez.SID
+		RID          aez.RID
 		Data         Exportable
 		Error        error
 		Buffer       []byte
@@ -334,6 +348,7 @@ func TestDataRecord_OriginName(t *testing.T) {
 				SourceHeader: tt.fields.SourceHeader,
 				TMHeader:     tt.fields.TMHeader,
 				SID:          tt.fields.SID,
+				RID:          tt.fields.RID,
 				Data:         tt.fields.Data,
 				Error:        tt.fields.Error,
 				Buffer:       tt.fields.Buffer,

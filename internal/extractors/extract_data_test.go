@@ -65,15 +65,23 @@ func Example() {
 		StreamBatch{byteStream2, common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}})
 
 	// Output:
-	// {{Set1 1980-01-06 00:00:01 +0000 UTC} {60304 56 55417 0 0 80260603 7386} {36569088 0 100 0 52224 0} {2148 51352 49} {16 3 25 4633 58169} STAT {1151 2 1154 2 2 6 1 4633 58124 2 0 0 1 65 0 0} <nil> []}
-	// {{Set1 1980-01-06 00:00:01 +0000 UTC} {60304 56 55417 0 0 80261337 7386} {36569088 0 100 0 52224 0} {0 0 0} {0 0 0 0 0}  <nil> checksum bad 48789 []}
-	// {{Set1 1980-01-06 00:00:01 +0000 UTC} {0 0 0 0 0 0 0} {0 0 0 0 0 0} {0 0 0} {0 0 0 0 0}  <nil> EOF []}
-	// {{Set2 1980-01-06 00:00:01 +0000 UTC} {60304 56 55417 0 0 80260603 7386} {36569088 0 100 0 52224 0} {2148 51352 49} {16 3 25 4633 58169} STAT {1151 2 1154 2 2 6 1 4633 58124 2 0 0 1 65 0 0} <nil> []}
-	// {{Set2 1980-01-06 00:00:01 +0000 UTC} {60304 56 55417 0 0 80261337 7386} {36569088 0 100 0 52224 0} {0 0 0} {0 0 0 0 0}  <nil> checksum bad 48789 []}
-	// {{Set2 1980-01-06 00:00:01 +0000 UTC} {0 0 0 0 0 0 0} {0 0 0 0 0 0} {0 0 0} {0 0 0 0 0}  <nil> EOF []}
-
+	// CCD3  got stop packet without a start packet
+	// CCD3  <nil>
+	//  STAT <nil>
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	// CCD3  got stop packet without a start packet
+	// CCD3  <nil>
+	//  STAT <nil>
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
 }
 
-func simpleOutput(pkg common.ExportablePackage) {
-	fmt.Println(pkg)
+func simpleOutput(expPack common.ExportablePackage) {
+	pkg, ok := expPack.(common.DataRecord)
+	if !ok {
+		fmt.Println("Uknown package")
+	} else {
+		fmt.Println(pkg.RID, pkg.SID, pkg.Error)
+	}
 }

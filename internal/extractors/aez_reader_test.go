@@ -2,6 +2,7 @@ package extractors
 
 import (
 	"bytes"
+	"encoding/binary"
 	"io"
 	"reflect"
 	"testing"
@@ -11,18 +12,32 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
+// makeInstrumentData is a test fixture creator for generating a byte slice of RID/SID the struct and any trailing bytes in the packet.
+func makeInstrumentData(sidrid uint16, data interface{}, trailingBytes []byte) []byte {
+	var buf bytes.Buffer
+	binary.Write(&buf, binary.BigEndian, sidrid)
+	binary.Write(&buf, binary.LittleEndian, data)
+	return append(buf.Bytes(), trailingBytes...)
+}
+
 func TestDecodeAEZ(t *testing.T) {
 
 	tests := []struct {
-		name    string
-		arg     common.DataRecord
-		want    PackageType
-		wantErr bool
+		name       string
+		arg        common.DataRecord
+		want       common.Exportable
+		wantSID    aez.SID
+		wantRID    aez.RID
+		wantBufLen int
+		wantErr    bool
 	}{
 		{
 			"Package with error",
-			common.DataRecord{Error: io.EOF},
+			common.DataRecord{Error: io.EOF, Buffer: []byte("Hello")},
 			nil,
+			aez.SID(0),
+			aez.RID(0),
+			5,
 			true,
 		},
 
@@ -38,6 +53,9 @@ func TestDecodeAEZ(t *testing.T) {
 				},
 			},
 			aez.STAT{SPID: 1151, SPREV: 2, FPID: 1154, FPREV: 2, SVNA: 2, SVNB: 6, SVNC: 1, TS: 4635, TSS: 41199, MODE: 2, EDACE: 0, EDACCE: 0, EDACN: 1, SPWEOP: 65, SPWEEP: 0, ANOMALY: 0},
+			aez.SIDSTAT,
+			aez.RID(0),
+			2,
 			false,
 		},
 		{
@@ -51,7 +69,26 @@ func TestDecodeAEZ(t *testing.T) {
 				},
 			},
 			aez.STAT{},
+			aez.SIDSTAT,
+			aez.RID(0),
+			0,
 			true,
+		},
+		{
+			"Transparent Data package",
+			common.DataRecord{
+				TMHeader: innosat.TMDataFieldHeader{ServiceType: 128, ServiceSubType: 25},
+				Buffer: makeInstrumentData(
+					uint16(aez.CCD2),
+					aez.CCDImagePackData{NBC: 2},
+					[]byte{0xff, 0xff, 0x00, 0x00, 0xcc, 0xcc},
+				),
+			},
+			aez.CCDImage{PackData: aez.CCDImagePackData{NBC: 2}, BadColumns: []uint16{0xffff, 0x0000}},
+			aez.SID(0),
+			aez.CCD2,
+			2,
+			false,
 		},
 	}
 	for _, tt := range tests {
@@ -62,69 +99,20 @@ func TestDecodeAEZ(t *testing.T) {
 			source <- tt.arg
 			close(source)
 			got := <-target
-
 			if (got.Error != nil) != tt.wantErr {
 				t.Errorf("DataRecord.Error = %v, wantErr %v", got.Error, tt.wantErr)
-				return
 			}
 			if !reflect.DeepEqual(got.Data, tt.want) {
-				t.Errorf("DataRecord.Buffer = %+v, want %+v", got.Data, tt.want)
+				t.Errorf("DataRecord.Data = %v, want %v", got.Data, tt.want)
 			}
-		})
-	}
-}
-
-func Test_instrumentHK(t *testing.T) {
-	type args struct {
-		sid aez.SID
-		buf io.Reader
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    PackageType
-		wantErr bool
-	}{
-		{
-			"STAT",
-			args{sid: aez.SIDSTAT, buf: bytes.NewReader(make([]byte, 100))},
-			aez.STAT{},
-			false,
-		},
-		{
-			"HTR",
-			args{sid: aez.SIDHTR, buf: bytes.NewReader(make([]byte, 100))},
-			aez.HTR{},
-			false,
-		},
-		{
-			"PWR",
-			args{sid: aez.SIDPWR, buf: bytes.NewReader(make([]byte, 100))},
-			aez.PWR{},
-			false,
-		},
-		{
-			"CPRUA",
-			args{sid: aez.SIDCPRUA, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CPRU{},
-			false,
-		},
-		{
-			"CPRUB",
-			args{sid: aez.SIDCPRUB, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CPRU{},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := instrumentHK(tt.args.sid, tt.args.buf)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("instrumentHK() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if got.SID != tt.wantSID {
+				t.Errorf("DataRecord.SID = %v, want %v", got.SID, tt.wantSID)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("instrumentHK() = %v, want %v", got, tt.want)
+			if got.RID != tt.wantRID {
+				t.Errorf("DataRecord.RID = %v, want %v", got.RID, tt.wantRID)
+			}
+			if len(got.Buffer) != tt.wantBufLen {
+				t.Errorf("DataRecord.Buffer = %v, want length %v", got.Buffer, tt.wantBufLen)
 			}
 		})
 	}
