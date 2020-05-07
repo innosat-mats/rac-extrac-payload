@@ -187,7 +187,7 @@ func TestPWR_CSVRow(t *testing.T) {
 				fmt.Sprintf("%v", pwrm16c(7).current()),
 				fmt.Sprintf("%v", pwrp3v3(8).voltage()),
 				fmt.Sprintf("%v", pwrp3c3(9).current()),
-				"PWRT: Resistance 5.4044e+06 is too large for interpolator. Returning value for maximum.",
+				"PWRT: 5.4044e+06 is too large for interpolator. Returning value for maximum.",
 			},
 		},
 	}

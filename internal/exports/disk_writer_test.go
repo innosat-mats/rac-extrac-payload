@@ -124,12 +124,21 @@ func TestDiskCallbackFactory(t *testing.T) {
 					Origin: common.OriginDescription{Name: "File1.rac"},
 					Data:   aez.PWR{},
 				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.PMData{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.PMData{},
+				},
 			},
 			[]wantFile{
 				{"File1_STAT.csv", 3},
 				{"File1_CPRU.csv", 4},
 				{"File1_HTR.csv", 4},
 				{"File1_PWR.csv", 4},
+				{"File1_PM.csv", 4},
 			},
 		},
 		{
@@ -160,14 +169,24 @@ func TestDiskCallbackFactory(t *testing.T) {
 					Origin: common.OriginDescription{Name: "File2.rac"},
 					Data:   aez.PWR{},
 				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.PMData{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File2.rac"},
+					Data:   aez.PMData{},
+				},
 			},
 			[]wantFile{
 				{"File1_CPRU.csv", 3},
 				{"File1_HTR.csv", 3},
 				{"File1_PWR.csv", 3},
+				{"File1_PM.csv", 3},
 				{"File2_CPRU.csv", 3},
 				{"File2_HTR.csv", 3},
 				{"File2_PWR.csv", 3},
+				{"File2_PM.csv", 3},
 			},
 		},
 	}
