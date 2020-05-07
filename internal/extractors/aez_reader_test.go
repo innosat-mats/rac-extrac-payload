@@ -37,7 +37,7 @@ func TestDecodeAEZ(t *testing.T) {
 					0x00, 0xa5, 0xd5,
 				},
 			},
-			aez.STAT{SPID: 32516, SPREV: 2, FPID: 33284, FPREV: 2, SVNA: 2, SVNB: 6, SVNC: 1, TS: 454164480, TSS: 61344, MODE: 2, EDACE: 0, EDACCE: 0, EDACN: 16777216, SPWEOP: 1090519040, SPWEEP: 0, ANOMALY: 0},
+			aez.STAT{SPID: 1151, SPREV: 2, FPID: 1154, FPREV: 2, SVNA: 2, SVNB: 6, SVNC: 1, TS: 4635, TSS: 41199, MODE: 2, EDACE: 0, EDACCE: 0, EDACN: 1, SPWEOP: 65, SPWEEP: 0, ANOMALY: 0},
 			false,
 		},
 		{
@@ -68,7 +68,7 @@ func TestDecodeAEZ(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got.Data, tt.want) {
-				t.Errorf("DataRecord.Buffer = %v, want %v", got.Data, tt.want)
+				t.Errorf("DataRecord.Buffer = %+v, want %+v", got.Data, tt.want)
 			}
 		})
 	}

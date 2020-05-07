@@ -134,7 +134,7 @@ type PWRReport struct {
 
 // Read PWR
 func (pwr *PWR) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, pwr)
+	return binary.Read(buf, binary.LittleEndian, pwr)
 }
 
 func pwrVoltageADC(data uint16) float64 {
