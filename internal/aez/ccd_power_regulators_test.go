@@ -190,6 +190,8 @@ func TestCPRU_CSVRow(t *testing.T) {
 				fmt.Sprintf("%v", subs(15).voltage()),
 				fmt.Sprintf("%v", rd(16).voltage()),
 				fmt.Sprintf("%v", od(17).voltage()),
+				"false|false|false|false",
+				"false|false|false|true",
 			},
 		},
 	}

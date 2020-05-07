@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"reflect"
+	"strings"
 )
 
 type gate uint16
@@ -36,16 +37,18 @@ func (data od) voltage() float64 {
 
 type cpruStat uint8
 
-func (stat cpruStat) overvoltageFault() [3]bool {
-	return [3]bool{
+func (stat cpruStat) overvoltageFault() [4]bool {
+	return [4]bool{
+		stat&0x80 != 0,
 		stat&0x40 != 0,
 		stat&0x20 != 0,
 		stat&0x10 != 0,
 	}
 }
 
-func (stat cpruStat) powerEnabled() [3]bool {
-	return [3]bool{
+func (stat cpruStat) powerEnabled() [4]bool {
+	return [4]bool{
+		stat&0x08 != 0,
 		stat&0x04 != 0,
 		stat&0x02 != 0,
 		stat&0x01 != 0,
@@ -93,8 +96,8 @@ type CPRUReport struct {
 	VSUBS3      float64 // CCD3 Substrate Voltage
 	VRD3        float64 // CCD3 Reset transistor Drain Voltage
 	VOD3        float64 // CCD3 Output Drain Voltage
-	Overvoltage [3]bool // CCD overvoltage fault, one bit per CCD
-	Power       [3]bool // CCD overvoltage fault, one bit per CCD
+	Overvoltage [4]bool // CCD overvoltage fault, one bit per CCD
+	Power       [4]bool // CCD overvoltage fault, one bit per CCD
 
 }
 
@@ -141,9 +144,23 @@ func (cpru CPRU) CSVHeaders() []string {
 func (cpru CPRU) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(cpru.Report()))
 	values := make([]string, val.NumField())
+	t := val.Type()
 	for i := range values {
 		valueField := val.Field(i)
-		values[i] = fmt.Sprintf("%v", valueField.Float())
+		name := t.Field(i).Name
+		if name == "Overvoltage" || name == "Power" {
+			if valueField.Len() == 0 {
+				values[i] = ""
+			} else {
+				var stats = make([]string, valueField.Len())
+				for j, l := 0, valueField.Len(); j < l; j++ {
+					stats[j] = fmt.Sprintf("%v", valueField.Index(j))
+				}
+				values[i] = strings.Join(stats, "|")
+			}
+		} else {
+			values[i] = fmt.Sprintf("%v", valueField.Float())
+		}
 	}
 	return values
 }

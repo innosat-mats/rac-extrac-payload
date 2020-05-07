@@ -165,7 +165,6 @@ func (htr HTR) CSVRow() []string {
 				}
 				values[i] = strings.Join(errs, "|")
 			}
-
 		} else {
 			values[i] = fmt.Sprintf("%v", valueField.Float())
 		}
