@@ -148,12 +148,12 @@ type CCDImagePackData struct {
 //
 // returns the BC (bad columns) array and the error status.
 func (ccdImagePackData *CCDImagePackData) Read(buf io.Reader) ([]uint16, error) {
-	err := binary.Read(buf, binary.BigEndian, ccdImagePackData)
+	err := binary.Read(buf, binary.LittleEndian, ccdImagePackData)
 	if err != nil {
 		return nil, err
 	}
 	badColumns := make([]uint16, ccdImagePackData.NBC)
-	return badColumns, binary.Read(buf, binary.BigEndian, &badColumns)
+	return badColumns, binary.Read(buf, binary.LittleEndian, &badColumns)
 }
 
 // Time returns the measurement time in UTC
