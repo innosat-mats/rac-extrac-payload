@@ -3,6 +3,7 @@ package exports
 import (
 	"encoding/csv"
 	"fmt"
+	"image/png"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,11 +25,6 @@ func csvName(dir string, originName string, packetType string) string {
 func csvOutputFactory(dir string, originName string, packetType string, pkg *common.ExportablePackage) (csvOutput, error) {
 	outPath := csvName(dir, originName, packetType)
 
-	// Create Directory and File
-	err := os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		return nil, fmt.Errorf("Could not create output directory '%v'", dir)
-	}
 	out, err := os.Create(outPath)
 	if err != nil {
 		return nil, fmt.Errorf("Could not create output file '%v'", outPath)
@@ -60,9 +56,49 @@ func DiskCallbackFactory(
 	var cpruOut csvOutput = nil
 	var statOut csvOutput = nil
 
+	if writeImages || writeTimeseries {
+		// Create Directory and File
+		err := os.MkdirAll(output, os.ModePerm)
+		if err != nil {
+			log.Printf("Could not create output directory '%v'", output)
+		}
+	}
+
 	callback := func(pkg common.ExportablePackage) {
+		err = pkg.ParsingError()
+		if err != nil {
+			log.Println(err)
+		}
 		if writeImages {
-			// TODO: Add image writing here
+			switch pkg.AEZData().(type) {
+			case aez.CCDImage:
+				ccdImage, ok := pkg.AEZData().(aez.CCDImage)
+				if !ok {
+					log.Print("Could not understand CCDImage, this should be impossible.")
+					break
+				}
+				imgFileName := getGrayscaleImageName(output, ccdImage.PackData)
+				imgData := getImageData(
+					pkg.RemainingBuffer(),
+					ccdImage.PackData,
+					imgFileName,
+				)
+
+				_, rightShift, _ := ccdImage.PackData.WDW.InputDataWindow()
+				img := getGrayscaleImage(
+					imgData,
+					int(ccdImage.PackData.NCOL)+1, // Because SPEC says so we believe
+					int(ccdImage.PackData.NROW),
+					rightShift,
+				)
+				imgFile, err := os.Create(imgFileName)
+				if err != nil {
+					log.Printf("failed creating %s: %s", imgFileName, err)
+					panic(err.Error())
+				}
+				defer imgFile.Close()
+				png.Encode(imgFile, img)
+			}
 		}
 
 		if !writeTimeseries {

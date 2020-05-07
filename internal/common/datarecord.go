@@ -84,3 +84,11 @@ func (record DataRecord) AEZData() interface{} {
 func (record DataRecord) OriginName() string {
 	return record.Origin.Name
 }
+
+func (record DataRecord) RemainingBuffer() []byte {
+	return record.Buffer
+}
+
+func (record DataRecord) ParsingError() error {
+	return record.Error
+}

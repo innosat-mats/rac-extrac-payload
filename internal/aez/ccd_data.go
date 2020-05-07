@@ -114,6 +114,9 @@ func (gain CCDGain) Truncation() uint8 {
 	return uint8(gain & 0b1111)
 }
 
+// JPEGQUncompressed16bit is the value for non-12bit image data
+var JPEGQUncompressed16bit = uint8(101)
+
 // CCDImagePackData contains the composite information from the CCD and the CRB module
 type CCDImagePackData struct {
 	CCDSEL  uint8   // CCD sensor number, not same format for TM and TC
