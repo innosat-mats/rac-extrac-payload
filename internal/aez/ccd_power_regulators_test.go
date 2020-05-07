@@ -76,7 +76,7 @@ func TestCPRU_Report(t *testing.T) {
 
 func TestCPRU_CSVHeaders(t *testing.T) {
 	type fields struct {
-		STAT   uint8
+		STAT   cpruStat
 		VGATE0 gate
 		VSUBS0 subs
 		VRD0   rd
@@ -107,6 +107,7 @@ func TestCPRU_CSVHeaders(t *testing.T) {
 				"VGATE1", "VSUBS1", "VRD1", "VOD1",
 				"VGATE2", "VSUBS2", "VRD2", "VOD2",
 				"VGATE3", "VSUBS3", "VRD3", "VOD3",
+				"Overvoltage", "Power",
 			},
 		},
 	}
@@ -140,7 +141,7 @@ func TestCPRU_CSVHeaders(t *testing.T) {
 
 func TestCPRU_CSVRow(t *testing.T) {
 	type fields struct {
-		STAT   uint8
+		STAT   cpruStat
 		VGATE0 gate
 		VSUBS0 subs
 		VRD0   rd
@@ -222,7 +223,7 @@ func TestCPRU_CSVRow(t *testing.T) {
 
 func TestCPRU_CSVSpecifications(t *testing.T) {
 	type fields struct {
-		STAT   uint8
+		STAT   cpruStat
 		VGATE0 gate
 		VSUBS0 subs
 		VRD0   rd
