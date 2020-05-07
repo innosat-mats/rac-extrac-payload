@@ -18,7 +18,8 @@ func Example() {
 		log.Fatalln(err)
 	}
 	raw, width, height, err := JpegImageData(fileContents)
-
+	// repeated us is OK
+	raw, width, height, err = JpegImageData(fileContents)
 	bufArray := []byte{}
 	buf := bytes.NewBuffer(bufArray)
 	err = binary.Write(buf, binary.BigEndian, raw)
