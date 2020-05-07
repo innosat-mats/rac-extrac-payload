@@ -80,7 +80,7 @@ type HTRReport struct {
 
 // Read HTR
 func (htr *HTR) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, htr)
+	return binary.Read(buf, binary.LittleEndian, htr)
 }
 
 // Report returns a HTRReport with useful units

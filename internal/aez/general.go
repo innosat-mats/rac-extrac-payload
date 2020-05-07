@@ -115,7 +115,7 @@ type STAT struct { //(34 octets)
 
 // Read STAT
 func (stat *STAT) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, stat)
+	return binary.Read(buf, binary.LittleEndian, stat)
 }
 
 // Time returns the measurement time in UTC

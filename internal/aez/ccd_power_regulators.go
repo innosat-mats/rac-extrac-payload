@@ -79,7 +79,7 @@ type CPRUReport struct {
 
 // Read CRPU
 func (cpru *CPRU) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, cpru)
+	return binary.Read(buf, binary.LittleEndian, cpru)
 }
 
 // Report transforms CPRU data to useful units

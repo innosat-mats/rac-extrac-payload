@@ -65,18 +65,23 @@ func Example() {
 		StreamBatch{byteStream2, common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}})
 
 	// Output:
-	// [Set1 1980-01-06T00:00:01Z 2020-03-22T22:17:40.572Z 2199 1980-01-06T01:17:13.853485107Z 4633853485107  CCD3 EOF]
-	// [Set1 1980-01-06T00:00:01Z 2020-03-22T22:17:40.572Z 2199 1980-01-06T01:17:13.853485107Z 4633853485107  CCD3 EOF]
-	// [Set1 1980-01-06T00:00:01Z 2020-03-22T22:17:40.603Z 2200 1980-01-06T01:17:13.887588501Z 4633887588501 STAT  1993-05-05T04:07:28.050338745Z 420610048050338745 32516 2 33284 2 2 6 1 2 0 0 16777216 1090519040 0 0 ]
-	// [Set1 1980-01-06T00:00:01Z 2020-03-22T22:17:41.337Z 0 1980-01-06T00:00:00Z 0   the TMHeader isn't recognized as either housekeeping or tranparent data]
-	// [Set1 1980-01-06T00:00:01Z 2000-01-01T00:00:00Z 0 1980-01-06T00:00:00Z 0   the TMHeader isn't recognized as either housekeeping or tranparent data]
-	// [Set2 1980-01-06T00:00:01Z 2020-03-22T22:17:40.572Z 2199 1980-01-06T01:17:13.853485107Z 4633853485107  CCD3 EOF]
-	// [Set2 1980-01-06T00:00:01Z 2020-03-22T22:17:40.572Z 2199 1980-01-06T01:17:13.853485107Z 4633853485107  CCD3 EOF]
-	// [Set2 1980-01-06T00:00:01Z 2020-03-22T22:17:40.603Z 2200 1980-01-06T01:17:13.887588501Z 4633887588501 STAT  1993-05-05T04:07:28.050338745Z 420610048050338745 32516 2 33284 2 2 6 1 2 0 0 16777216 1090519040 0 0 ]
-	// [Set2 1980-01-06T00:00:01Z 2020-03-22T22:17:41.337Z 0 1980-01-06T00:00:00Z 0   the TMHeader isn't recognized as either housekeeping or tranparent data]
-	// [Set2 1980-01-06T00:00:01Z 2000-01-01T00:00:00Z 0 1980-01-06T00:00:00Z 0   the TMHeader isn't recognized as either housekeeping or tranparent data]
+	// CCD3  got stop packet without a start packet
+	// CCD3  <nil>
+	//  STAT <nil>
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	// CCD3  got stop packet without a start packet
+	// CCD3  <nil>
+	//  STAT <nil>
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	//   the TMHeader isn't recognized as either housekeeping or transparent data
 }
 
-func simpleOutput(pkg common.ExportablePackage) {
-	fmt.Println(pkg.CSVRow())
+func simpleOutput(expPack common.ExportablePackage) {
+	pkg, ok := expPack.(common.DataRecord)
+	if !ok {
+		fmt.Println("Uknown package")
+	} else {
+		fmt.Println(pkg.RID, pkg.SID, pkg.Error)
+	}
 }

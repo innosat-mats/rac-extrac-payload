@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"io"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
@@ -29,10 +30,12 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 			sourcePacket.RID = rid
 			exportable, err = instrumentTransparentData(rid, buffer)
 		default:
-			err = errors.New("the TMHeader isn't recognized as either housekeeping or tranparent data")
+			err = errors.New("the TMHeader isn't recognized as either housekeeping or transparent data")
 			exportable = nil
 		}
-		sourcePacket.Error = err
+		if err != io.EOF {
+			sourcePacket.Error = err
+		}
 		sourcePacket.Data = exportable
 		sourcePacket.Buffer = buffer.Bytes()
 		target <- sourcePacket
