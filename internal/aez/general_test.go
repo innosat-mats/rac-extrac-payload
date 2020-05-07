@@ -347,7 +347,8 @@ func TestRID_String(t *testing.T) {
 		{"Stringifies CCD5", CCD5, "CCD5"},
 		{"Stringifies CCD6", CCD6, "CCD6"},
 		{"Stringifies CCD7", CCD7, "CCD7"},
-		{"Stringifies unknonw", RID(42), "Unknown RID: 42"},
+		{"Stringifies PM", PM, "PM"},
+		{"Stringifies unknown", RID(42), "Unknown RID: 42"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

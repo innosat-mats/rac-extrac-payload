@@ -123,8 +123,8 @@ func Test_instrumentTransparentData(t *testing.T) {
 		{
 			"PM",
 			args{rid: aez.PM, buf: bytes.NewReader(make([]byte, 100))},
-			nil,
-			true,
+			aez.PMData{},
+			false,
 		},
 		{"Unknown", args{rid: aez.RID(0)}, nil, true},
 	}

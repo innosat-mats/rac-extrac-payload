@@ -88,6 +88,8 @@ func (rid RID) String() string {
 		return "CCD6"
 	case CCD7:
 		return "CCD7"
+	case PM:
+		return "PM"
 	default:
 		return fmt.Sprintf("Unknown RID: %v", int(rid))
 	}
