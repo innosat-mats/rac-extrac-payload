@@ -16,7 +16,7 @@ import (
 func makeInstrumentData(sidrid uint16, data interface{}, trailingBytes []byte) []byte {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.BigEndian, sidrid)
-	binary.Write(&buf, binary.BigEndian, data)
+	binary.Write(&buf, binary.LittleEndian, data)
 	return append(buf.Bytes(), trailingBytes...)
 }
 
@@ -101,7 +101,6 @@ func TestDecodeAEZ(t *testing.T) {
 			got := <-target
 			if (got.Error != nil) != tt.wantErr {
 				t.Errorf("DataRecord.Error = %v, wantErr %v", got.Error, tt.wantErr)
-				return
 			}
 			if !reflect.DeepEqual(got.Data, tt.want) {
 				t.Errorf("DataRecord.Data = %v, want %v", got.Data, tt.want)
