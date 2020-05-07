@@ -14,6 +14,7 @@ type DataRecord struct {
 	SourceHeader innosat.SourcePacketHeader // Source header from the innosat platform
 	TMHeader     innosat.TMDataFieldHeader  // Data header information
 	SID          aez.SID                    // SID of the Data if any
+	RID          aez.RID                    // RID of Data if any
 	Data         Exportable                 // The data payload itself, HK report, jpeg image etc.
 	Error        error                      // First propagated error from the decoding process
 	Buffer       []byte                     // Currently unprocessed data (payload)
@@ -47,7 +48,7 @@ func (record DataRecord) CSVHeaders() []string {
 	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
 	headers = append(headers, record.SourceHeader.CSVHeaders()...)
 	headers = append(headers, record.TMHeader.CSVHeaders()...)
-	headers = append(headers, "SID")
+	headers = append(headers, "SID", "RID")
 	if record.Data != nil {
 		headers = append(headers, record.Data.CSVHeaders()...)
 	}
@@ -62,7 +63,7 @@ func (record DataRecord) CSVRow() []string {
 	row = append(row, record.RamsesHeader.CSVRow()...)
 	row = append(row, record.SourceHeader.CSVRow()...)
 	row = append(row, record.TMHeader.CSVRow()...)
-	row = append(row, record.SID.String())
+	row = append(row, record.SID.String(), record.RID.String())
 	if record.Data != nil {
 		row = append(row, record.Data.CSVRow()...)
 	}
