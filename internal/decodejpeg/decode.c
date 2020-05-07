@@ -21,7 +21,7 @@ read_JPEG_file(char *inbuffer, size_t size)
   (void)jpeg_read_header(&cinfo, TRUE);
 
   (void)jpeg_start_decompress(&cinfo);
-  result.pix = (char *)malloc(cinfo.output_height * cinfo.output_width * cinfo.output_components * BYTES_PER_SAMPLE);
+  result.pix = (char *)malloc(cinfo.output_height * cinfo.output_width * cinfo.output_components * (BYTES_PER_SAMPLE+1));
   result.width = cinfo.output_width;
   result.height = cinfo.output_height;
 
