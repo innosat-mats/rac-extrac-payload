@@ -22,7 +22,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			target <- sourcePacket
 			continue
 		}
-		reader := bytes.NewReader(sourcePacket.Buffer)
+		buffer := bytes.NewBuffer(sourcePacket.Buffer)
 		switch sourcePacket.SourceHeader.PacketSequenceControl.GroupingFlags() {
 		case innosat.SPStandalone:
 			// Produce error for unfinished multipack lingering
@@ -44,7 +44,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			multiPackStarted = true
 			multiPackBuffer.Reset()
 			multiPackStart = sourcePacket
-			_, err := io.Copy(multiPackBuffer, reader)
+			_, err := multiPackBuffer.ReadFrom(buffer)
 			if err != nil && err != io.EOF {
 				sourcePacket.Error = err
 				target <- sourcePacket
@@ -60,7 +60,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			}
 
 			// Concat SPCont packet
-			_, err := multiPackBuffer.ReadFrom(reader)
+			_, err := multiPackBuffer.ReadFrom(buffer)
 			if err != nil && err != io.EOF {
 				sourcePacketCopy := sourcePacket
 				sourcePacketCopy.Error = err
@@ -78,7 +78,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			}
 
 			// Concat SPStop and report parsed packet
-			_, err := multiPackBuffer.ReadFrom(reader)
+			_, err := multiPackBuffer.ReadFrom(buffer)
 			if err != nil && err != io.EOF {
 				sourcePacket.Error = err
 				target <- sourcePacket
