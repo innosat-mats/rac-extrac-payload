@@ -16,7 +16,7 @@ type SourcePackage struct {
 	ApplicationPayload []byte
 }
 
-var crcChecksumLength int = 2
+const crcChecksumLength int = 2
 var pusLengthOffset int = 1
 
 // DecodeSource decodes a byte array to a SourcePackage

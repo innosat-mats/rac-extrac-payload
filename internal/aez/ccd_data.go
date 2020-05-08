@@ -115,7 +115,8 @@ func (gain CCDGain) Truncation() uint8 {
 }
 
 // JPEGQUncompressed16bit is the value for non-12bit image data
-var JPEGQUncompressed16bit = uint8(101)
+const JPEGQUncompressed16bit = uint8(101)
+
 
 // NCOLStartOffset says how many more columns than reported the actual columns are
 var NCOLStartOffset uint16 = 1

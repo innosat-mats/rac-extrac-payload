@@ -95,11 +95,12 @@ func DiskCallbackFactory(
 				)
 
 				imgFile, err := os.Create(imgFileName)
+				defer imgFile.Close()
 				if err != nil {
 					log.Printf("failed creating %s: %s", imgFileName, err)
 					panic(err.Error())
 				}
-				defer imgFile.Close()
+
 				png.Encode(imgFile, img)
 			}
 		}
