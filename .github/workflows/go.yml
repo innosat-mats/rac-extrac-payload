@@ -49,6 +49,6 @@ jobs:
 
     - name: binaries
       uses: actions/upload-artifact@v2
-        with:
-          name: CLI
-          path: ./rac*
+      with:
+        name: CLI
+        path: ./rac*
