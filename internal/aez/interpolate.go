@@ -4,97 +4,101 @@ import (
 	"fmt"
 )
 
-// ErrResistanceTooLarge resistance sent to interpolator is too large
-type ErrResistanceTooLarge float64
+// ErrXTooLarge x value sent to interpolator is too large
+type ErrXTooLarge float64
 
-func (err ErrResistanceTooLarge) String() string {
+func (err ErrXTooLarge) String() string {
 	return fmt.Sprint(float64(err))
 }
 
-func (err ErrResistanceTooLarge) Error() string {
+func (err ErrXTooLarge) Error() string {
 	return fmt.Sprintf(
-		"Resistance %v is too large for interpolator. Returning value for maximum.",
+		"%v is too large for interpolator. Returning value for maximum.",
 		float64(err),
 	)
 }
 
-// ErrResistanceTooSmall resistance sent to interpolator is too small
-type ErrResistanceTooSmall float64
+// ErrXTooSmall value sent to interpolator is too small
+type ErrXTooSmall float64
 
-func (err ErrResistanceTooSmall) String() string {
+func (err ErrXTooSmall) String() string {
 	return fmt.Sprint(float64(err))
 }
 
-func (err ErrResistanceTooSmall) Error() string {
+func (err ErrXTooSmall) Error() string {
 	return fmt.Sprintf(
-		"Resistance %v is too small for interpolator. Returning value for minimum.",
+		"%v is too small for interpolator. Returning value for minimum.",
 		float64(err),
 	)
 }
 
-// ErrResistancesTemperaturesTooShort resistance sent to interpolator is too small
-type ErrResistancesTemperaturesTooShort int
+// ErrXYTooShort x or y slice sent to interpolator is too short
+type ErrXYTooShort int
 
-func (err ErrResistancesTemperaturesTooShort) String() string {
+func (err ErrXYTooShort) String() string {
 	return fmt.Sprint(int(err))
 }
 
-func (err ErrResistancesTemperaturesTooShort) Error() string {
+func (err ErrXYTooShort) Error() string {
 	return fmt.Sprintf(
-		"Resistances and temperatures must be at least of length 2 (%d < 0). Returning absolute zero.",
+		"Slices x and y must be at least of length 2 (%d < 0). Returning -9999.",
 		int(err),
 	)
 }
 
-// ErrResistancesTemperaturesMismatch resistances and temperatures of different lengths
-type ErrResistancesTemperaturesMismatch struct{ lenRes, lenTemp int }
+// ErrXYMismatch x and y slices of different lengths
+type ErrXYMismatch struct{ lenRes, lenTemp int }
 
-func (err ErrResistancesTemperaturesMismatch) String() string {
+func (err ErrXYMismatch) String() string {
 	return fmt.Sprintf("%d, %d", err.lenRes, err.lenTemp)
 }
 
-func (err ErrResistancesTemperaturesMismatch) Error() string {
+func (err ErrXYMismatch) Error() string {
 	return fmt.Sprintf(
-		"Resistances and temperatures not of same length (%d != %d). Returning absolute zero.",
+		"Slices x and y not of same length (%d != %d). Returning absolute -9999.",
 		err.lenRes, err.lenTemp,
 	)
 }
 
-func getResistanceIndex(res float64, resistances []float64) int {
+// Note! Assumes xSlice contains a monotonically increasing values!
+func getXIndex(x float64, xSlice []float64) int {
 	var i int
-	for i = range resistances {
-		if res > resistances[i] {
+	for i = range xSlice {
+		if x > xSlice[i] {
 			break
 		}
 	}
 	return i
 }
 
-func interpolate(r [2]float64, t [2]float64, resistance float64) float64 {
-	return ((t[1]-t[0])/(r[1]-r[0]))*(resistance-r[0]) + t[0]
-}
-
-func interpolateTemperature(
-	resistance float64, resistances []float64, temperatures []float64,
+// Interpolate y value corresponding to x value, given
+// xSlice (e.g. resistances or voltages), and
+// ySlice (e.g. temperatures or photometer values).
+func Interpolate(
+	x float64, xSlice []float64, ySlice []float64,
 ) (float64, error) {
-	if len(resistances) != len(temperatures) {
-		return -273.15, ErrResistancesTemperaturesMismatch{
-			len(resistances), len(temperatures),
+	if len(xSlice) != len(ySlice) {
+		return -9999, ErrXYMismatch{
+			len(xSlice), len(ySlice),
 		}
 	}
-	if len(resistances) < 2 {
-		return -273.15, ErrResistancesTemperaturesTooShort(len(resistances))
+	if len(xSlice) < 2 {
+		return -9999, ErrXYTooShort(len(xSlice))
 	}
 
-	i := getResistanceIndex(resistance, resistances)
+	i := getXIndex(x, xSlice)
 	if i == 0 {
-		return temperatures[0], ErrResistanceTooLarge(resistance)
-	} else if i == len(resistances)-1 {
-		return temperatures[len(resistances)-1], ErrResistanceTooSmall(resistance)
+		return ySlice[0], ErrXTooLarge(x)
+	} else if i == len(xSlice)-1 {
+		return ySlice[len(xSlice)-1], ErrXTooSmall(x)
 	}
 
-	var r, t [2]float64
-	copy(r[:], resistances[i-1:i+1])
-	copy(t[:], temperatures[i-1:i+1])
-	return interpolate(r, t, resistance), nil
+	var xs, ys [2]float64
+	copy(xs[:], xSlice[i-1:i+1])
+	copy(ys[:], ySlice[i-1:i+1])
+	return interpolate(xs, ys, x), nil
+}
+
+func interpolate(xs [2]float64, ys [2]float64, x float64) float64 {
+	return ((ys[1]-ys[0])/(xs[1]-xs[0]))*(x-xs[0]) + ys[0]
 }

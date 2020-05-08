@@ -55,6 +55,7 @@ func DiskCallbackFactory(
 	var pwrOut csvOutput = nil
 	var cpruOut csvOutput = nil
 	var statOut csvOutput = nil
+	var pmOut csvOutput = nil
 
 	if writeImages || writeTimeseries {
 		// Create Directory and File
@@ -124,6 +125,10 @@ func DiskCallbackFactory(
 				cpruOut.close()
 				cpruOut = nil
 			}
+			if pmOut != nil {
+				pmOut.close()
+				pmOut = nil
+			}
 			currentOrigin = pkg.OriginName()
 		}
 
@@ -166,6 +171,14 @@ func DiskCallbackFactory(
 				}
 			}
 			err = cpruOut.writeData(pkg.CSVRow())
+		case aez.PMData:
+			if pmOut == nil {
+				pmOut, err = csvOutputFactory(output, currentOrigin, "PM", &pkg)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+			err = pmOut.writeData(pkg.CSVRow())
 		}
 		// This error comes from writing a line and most probably would be a column missmatch
 		// that means we should be able to continue and just report the error
@@ -186,6 +199,9 @@ func DiskCallbackFactory(
 		}
 		if cpruOut != nil {
 			cpruOut.close()
+		}
+		if pmOut != nil {
+			pmOut.close()
 		}
 	}
 

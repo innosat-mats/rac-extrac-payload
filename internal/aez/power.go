@@ -98,7 +98,7 @@ func (data pwrp3c3) current() float64 {
 }
 
 func (data pwrt) temperature() (float64, error) {
-	return interpolateTemperature(
+	return Interpolate(
 		data.resistance(),
 		pwrResistances[:],
 		pwrTemperatures[:],

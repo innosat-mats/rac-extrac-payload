@@ -40,8 +40,9 @@ func TestDiskCallbackFactory(t *testing.T) {
 		writeTimeseries bool
 	}
 	type wantFile struct {
-		base  string
-		lines int
+		base   string
+		lines  int
+		binary bool
 	}
 	tests := []struct {
 		name         string
@@ -71,7 +72,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_STAT.csv", 4},
+				{"File1_STAT.csv", 4, false},
 			},
 		},
 		{
@@ -88,8 +89,8 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_STAT.csv", 3},
-				{"File2_STAT.csv", 3},
+				{"File1_STAT.csv", 3, false},
+				{"File2_STAT.csv", 3, false},
 			},
 		},
 		{
@@ -124,12 +125,21 @@ func TestDiskCallbackFactory(t *testing.T) {
 					Origin: common.OriginDescription{Name: "File1.rac"},
 					Data:   aez.PWR{},
 				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.PMData{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.PMData{},
+				},
 			},
 			[]wantFile{
-				{"File1_STAT.csv", 3},
-				{"File1_CPRU.csv", 4},
-				{"File1_HTR.csv", 4},
-				{"File1_PWR.csv", 4},
+				{"File1_STAT.csv", 3, false},
+				{"File1_CPRU.csv", 4, false},
+				{"File1_HTR.csv", 4, false},
+				{"File1_PWR.csv", 4, false},
+				{"File1_PM.csv", 4, false},
 			},
 		},
 		{
@@ -160,15 +170,75 @@ func TestDiskCallbackFactory(t *testing.T) {
 					Origin: common.OriginDescription{Name: "File2.rac"},
 					Data:   aez.PWR{},
 				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.PMData{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File2.rac"},
+					Data:   aez.PMData{},
+				},
 			},
 			[]wantFile{
-				{"File1_CPRU.csv", 3},
-				{"File1_HTR.csv", 3},
-				{"File1_PWR.csv", 3},
-				{"File2_CPRU.csv", 3},
-				{"File2_HTR.csv", 3},
-				{"File2_PWR.csv", 3},
+				{"File1_CPRU.csv", 3, false},
+				{"File1_HTR.csv", 3, false},
+				{"File1_PWR.csv", 3, false},
+				{"File1_PM.csv", 3, false},
+				{"File2_CPRU.csv", 3, false},
+				{"File2_HTR.csv", 3, false},
+				{"File2_PWR.csv", 3, false},
+				{"File2_PM.csv", 3, false},
 			},
+		},
+		{
+			"Creates images",
+			args{writeImages: true},
+			[]common.DataRecord{
+				{
+					Data: aez.CCDImage{
+						PackData: aez.CCDImagePackData{
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  1,
+							NROW:  2,
+							EXPTS: 5,
+						},
+					},
+					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				{
+					Data: aez.CCDImage{
+						PackData: aez.CCDImagePackData{
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  1,
+							NROW:  2,
+							EXPTS: 6,
+						},
+					},
+					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+			},
+			[]wantFile{
+				{"5000000000.png", 0, true},
+				{"6000000000.png", 0, true},
+			},
+		},
+		{
+			"Doesn't creates images when asked not to",
+			args{writeImages: false},
+			[]common.DataRecord{
+				{
+					Data: aez.CCDImage{
+						PackData: aez.CCDImagePackData{
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  1,
+							NROW:  2,
+							EXPTS: 5,
+						},
+					},
+					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+			},
+			[]wantFile{},
 		},
 	}
 	for _, tt := range tests {
@@ -196,8 +266,10 @@ func TestDiskCallbackFactory(t *testing.T) {
 				if err != nil {
 					t.Errorf("DiskCallbackFactory() expected to produce file '%v', but got error reading it: %v", path, err)
 				}
-				if newLines := strings.Count(string(content), "\n"); newLines != want.lines {
-					t.Errorf("DiskCallbackFactory() expected file %v to have %v lines, found %v", want.base, want.lines, newLines)
+				if !want.binary {
+					if newLines := strings.Count(string(content), "\n"); newLines != want.lines {
+						t.Errorf("DiskCallbackFactory() expected file %v to have %v lines, found %v", want.base, want.lines, newLines)
+					}
 				}
 			}
 
