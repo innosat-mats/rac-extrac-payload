@@ -1,7 +1,7 @@
 package decodejpeg
 
-// #cgo CFLAGS: -I${SRCDIR}/include
-// #cgo LDFLAGS: ${SRCDIR}/lib/libjpeg.a
+// #cgo CFLAGS: -I${SRCDIR}/windows/include
+// #cgo LDFLAGS: ${SRCDIR}/windows/lib/libjpeg.a
 // #include <stdlib.h>
 // #include "decode.h"
 import "C"
