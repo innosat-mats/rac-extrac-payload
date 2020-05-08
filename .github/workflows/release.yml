@@ -13,12 +13,12 @@ jobs:
     steps:
 
     - name: install mingw
-      run : sudo apt-get install -y mingw-w64
+      run : sudo apt-get install -y gcc-mingw-w64
 
-    - name: Set up Go 1.13
+    - name: Set up Go 1.14
       uses: actions/setup-go@v1
       with:
-        go-version: 1.13
+        go-version: 1.14
       id: go
 
     - name: Check out code into the Go module directory
