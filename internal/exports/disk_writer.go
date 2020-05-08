@@ -103,7 +103,6 @@ func DiskCallbackFactory(
 				}
 
 				png.Encode(imgFile, img)
-				defer imgFile.Close()
 
 				// Write metadata only supports DataRecord
 				pkg, ok := expPkg.(common.DataRecord)
@@ -114,6 +113,7 @@ func DiskCallbackFactory(
 						imgFileName[0:len(imgFileName)-len(ext)],
 					)
 					jsonFile, err := os.Create(jsonFileName)
+					defer jsonFile.Close()
 					if err != nil {
 						log.Printf("failed creating %s: %s", jsonFileName, err)
 						panic(err.Error())
