@@ -29,14 +29,11 @@ jobs:
             dep ensure
         fi
 
-    - name: Build windows
-      run: GOOS=windows GOARCH=amd64 go build -o rac.exe ./cmd/rac  
-
     - name: Build linux 
       run: go build -o rac ./cmd/rac 
     
     - name: Creating release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "rac,rac.exe"
+        artifacts: "rac"
         token: ${{ secrets.GITHUB_TOKEN }}
