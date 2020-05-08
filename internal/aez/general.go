@@ -2,6 +2,7 @@ package aez
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"reflect"
@@ -46,6 +47,11 @@ func (sid SID) String() string {
 	default:
 		return fmt.Sprintf("Unknown SID: %v", int(sid))
 	}
+}
+
+// MarshalJSON makes a custom json of what is of interest in the struct
+func (sid *SID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(sid.String())
 }
 
 // RID is Report Identification
@@ -93,6 +99,11 @@ func (rid RID) String() string {
 	default:
 		return fmt.Sprintf("Unknown RID: %v", int(rid))
 	}
+}
+
+// MarshalJSON makes a custom json of what is of interest in the struct
+func (rid *RID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(rid.String())
 }
 
 //STAT General status housekeeping report of the payload instrument.

@@ -243,3 +243,45 @@ func TestTMDataFieldHeader_CSVRow(t *testing.T) {
 		})
 	}
 }
+
+func TestTMDataFieldHeader_MarshalJSON(t *testing.T) {
+	type fields struct {
+		PUS             pus
+		ServiceType     SourcePackageServiceType
+		ServiceSubType  uint8
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    []byte
+		wantErr bool
+	}{
+		{
+			"Marshals into expected json",
+			fields{CUCTimeSeconds: 4},
+			[]byte("{\"tmHeaderTime\":\"1980-01-06T00:00:04Z\",\"tmHeaderNanoseconds\":4000000000}"),
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmdfh := &TMDataFieldHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			got, err := tmdfh.MarshalJSON()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TMDataFieldHeader.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TMDataFieldHeader.MarshalJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

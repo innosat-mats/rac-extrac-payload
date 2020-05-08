@@ -2,6 +2,7 @@ package ramses
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"time"
@@ -56,4 +57,15 @@ func (ramses Ramses) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", ramses.Created().Format(time.RFC3339Nano)),
 	}
+}
+
+// MarshalJSON makes a custom json of what is of interest in the struct
+func (ramses *Ramses) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Specification string `json:"specification"`
+		RamsesTime    string `json:"ramsesTime"`
+	}{
+		Specification: Specification,
+		RamsesTime:    ramses.Created().Format(time.RFC3339Nano),
+	})
 }

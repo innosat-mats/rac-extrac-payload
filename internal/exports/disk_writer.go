@@ -2,6 +2,7 @@ package exports
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"image/png"
 	"log"
@@ -65,15 +66,15 @@ func DiskCallbackFactory(
 		}
 	}
 
-	callback := func(pkg common.ExportablePackage) {
-		err = pkg.ParsingError()
+	callback := func(expPkg common.ExportablePackage) {
+		err = expPkg.ParsingError()
 		if err != nil {
 			log.Println(err)
 		}
 		if writeImages {
-			switch pkg.AEZData().(type) {
+			switch expPkg.AEZData().(type) {
 			case aez.CCDImage:
-				ccdImage, ok := pkg.AEZData().(aez.CCDImage)
+				ccdImage, ok := expPkg.AEZData().(aez.CCDImage)
 				if !ok {
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
@@ -81,7 +82,7 @@ func DiskCallbackFactory(
 				imgFileName := getGrayscaleImageName(output, ccdImage.PackData)
 
 				imgData := getImageData(
-					pkg.RemainingBuffer(),
+					expPkg.RemainingBuffer(),
 					ccdImage.PackData,
 					imgFileName,
 				)
@@ -102,6 +103,26 @@ func DiskCallbackFactory(
 				}
 
 				png.Encode(imgFile, img)
+
+				// Write metadata only supports DataRecord
+				pkg, ok := expPkg.(common.DataRecord)
+				if ok {
+					ext := filepath.Ext(imgFileName)
+					jsonFileName := fmt.Sprintf(
+						"%v.json",
+						imgFileName[0:len(imgFileName)-len(ext)],
+					)
+					jsonFile, err := os.Create(jsonFileName)
+					defer jsonFile.Close()
+					if err != nil {
+						log.Printf("failed creating %s: %s", jsonFileName, err)
+						panic(err.Error())
+					}
+					err = json.NewEncoder(jsonFile).Encode(&pkg)
+					if err != nil {
+						log.Printf("failed to encode json into %s", jsonFileName)
+					}
+				}
 			}
 		}
 
@@ -109,7 +130,7 @@ func DiskCallbackFactory(
 			return
 		}
 		// Close streams from previous file
-		if pkg.OriginName() != currentOrigin {
+		if expPkg.OriginName() != currentOrigin {
 			if pwrOut != nil {
 				pwrOut.close()
 				pwrOut = nil
@@ -130,56 +151,56 @@ func DiskCallbackFactory(
 				pmOut.close()
 				pmOut = nil
 			}
-			currentOrigin = pkg.OriginName()
+			currentOrigin = expPkg.OriginName()
 		}
 
 		// We have nowhere to write partial extraction of record so we discard
-		if pkg.AEZData() == nil {
+		if expPkg.AEZData() == nil {
 			return
 		}
 
 		// Write to the dedicated target stream
-		switch pkg.AEZData().(type) {
+		switch expPkg.AEZData().(type) {
 		case aez.STAT:
 			if statOut == nil {
-				statOut, err = csvOutputFactory(output, currentOrigin, "STAT", &pkg)
+				statOut, err = csvOutputFactory(output, currentOrigin, "STAT", &expPkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = statOut.writeData(pkg.CSVRow())
+			err = statOut.writeData(expPkg.CSVRow())
 		case aez.HTR:
 			if htrOut == nil {
-				htrOut, err = csvOutputFactory(output, currentOrigin, "HTR", &pkg)
+				htrOut, err = csvOutputFactory(output, currentOrigin, "HTR", &expPkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = htrOut.writeData(pkg.CSVRow())
+			err = htrOut.writeData(expPkg.CSVRow())
 		case aez.PWR:
 			if pwrOut == nil {
-				pwrOut, err = csvOutputFactory(output, currentOrigin, "PWR", &pkg)
+				pwrOut, err = csvOutputFactory(output, currentOrigin, "PWR", &expPkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = pwrOut.writeData(pkg.CSVRow())
+			err = pwrOut.writeData(expPkg.CSVRow())
 		case aez.CPRU:
 			if cpruOut == nil {
-				cpruOut, err = csvOutputFactory(output, currentOrigin, "CPRU", &pkg)
+				cpruOut, err = csvOutputFactory(output, currentOrigin, "CPRU", &expPkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = cpruOut.writeData(pkg.CSVRow())
+			err = cpruOut.writeData(expPkg.CSVRow())
 		case aez.PMData:
 			if pmOut == nil {
-				pmOut, err = csvOutputFactory(output, currentOrigin, "PM", &pkg)
+				pmOut, err = csvOutputFactory(output, currentOrigin, "PM", &expPkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = pmOut.writeData(pkg.CSVRow())
+			err = pmOut.writeData(expPkg.CSVRow())
 		}
 		// This error comes from writing a line and most probably would be a column missmatch
 		// that means we should be able to continue and just report the error

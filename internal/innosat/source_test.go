@@ -1,6 +1,7 @@
 package innosat
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -212,6 +213,44 @@ func TestSourcePacketHeader_CSVRow(t *testing.T) {
 			}
 			if got := sph.CSVRow(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("SourcePacketHeader.CSVRow() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSourcePacketHeader_MarshalJSON(t *testing.T) {
+	type fields struct {
+		PacketID              packetID
+		PacketSequenceControl PacketSequenceControl
+		PacketLength          uint16
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    []byte
+		wantErr bool
+	}{
+		{
+			"Marshals into expected json",
+			fields{PacketSequenceControl: 0xc008},
+			[]byte(fmt.Sprintf("{\"specification\":\"%s\",\"spSequenceCount\":8}", Specification)),
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sph := &SourcePacketHeader{
+				PacketID:              tt.fields.PacketID,
+				PacketSequenceControl: tt.fields.PacketSequenceControl,
+				PacketLength:          tt.fields.PacketLength,
+			}
+			got, err := sph.MarshalJSON()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SourcePacketHeader.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SourcePacketHeader.MarshalJSON() = %v, want %v", got, tt.want)
 			}
 		})
 	}

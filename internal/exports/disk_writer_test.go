@@ -40,9 +40,9 @@ func TestDiskCallbackFactory(t *testing.T) {
 		writeTimeseries bool
 	}
 	type wantFile struct {
-		base   string
-		lines  int
-		binary bool
+		base           string
+		lines          int
+		dontCountLines bool
 	}
 	tests := []struct {
 		name         string
@@ -191,7 +191,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 			},
 		},
 		{
-			"Creates images",
+			"Creates images and jsons",
 			args{writeImages: true},
 			[]common.DataRecord{
 				{
@@ -219,7 +219,9 @@ func TestDiskCallbackFactory(t *testing.T) {
 			},
 			[]wantFile{
 				{"5000000000.png", 0, true},
+				{"5000000000.json", 0, true},
 				{"6000000000.png", 0, true},
+				{"6000000000.json", 0, true},
 			},
 		},
 		{
@@ -266,7 +268,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 				if err != nil {
 					t.Errorf("DiskCallbackFactory() expected to produce file '%v', but got error reading it: %v", path, err)
 				}
-				if !want.binary {
+				if !want.dontCountLines {
 					if newLines := strings.Count(string(content), "\n"); newLines != want.lines {
 						t.Errorf("DiskCallbackFactory() expected file %v to have %v lines, found %v", want.base, want.lines, newLines)
 					}
