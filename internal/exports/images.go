@@ -35,8 +35,9 @@ func getGrayscaleImage(
 	}
 	buf := bytes.NewBuffer([]byte{})
 	if shift > 0 {
-		for idx := 0; idx < nPixels; idx++ {
-			pixels[idx] = pixels[idx] << shift
+		for idx, pix := range pixels {
+			pixels[idx] = pix << shift
+
 		}
 	}
 	err := binary.Write(buf, binary.BigEndian, pixels)
