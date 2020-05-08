@@ -21,7 +21,8 @@ read_JPEG_file(char *inbuffer, size_t size)
   (void)jpeg_read_header(&cinfo, TRUE);
 
   (void)jpeg_start_decompress(&cinfo);
-  result.pix = (char *)malloc(cinfo.output_height * cinfo.output_width * cinfo.output_components * BYTES_PER_SAMPLE);
+  result.pix = (char *)malloc(cinfo.output_height * cinfo.output_width
+                              * cinfo.output_components * BYTES_PER_SAMPLE);
   result.width = cinfo.output_width;
   result.height = cinfo.output_height;
 
@@ -31,7 +32,9 @@ read_JPEG_file(char *inbuffer, size_t size)
   while (cinfo.output_scanline < cinfo.output_height)
   {
     (void)jpeg_read_scanlines(&cinfo, buffer, 1);
-    memcpy(&(result.pix)[(cinfo.output_scanline - 1) * row_stride], buffer[0], row_stride * BYTES_PER_SAMPLE);
+    memcpy(&(result.pix)[(cinfo.output_scanline - 1) * row_stride],
+           buffer[0],
+           row_stride);
   }
   (void)jpeg_finish_decompress(&cinfo);
 
