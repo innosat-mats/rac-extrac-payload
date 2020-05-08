@@ -2,6 +2,7 @@ package innosat
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"time"
@@ -58,12 +59,24 @@ func (tmdfh TMDataFieldHeader) CSVHeaders() []string {
 	}
 }
 
+var gpsTime = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
+
 // CSVRow returns the data row
 func (tmdfh TMDataFieldHeader) CSVRow() []string {
-	gpsTime := time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
 	tmTime := tmdfh.Time(gpsTime)
 	return []string{
 		tmTime.Format(time.RFC3339Nano),
 		fmt.Sprintf("%v", tmdfh.Nanoseconds()),
 	}
+}
+
+// MarshalJSON makes a custom json of what is of interest in the struct
+func (tmdfh *TMDataFieldHeader) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		TMHeaderTime        string `json:"tmHeaderTime"`
+		TMHeaderNanoseconds int64  `json:"tmHeaderNanoseconds"`
+	}{
+		TMHeaderTime:        tmdfh.Time(gpsTime).Format(time.RFC3339Nano),
+		TMHeaderNanoseconds: tmdfh.Nanoseconds(),
+	})
 }

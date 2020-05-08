@@ -8,16 +8,16 @@ import (
 
 // DataRecord holds the full decode from one or many Ramses packages
 type DataRecord struct {
-	Origin       OriginDescription          // Describes the origin of the data like filename or data batch name
-	RamsesHeader ramses.Ramses              // Ramses header information
-	RamsesSecure ramses.Secure              // Ramses secure header information
-	SourceHeader innosat.SourcePacketHeader // Source header from the innosat platform
-	TMHeader     innosat.TMDataFieldHeader  // Data header information
+	Origin       OriginDescription          `json:"origin"`       // Describes the origin of the data like filename or data batch name
+	RamsesHeader ramses.Ramses              `json:"ramsesHeader"` // Ramses header information
+	RamsesSecure ramses.Secure              `json:"-"`            // Ramses secure header information
+	SourceHeader innosat.SourcePacketHeader `json:"sourceHeader"` // Source header from the innosat platform
+	TMHeader     innosat.TMDataFieldHeader  `json:"tmHeader"`     // Data header information
 	SID          aez.SID                    // SID of the Data if any
 	RID          aez.RID                    // RID of Data if any
-	Data         Exportable                 // The data payload itself, HK report, jpeg image etc.
-	Error        error                      // First propagated error from the decoding process
-	Buffer       []byte                     // Currently unprocessed data (payload)
+	Data         Exportable                 `json:"data"`  // The data payload itself, HK report, jpeg image etc.
+	Error        error                      `json:"error"` // First propagated error from the decoding process
+	Buffer       []byte                     `json:"-"`     // Currently unprocessed data (payload)
 }
 
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
