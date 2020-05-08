@@ -15,9 +15,9 @@ type DataRecord struct {
 	TMHeader     innosat.TMDataFieldHeader  `json:"tmHeader"`     // Data header information
 	SID          aez.SID                    // SID of the Data if any
 	RID          aez.RID                    // RID of Data if any
-	Data         Exportable                 `json:"data"`  // The data payload itself, HK report, jpeg image etc.
-	Error        error                      `json:"error"` // First propagated error from the decoding process
-	Buffer       []byte                     `json:"-"`     // Currently unprocessed data (payload)
+	Data         Exportable                 `json:"data"`            // The data payload itself, HK report, jpeg image etc.
+	Error        error                      `json:"error,omitempty"` // First propagated error from the decoding process
+	Buffer       []byte                     `json:"-"`               // Currently unprocessed data (payload)
 }
 
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
