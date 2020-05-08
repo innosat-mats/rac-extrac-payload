@@ -100,18 +100,6 @@ func Test_Interpolate(t *testing.T) {
 			155,
 			true,
 		},
-		{
-			"Interpolate gets angry if resistances and temperatures of different size",
-			args{0, htrResistances[:], pwrTemperatures[:]},
-			-9999,
-			true,
-		},
-		{
-			"Interpolate gets angry if x or y slice too short",
-			args{0, []float64{1}, []float64{0}},
-			-9999,
-			true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
