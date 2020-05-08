@@ -2,6 +2,7 @@ package aez
 
 import (
 	"fmt"
+	"log"
 )
 
 // ErrXTooLarge x value sent to interpolator is too large
@@ -32,34 +33,6 @@ func (err ErrXTooSmall) Error() string {
 	)
 }
 
-// ErrXYTooShort x or y slice sent to interpolator is too short
-type ErrXYTooShort int
-
-func (err ErrXYTooShort) String() string {
-	return fmt.Sprint(int(err))
-}
-
-func (err ErrXYTooShort) Error() string {
-	return fmt.Sprintf(
-		"Slices x and y must be at least of length 2 (%d < 0). Returning -9999.",
-		int(err),
-	)
-}
-
-// ErrXYMismatch x and y slices of different lengths
-type ErrXYMismatch struct{ lenRes, lenTemp int }
-
-func (err ErrXYMismatch) String() string {
-	return fmt.Sprintf("%d, %d", err.lenRes, err.lenTemp)
-}
-
-func (err ErrXYMismatch) Error() string {
-	return fmt.Sprintf(
-		"Slices x and y not of same length (%d != %d). Returning absolute -9999.",
-		err.lenRes, err.lenTemp,
-	)
-}
-
 // Note! Assumes xSlice contains a monotonically increasing values!
 func getXIndex(x float64, xSlice []float64) int {
 	var i int
@@ -78,12 +51,16 @@ func Interpolate(
 	x float64, xSlice []float64, ySlice []float64,
 ) (float64, error) {
 	if len(xSlice) != len(ySlice) {
-		return -9999, ErrXYMismatch{
+		log.Fatalf(
+			"Slices x and y not of same length (%d != %d).\n",
 			len(xSlice), len(ySlice),
-		}
+		)
 	}
 	if len(xSlice) < 2 {
-		return -9999, ErrXYTooShort(len(xSlice))
+		log.Fatalf(
+			"Slices x and y must be at least of length 2 (%d < 2).\n",
+			len(xSlice),
+		)
 	}
 
 	i := getXIndex(x, xSlice)
