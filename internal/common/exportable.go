@@ -14,4 +14,6 @@ type ExportablePackage interface {
 	CSVSpecifications() []string
 	OriginName() string
 	AEZData() interface{}
+	RemainingBuffer() []byte
+	ParsingError() error
 }

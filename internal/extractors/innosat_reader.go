@@ -16,6 +16,9 @@ type SourcePackage struct {
 	ApplicationPayload []byte
 }
 
+const crcChecksumLength int = 2
+const pusLengthOffset int = 1
+
 // DecodeSource decodes a byte array to a SourcePackage
 func DecodeSource(data []byte) (SourcePackage, error) {
 	var err error
@@ -25,8 +28,11 @@ func DecodeSource(data []byte) (SourcePackage, error) {
 	if err != nil {
 		return SourcePackage{}, err
 	}
-	if crc16.ChecksumCCITTFalse(data[:len(data)-2]) != binary.BigEndian.Uint16(data[len(data)-2:]) {
-		return SourcePackage{}, fmt.Errorf("checksum bad %d", crc16.ChecksumCCITTFalse(data[:len(data)-2]))
+	if crc16.ChecksumCCITTFalse(data[:len(data)-crcChecksumLength]) != binary.BigEndian.Uint16(data[len(data)-crcChecksumLength:]) {
+		return SourcePackage{}, fmt.Errorf(
+			"checksum bad %d",
+			crc16.ChecksumCCITTFalse(data[:len(data)-crcChecksumLength]),
+		)
 	}
 
 	tmPayload := innosat.TMDataFieldHeader{}
@@ -35,9 +41,11 @@ func DecodeSource(data []byte) (SourcePackage, error) {
 		return SourcePackage{}, err
 	}
 
+	sliceStart := binary.Size(header) + binary.Size(tmPayload)
+	sliceEnd := sliceStart + int(header.PacketLength) - binary.Size(tmPayload) - crcChecksumLength + pusLengthOffset
 	return SourcePackage{
 		header,
 		tmPayload,
-		data[binary.Size(header)+binary.Size(tmPayload) : len(data)-2],
+		data[sliceStart:sliceEnd],
 	}, nil
 }

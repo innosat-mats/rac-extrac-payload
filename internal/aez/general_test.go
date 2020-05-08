@@ -358,3 +358,59 @@ func TestRID_String(t *testing.T) {
 		})
 	}
 }
+
+func TestRID_MarshalJSON(t *testing.T) {
+	tests := []struct {
+		name    string
+		rid     RID
+		want    []byte
+		wantErr bool
+	}{
+		{
+			"Marschals into string representation",
+			CCD2,
+			[]byte("\"CCD2\""),
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.rid.MarshalJSON()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RID.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("RID.MarshalJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSID_MarshalJSON(t *testing.T) {
+	tests := []struct {
+		name    string
+		sid     SID
+		want    []byte
+		wantErr bool
+	}{
+		{
+			"Marschals into string representation",
+			SIDHTR,
+			[]byte("\"HTR\""),
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.sid.MarshalJSON()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SID.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SID.MarshalJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

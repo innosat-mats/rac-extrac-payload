@@ -1,6 +1,7 @@
 package ramses
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -191,6 +192,52 @@ func TestRamses_CSVRow(t *testing.T) {
 			}
 			if got := ramses.CSVRow(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Ramses.CSVRow() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRamses_MarshalJSON(t *testing.T) {
+	type fields struct {
+		Synch  uint16
+		Length uint16
+		Port   uint16
+		Type   uint8
+		Secure uint8
+		Time   uint32
+		Date   int32
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    []byte
+		wantErr bool
+	}{
+		{
+			"Marshals into expected json",
+			fields{},
+			[]byte(fmt.Sprintf("{\"specification\":\"%v\",\"ramsesTime\":\"2000-01-01T00:00:00Z\"}", Specification)),
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := &Ramses{
+				Synch:  tt.fields.Synch,
+				Length: tt.fields.Length,
+				Port:   tt.fields.Port,
+				Type:   tt.fields.Type,
+				Secure: tt.fields.Secure,
+				Time:   tt.fields.Time,
+				Date:   tt.fields.Date,
+			}
+			got, err := ramses.MarshalJSON()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Ramses.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Ramses.MarshalJSON() = %v, want %v", got, tt.want)
 			}
 		})
 	}
