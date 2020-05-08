@@ -16,7 +16,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 	multiPackBuffer := bytes.NewBuffer([]byte{})
 	var multiPackStarted bool
 	var multiPackStart common.DataRecord
-	var sidRidLength = 2
+	const sidRidLength = 2
 
 	for sourcePacket := range source {
 		if sourcePacket.Error != nil {

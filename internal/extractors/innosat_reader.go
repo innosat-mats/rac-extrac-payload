@@ -17,7 +17,7 @@ type SourcePackage struct {
 }
 
 const crcChecksumLength int = 2
-var pusLengthOffset int = 1
+const pusLengthOffset int = 1
 
 // DecodeSource decodes a byte array to a SourcePackage
 func DecodeSource(data []byte) (SourcePackage, error) {

@@ -119,7 +119,8 @@ const JPEGQUncompressed16bit = uint8(101)
 
 
 // NCOLStartOffset says how many more columns than reported the actual columns are
-var NCOLStartOffset uint16 = 1
+const NCOLStartOffset uint16 = 1
+
 
 // CCDImagePackData contains the composite information from the CCD and the CRB module
 type CCDImagePackData struct {
