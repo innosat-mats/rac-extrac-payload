@@ -72,7 +72,7 @@ func getImageData(
 		}
 		if uint16(height) != packData.NROW || uint16(width) != packData.NCOL+aez.NCOLStartOffset {
 			log.Printf(
-				"CCDImage %v has either width %v != %v and/or height %v != %v\n",
+				"Compressed CCDImage %v has either width %v != %v and/or height %v != %v\n",
 				outFileName,
 				width,
 				packData.NCOL+aez.NCOLStartOffset,
@@ -83,13 +83,14 @@ func getImageData(
 	} else {
 		reader := bytes.NewReader(buf)
 		imgData = make([]uint16, reader.Len()/2)
-		if len(imgData) != int(packData.NROW*(packData.NCOL+aez.NCOLStartOffset)) {
+		width, height := int(packData.NCOL+aez.NCOLStartOffset), int(packData.NROW)
+		if len(imgData) != width*height {
 			log.Printf(
-				"CCDImage %v has %v pixels, but dimensions %v x %v\n",
+				"Raw CCDImage %v has %v pixels, but dimensions %v x %v\n",
 				outFileName,
 				len(imgData),
-				packData.NCOL+aez.NCOLStartOffset,
-				packData.NROW,
+				width,
+				height,
 			)
 		}
 		binary.Read(reader, binary.LittleEndian, &imgData)
