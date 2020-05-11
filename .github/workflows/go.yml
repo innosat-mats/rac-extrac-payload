@@ -18,7 +18,6 @@ jobs:
       with:
         go-version: 1.14
       id: go
-
       
     - name: install mingw
       run : sudo apt-get install -y gcc-mingw-w64
@@ -39,9 +38,10 @@ jobs:
 
     - name: Test
       run: make test
-      
-    - name: Build windows
-      run: CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o rac.exe ./cmd/rac  
+
+    # # TODO: wait for #https://github.com/actions/virtual-environments/issues/228
+    # - name: Build windows
+    #   run: CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o rac.exe ./cmd/rac  
 
     - name: Build linux 
       run: go build -o rac ./cmd/rac 
