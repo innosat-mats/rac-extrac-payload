@@ -39,7 +39,7 @@ func TestJpegImage(t *testing.T) {
 		log.Fatalln(err)
 	}
 	if md5.Sum(img.Pix) != md5.Sum(refImg.(*image.Gray16).Pix) {
-		t.Errorf("JpegImageData() integration test: Image data is the same")
+		t.Errorf("JpegImageData() integration test: Image data is not the same")
 	}
 
 }
