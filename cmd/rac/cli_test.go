@@ -77,7 +77,7 @@ func Test_processFiles(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dir, err := ioutil.TempDir("/tmp", "mats-testing")
+			dir, err := ioutil.TempDir("", "mats-testing")
 			if err != nil {
 				log.Fatal(err)
 			}

@@ -8,16 +8,16 @@ import (
 
 // DataRecord holds the full decode from one or many Ramses packages
 type DataRecord struct {
-	Origin       OriginDescription          // Describes the origin of the data like filename or data batch name
-	RamsesHeader ramses.Ramses              // Ramses header information
-	RamsesSecure ramses.Secure              // Ramses secure header information
-	SourceHeader innosat.SourcePacketHeader // Source header from the innosat platform
-	TMHeader     innosat.TMDataFieldHeader  // Data header information
-	SID          aez.SID                    // SID of the Data if any
-	RID          aez.RID                    // RID of Data if any
-	Data         Exportable                 // The data payload itself, HK report, jpeg image etc.
-	Error        error                      // First propagated error from the decoding process
-	Buffer       []byte                     // Currently unprocessed data (payload)
+	Origin         OriginDescription          `json:"origin"`         // Describes the origin of the data like filename or data batch name
+	RamsesHeader   ramses.Ramses              `json:"ramsesHeader"`   // Ramses header information
+	RamsesTMHeader ramses.TMHeader            `json:"ramsesTMHeader"` // The CCSDS compliant OHBSE TM Packet header
+	SourceHeader   innosat.SourcePacketHeader `json:"sourceHeader"`   // Source header from the innosat platform
+	TMHeader       innosat.TMHeader           `json:"tmHeader"`       // Data header information
+	SID            aez.SID                    // SID of the Data if any
+	RID            aez.RID                    // RID of Data if any
+	Data           Exportable                 `json:"data"`            // The data payload itself, HK report, jpeg image etc.
+	Error          error                      `json:"error,omitempty"` // First propagated error from the decoding process
+	Buffer         []byte                     `json:"-"`               // Currently unprocessed data (payload)
 }
 
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
@@ -46,6 +46,7 @@ func (record DataRecord) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, record.Origin.CSVHeaders()...)
 	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
+	headers = append(headers, record.RamsesTMHeader.CSVHeaders()...)
 	headers = append(headers, record.SourceHeader.CSVHeaders()...)
 	headers = append(headers, record.TMHeader.CSVHeaders()...)
 	headers = append(headers, "SID", "RID")
@@ -61,6 +62,7 @@ func (record DataRecord) CSVRow() []string {
 	var row []string
 	row = append(row, record.Origin.CSVRow()...)
 	row = append(row, record.RamsesHeader.CSVRow()...)
+	row = append(row, record.RamsesTMHeader.CSVRow()...)
 	row = append(row, record.SourceHeader.CSVRow()...)
 	row = append(row, record.TMHeader.CSVRow()...)
 	row = append(row, record.SID.String(), record.RID.String())
@@ -83,4 +85,14 @@ func (record DataRecord) AEZData() interface{} {
 // OriginName returns the name of file/key that is source of data record
 func (record DataRecord) OriginName() string {
 	return record.Origin.Name
+}
+
+// RemainingBuffer returns the buffer in the packet not yet parsed
+func (record DataRecord) RemainingBuffer() []byte {
+	return record.Buffer
+}
+
+// ParsingError returns the error if any
+func (record DataRecord) ParsingError() error {
+	return record.Error
 }

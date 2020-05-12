@@ -2,6 +2,7 @@ package innosat
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 )
@@ -120,4 +121,15 @@ func (sph SourcePacketHeader) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", sph.PacketSequenceControl.SequenceCount()),
 	}
+}
+
+// MarshalJSON makes a custom json of what is of interest in the struct
+func (sph *SourcePacketHeader) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Specification   string `json:"specification"`
+		SPSequenceCount uint16 `json:"spSequenceCount"`
+	}{
+		Specification:   Specification,
+		SPSequenceCount: sph.PacketSequenceControl.SequenceCount(),
+	})
 }

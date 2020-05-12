@@ -114,6 +114,14 @@ func (gain CCDGain) Truncation() uint8 {
 	return uint8(gain & 0b1111)
 }
 
+// JPEGQUncompressed16bit is the value for non-12bit image data
+const JPEGQUncompressed16bit = uint8(101)
+
+
+// NCOLStartOffset says how many more columns than reported the actual columns are
+const NCOLStartOffset uint16 = 1
+
+
 // CCDImagePackData contains the composite information from the CCD and the CRB module
 type CCDImagePackData struct {
 	CCDSEL  uint8   // CCD sensor number, not same format for TM and TC

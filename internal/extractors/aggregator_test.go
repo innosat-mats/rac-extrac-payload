@@ -69,9 +69,10 @@ func TestAggregator(t *testing.T) {
 		},
 		{
 			"Three continuation packages makes one error for lacking start and one for lacking end",
-			[]common.DataRecord{{}, {}, {}},
+			[]common.DataRecord{{Buffer: []byte("42")}, {Buffer: []byte("42")}, {Buffer: []byte("42")}},
 			[]outcome{
-				{wantErr: true, partialErrMsg: "continuation packet"},
+				// For the unexpected start error we don't care about removing SID/RID
+				{wantErr: true, partialErrMsg: "continuation packet", bufferLength: 2},
 				{wantErr: true, partialErrMsg: "dangling final multipacket"},
 			},
 		},
@@ -92,15 +93,15 @@ func TestAggregator(t *testing.T) {
 				},
 				{
 					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
-					Buffer:       []byte(" "),
+					Buffer:       []byte("42 "),
 				},
 				{
 					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
-					Buffer:       []byte("World"),
+					Buffer:       []byte("42World"),
 				},
 				{
 					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
-					Buffer:       []byte("!"),
+					Buffer:       []byte("42!"),
 				},
 			},
 			[]outcome{{wantErr: false, bufferLength: 12}},
@@ -118,7 +119,7 @@ func TestAggregator(t *testing.T) {
 				},
 				{
 					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
-					Buffer:       []byte("World!"),
+					Buffer:       []byte("42World!"),
 				},
 			},
 			[]outcome{
