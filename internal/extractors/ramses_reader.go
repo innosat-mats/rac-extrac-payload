@@ -54,7 +54,11 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 				if stream.Buf.Len() == 0 {
 					break
 				}
-				recordChannel <- getRecord(stream)
+				record := getRecord(stream)
+				recordChannel <- record
+				if record.Error != nil {
+					break
+				}
 			}
 		}
 	}
@@ -72,7 +76,7 @@ func getRecord(stream StreamBatch) common.DataRecord {
 	}
 
 	if !header.Valid() {
-		err := fmt.Errorf("Not a valid RAC-record (%v)", stream.Origin.Name)
+		err := fmt.Errorf("Not a valid RAC-record %v (%s)", header, stream.Origin.Name)
 		return common.DataRecord{Origin: stream.Origin, Error: err, Buffer: []byte{}}
 	}
 
