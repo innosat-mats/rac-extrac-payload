@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"strconv"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
@@ -18,6 +19,17 @@ const (
 	// WDWModeAutomatic window selected depending on input data
 	WDWModeAutomatic WDWMode = 1
 )
+
+func (mode WDWMode) String() string {
+	switch mode {
+	case WDWModeManual:
+		return "Manual"
+	case WDWModeAutomatic:
+		return "Automatic"
+	default:
+		return ""
+	}
+}
 
 // Wdw is the composite status of Image Window Mode
 type Wdw uint8
@@ -83,6 +95,17 @@ const (
 	LowSignalMode
 )
 
+func (mode CCDGainMode) String() string {
+	switch mode {
+	case HighSignalMode:
+		return "High"
+	case LowSignalMode:
+		return "Low"
+	default:
+		return ""
+	}
+}
+
 // CCDGainTiming is the timing flag
 type CCDGainTiming int
 
@@ -92,6 +115,17 @@ const (
 	// FullTiming used even for pixels that are not read out
 	FullTiming
 )
+
+func (timing CCDGainTiming) String() string {
+	switch timing {
+	case FasterTiming:
+		return "Faster"
+	case FullTiming:
+		return "Full"
+	default:
+		return ""
+	}
+}
 
 // Mode returns high/low signal mode, Bit[12]
 func (gain CCDGain) Mode() CCDGainMode {
@@ -117,10 +151,8 @@ func (gain CCDGain) Truncation() uint8 {
 // JPEGQUncompressed16bit is the value for non-12bit image data
 const JPEGQUncompressed16bit = uint8(101)
 
-
 // NCOLStartOffset says how many more columns than reported the actual columns are
 const NCOLStartOffset uint16 = 1
-
 
 // CCDImagePackData contains the composite information from the CCD and the CRB module
 type CCDImagePackData struct {
@@ -155,21 +187,92 @@ type CCDImagePackData struct {
 // Read CCDImagePackData from the buffer
 //
 // returns the BC (bad columns) array and the error status.
-func (ccdImagePackData *CCDImagePackData) Read(buf io.Reader) ([]uint16, error) {
-	err := binary.Read(buf, binary.LittleEndian, ccdImagePackData)
+func (ccd *CCDImagePackData) Read(buf io.Reader) ([]uint16, error) {
+	err := binary.Read(buf, binary.LittleEndian, ccd)
 	if err != nil {
 		return nil, err
 	}
-	badColumns := make([]uint16, ccdImagePackData.NBC)
+	badColumns := make([]uint16, ccd.NBC)
 	return badColumns, binary.Read(buf, binary.LittleEndian, &badColumns)
 }
 
 // Time returns the measurement time in UTC
-func (ccdImagePackData *CCDImagePackData) Time(epoch time.Time) time.Time {
-	return ccsds.UnsegmentedTimeDate(ccdImagePackData.EXPTS, ccdImagePackData.EXPTSS, epoch)
+func (ccd *CCDImagePackData) Time(epoch time.Time) time.Time {
+	return ccsds.UnsegmentedTimeDate(ccd.EXPTS, ccd.EXPTSS, epoch)
 }
 
 // Nanoseconds returns the measurement time in nanoseconds since epoch
-func (ccdImagePackData *CCDImagePackData) Nanoseconds() int64 {
-	return ccsds.UnsegmentedTimeNanoseconds(ccdImagePackData.EXPTS, ccdImagePackData.EXPTSS)
+func (ccd *CCDImagePackData) Nanoseconds() int64 {
+	return ccsds.UnsegmentedTimeNanoseconds(ccd.EXPTS, ccd.EXPTSS)
+}
+
+// CSVHeaders returns the exportable field names
+func (ccd CCDImagePackData) CSVHeaders() []string {
+	return []string{
+		"CCDSEL",
+		"EXP Nanoseconds",
+		"EXP Date",
+		"WDW Mode",
+		"WDW InputDataWindow",
+		"WDWOV",
+		"JPEGQ",
+		"FRAME",
+		"NROW",
+		"NRBIN",
+		"NRSKIP",
+		"NCOL",
+		"NCBIN FPGAColumns",
+		"NCBIN CCDColumns",
+		"NCSKIP",
+		"NFLUSH",
+		"TEXPMS",
+		"GAIN Mode",
+		"GAIN Timing",
+		"TEMP",
+		"FBINOV",
+		"LBLNK",
+		"TBLNK",
+		"ZERO",
+		"TIMING1",
+		"TIMING2",
+		"VERSION",
+		"TIMING3",
+		"NBC",
+	}
+}
+
+// CSVRow returns the exportable field values
+func (ccd CCDImagePackData) CSVRow() []string {
+	wdwhigh, wdwlow, _ := ccd.WDW.InputDataWindow()
+	return []string{
+		strconv.Itoa(int(ccd.CCDSEL)),
+		strconv.FormatInt(ccd.Nanoseconds(), 10),
+		ccd.Time(gpsTime).Format(time.RFC3339Nano),
+		ccd.WDW.Mode().String(),
+		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
+		strconv.Itoa(int(ccd.WDWOV)),
+		strconv.Itoa(int(ccd.JPEGQ)),
+		strconv.Itoa(int(ccd.FRAME)),
+		strconv.Itoa(int(ccd.NROW)),
+		strconv.Itoa(int(ccd.NRBIN)),
+		strconv.Itoa(int(ccd.NRSKIP)),
+		strconv.Itoa(int(ccd.NCOL)),
+		strconv.Itoa(int(ccd.NCBIN.FPGAColumns())),
+		strconv.Itoa(int(ccd.NCBIN.CCDColumns())),
+		strconv.Itoa(int(ccd.NCSKIP)),
+		strconv.Itoa(int(ccd.NFLUSH)),
+		strconv.Itoa(int(ccd.TEXPMS)),
+		ccd.GAIN.Mode().String(),
+		ccd.GAIN.Timing().String(),
+		strconv.Itoa(int(ccd.TEMP)),
+		strconv.Itoa(int(ccd.FBINOV)),
+		strconv.Itoa(int(ccd.LBLNK)),
+		strconv.Itoa(int(ccd.TBLNK)),
+		strconv.Itoa(int(ccd.ZERO)),
+		strconv.Itoa(int(ccd.TIMING1)),
+		strconv.Itoa(int(ccd.TIMING2)),
+		strconv.Itoa(int(ccd.VERSION)),
+		strconv.Itoa(int(ccd.TIMING3)),
+		strconv.Itoa(int(ccd.NBC)),
+	}
 }

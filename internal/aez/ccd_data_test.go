@@ -416,3 +416,16 @@ func TestCCDImagePackData_Read(t *testing.T) {
 		})
 	}
 }
+
+func TestCCDImagePackData_CSVHeaders_EqualLengthAs_CSVRow(t *testing.T) {
+	ccd := CCDImagePackData{}
+	headers := ccd.CSVHeaders()
+	row := ccd.CSVRow()
+	if len(headers) != len(row) {
+		t.Errorf(
+			"CCDImagePackData.CSVHeaders() length %v != CCDImagePackData.CSVRow() length %v",
+			len(headers),
+			len(row),
+		)
+	}
+}

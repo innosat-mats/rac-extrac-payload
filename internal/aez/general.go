@@ -14,6 +14,8 @@ import (
 // Specification describes what version the current implementation follows
 var Specification string = "AEZICD002:H"
 
+var gpsTime time.Time = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
+
 // SID is the id of a single housekeeping parameter
 type SID uint16
 
@@ -157,7 +159,6 @@ func (stat STAT) CSVHeaders() []string {
 // CSVRow returns the data row
 func (stat STAT) CSVRow() []string {
 	var row []string
-	gpsTime := time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
 	statTime := stat.Time(gpsTime)
 	row = append(row, statTime.Format(time.RFC3339Nano), fmt.Sprintf("%v", stat.Nanoseconds()))
 	val := reflect.Indirect(reflect.ValueOf(stat))
