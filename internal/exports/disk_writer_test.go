@@ -246,7 +246,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup and cleanup of output directory
-			dir, err := ioutil.TempDir("", "innosat-mats*")
+			dir, err := ioutil.TempDir("", "innosat-mats")
 			if err != nil {
 				t.Errorf("DiskCallbackFactory() could not setup output directory '%v'", err)
 			}
