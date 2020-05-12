@@ -27,7 +27,16 @@ func (ramses *Ramses) Read(buf io.Reader) error {
 // Created is when the package was created
 func (ramses *Ramses) Created() time.Time {
 	start := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-	return start.Add(time.Hour * 24 * time.Duration(ramses.Date)).Add(time.Millisecond * time.Duration(ramses.Time))
+	return start.Add(time.Duration(ramses.Nanoseconds()))
+}
+
+// Nanoseconds since epoch when packet was created
+func (ramses *Ramses) Nanoseconds() int64 {
+	return int64(
+		time.Hour*24*time.Duration(ramses.Date) +
+			time.Millisecond*time.Duration(ramses.Time),
+	)
+
 }
 
 // Valid as in correct version

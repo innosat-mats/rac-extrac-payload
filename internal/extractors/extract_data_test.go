@@ -57,12 +57,23 @@ func Example() {
 		0x00, 0xcd, 0xa0, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 		0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7e, 0,
 	}
-	byteStream1 := bytes.NewReader(data)
-	byteStream2 := bytes.NewReader(data)
+	stream1 := bytes.NewReader(data)
+	reader1, err := common.NewRemainingReader(stream1)
+	if err != nil {
+		fmt.Printf("Could not create reader: %v", err)
+		return
+	}
+	stream2 := bytes.NewReader(data)
+	reader2, err := common.NewRemainingReader(stream2)
+	if err != nil {
+		fmt.Printf("Could not create reader: %v", err)
+		return
+	}
+
 	ExtractData(
 		simpleOutput,
-		StreamBatch{byteStream1, common.OriginDescription{Name: "Set1", ProcessingDate: innosat.Epoch}},
-		StreamBatch{byteStream2, common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}})
+		StreamBatch{reader1, common.OriginDescription{Name: "Set1", ProcessingDate: innosat.Epoch}},
+		StreamBatch{reader2, common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}})
 
 	// Output:
 	// CCD3  got stop packet without a start packet
