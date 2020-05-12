@@ -23,6 +23,7 @@ func (reader *RemainingReader) Len() int64 {
 	return reader.size - reader.read
 }
 
+// Read implements the io.Reader interface and remembers how much has been read.
 func (reader *RemainingReader) Read(buf []byte) (int, error) {
 	n, err := (*reader.reader).Read(buf)
 	atomic.AddInt64(&reader.read, int64(n))

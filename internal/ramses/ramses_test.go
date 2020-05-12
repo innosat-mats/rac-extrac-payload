@@ -221,3 +221,47 @@ func TestRamses_MarshalJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestRamses_Nanoseconds(t *testing.T) {
+	type fields struct {
+		Synch  uint16
+		Length uint16
+		Port   uint16
+		Type   uint8
+		Secure uint8
+		Time   uint32
+		Date   int32
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   int64
+	}{
+		{
+			"Returns 0",
+			fields{},
+			0,
+		},
+		{
+			"Returns expected value",
+			fields{Time: 42, Date: 10},
+			10*3600*24*1000000000 + 42*1000000,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := &Ramses{
+				Synch:  tt.fields.Synch,
+				Length: tt.fields.Length,
+				Port:   tt.fields.Port,
+				Type:   tt.fields.Type,
+				Secure: tt.fields.Secure,
+				Time:   tt.fields.Time,
+				Date:   tt.fields.Date,
+			}
+			if got := ramses.Nanoseconds(); got != tt.want {
+				t.Errorf("Ramses.Nanoseconds() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
