@@ -8,28 +8,28 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
-func TestTMDataFieldHeader_PUSVersion(t *testing.T) {
+func TestTMHeader_PUSVersion(t *testing.T) {
 	tests := []struct {
 		name string
-		h    *TMDataFieldHeader
+		h    *TMHeader
 		want uint8
 	}{
 		{
 			"bitpattern",
-			&TMDataFieldHeader{0b01110000, 0, 0, 0, 0},
+			&TMHeader{0b01110000, 0, 0, 0, 0},
 			0b111,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.h.PUS.Version(); got != tt.want {
-				t.Errorf("TMDataFieldHeader.PUSVersion() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.PUSVersion() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTMDataFieldHeader_Time(t *testing.T) {
+func TestTMHeader_Time(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
@@ -61,7 +61,7 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &TMDataFieldHeader{
+			h := &TMHeader{
 				PUS:             tt.fields.PUS,
 				ServiceType:     tt.fields.ServiceType,
 				ServiceSubType:  tt.fields.ServiceSubType,
@@ -69,13 +69,13 @@ func TestTMDataFieldHeader_Time(t *testing.T) {
 				CUCTimeFraction: tt.fields.CUCTimeFraction,
 			}
 			if got := h.Time(tt.args.epoch); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TMDataFieldHeader.Time() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.Time() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
+func TestTMHeader_Nanoseconds(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
@@ -93,7 +93,7 @@ func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &TMDataFieldHeader{
+			h := &TMHeader{
 				PUS:             tt.fields.PUS,
 				ServiceType:     tt.fields.ServiceType,
 				ServiceSubType:  tt.fields.ServiceSubType,
@@ -101,13 +101,13 @@ func TestTMDataFieldHeader_Nanoseconds(t *testing.T) {
 				CUCTimeFraction: tt.fields.CUCTimeFraction,
 			}
 			if got := h.Nanoseconds(); got != tt.want {
-				t.Errorf("TMDataFieldHeader.Nanoseconds() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.Nanoseconds() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
+func TestTMHeader_IsHousekeeping(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
@@ -131,7 +131,7 @@ func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmdfh := &TMDataFieldHeader{
+			tmdfh := &TMHeader{
 				PUS:             tt.fields.PUS,
 				ServiceType:     tt.fields.ServiceType,
 				ServiceSubType:  tt.fields.ServiceSubType,
@@ -139,13 +139,13 @@ func TestTMDataFieldHeader_IsHousekeeping(t *testing.T) {
 				CUCTimeFraction: tt.fields.CUCTimeFraction,
 			}
 			if got := tmdfh.IsHousekeeping(); got != tt.want {
-				t.Errorf("TMDataFieldHeader.IsHousekeeping() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.IsHousekeeping() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
+func TestTMHeader_IsTransparentData(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
@@ -164,7 +164,7 @@ func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmdfh := &TMDataFieldHeader{
+			tmdfh := &TMHeader{
 				PUS:             tt.fields.PUS,
 				ServiceType:     tt.fields.ServiceType,
 				ServiceSubType:  tt.fields.ServiceSubType,
@@ -172,13 +172,13 @@ func TestTMDataFieldHeader_IsTransparentData(t *testing.T) {
 				CUCTimeFraction: tt.fields.CUCTimeFraction,
 			}
 			if got := tmdfh.IsTransparentData(); got != tt.want {
-				t.Errorf("TMDataFieldHeader.IsTransparentData() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.IsTransparentData() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTMDataFieldHeader_CSVHeaders(t *testing.T) {
+func TestTMHeader_CSVHeaders(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
@@ -195,7 +195,7 @@ func TestTMDataFieldHeader_CSVHeaders(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmdfh := TMDataFieldHeader{
+			tmdfh := TMHeader{
 				PUS:             tt.fields.PUS,
 				ServiceType:     tt.fields.ServiceType,
 				ServiceSubType:  tt.fields.ServiceSubType,
@@ -203,13 +203,13 @@ func TestTMDataFieldHeader_CSVHeaders(t *testing.T) {
 				CUCTimeFraction: tt.fields.CUCTimeFraction,
 			}
 			if got := tmdfh.CSVHeaders(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TMDataFieldHeader.CSVHeaders() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.CSVHeaders() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTMDataFieldHeader_CSVRow(t *testing.T) {
+func TestTMHeader_CSVRow(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
@@ -230,7 +230,7 @@ func TestTMDataFieldHeader_CSVRow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmdfh := TMDataFieldHeader{
+			tmdfh := TMHeader{
 				PUS:             tt.fields.PUS,
 				ServiceType:     tt.fields.ServiceType,
 				ServiceSubType:  tt.fields.ServiceSubType,
@@ -238,13 +238,13 @@ func TestTMDataFieldHeader_CSVRow(t *testing.T) {
 				CUCTimeFraction: tt.fields.CUCTimeFraction,
 			}
 			if got := tmdfh.CSVRow(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TMDataFieldHeader.CSVRow() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.CSVRow() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTMDataFieldHeader_MarshalJSON(t *testing.T) {
+func TestTMHeader_MarshalJSON(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
@@ -267,7 +267,7 @@ func TestTMDataFieldHeader_MarshalJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmdfh := &TMDataFieldHeader{
+			tmdfh := &TMHeader{
 				PUS:             tt.fields.PUS,
 				ServiceType:     tt.fields.ServiceType,
 				ServiceSubType:  tt.fields.ServiceSubType,
@@ -276,11 +276,11 @@ func TestTMDataFieldHeader_MarshalJSON(t *testing.T) {
 			}
 			got, err := tmdfh.MarshalJSON()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TMDataFieldHeader.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TMHeader.MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TMDataFieldHeader.MarshalJSON() = %v, want %v", got, tt.want)
+				t.Errorf("TMHeader.MarshalJSON() = %v, want %v", got, tt.want)
 			}
 		})
 	}

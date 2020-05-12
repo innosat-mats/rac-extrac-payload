@@ -26,8 +26,8 @@ const (
 	Discontinuities
 )
 
-// OhbseCcsdsTMPacket is used to transport telemetry packets on CCSDS format
-type OhbseCcsdsTMPacket struct {
+// TMHeader is the OHBSE CCSDS TM Packet Header in the specification
+type TMHeader struct {
 	_                [8]byte
 	QualityIndicator QualityIndicator `json:"qualityIndicator"` // QualityIndicator indicates whether the transported data is complete or partial (0 = Complete, 1 = partial)
 	LossFlag         LossFlag         `json:"lossFlag"`         // LossFlag is used to indicate that a sequence discontinuity has been detected
@@ -36,12 +36,12 @@ type OhbseCcsdsTMPacket struct {
 }
 
 // Read a OhbseCssdsTMPacket header
-func (header *OhbseCcsdsTMPacket) Read(buf io.Reader) error {
+func (header *TMHeader) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.LittleEndian, header)
 }
 
 //CSVHeaders returns the field names
-func (header OhbseCcsdsTMPacket) CSVHeaders() []string {
+func (header TMHeader) CSVHeaders() []string {
 	return []string{
 		"QualityIndicator",
 		"LossFlag",
@@ -50,7 +50,7 @@ func (header OhbseCcsdsTMPacket) CSVHeaders() []string {
 }
 
 //CSVRow returns the field values
-func (header OhbseCcsdsTMPacket) CSVRow() []string {
+func (header TMHeader) CSVRow() []string {
 	return []string{
 		strconv.Itoa(int(header.QualityIndicator)),
 		strconv.Itoa(int(header.LossFlag)),

@@ -8,16 +8,16 @@ import (
 
 // DataRecord holds the full decode from one or many Ramses packages
 type DataRecord struct {
-	Origin                   OriginDescription          `json:"origin"`                   // Describes the origin of the data like filename or data batch name
-	RamsesHeader             ramses.Ramses              `json:"ramsesHeader"`             // Ramses header information
-	OhbseCcsdsTMPacketHeader ramses.OhbseCcsdsTMPacket  `json:"ohbseCcsdsTMPacketHeader"` // The CCSDS compliant OHBSE TM Packet header
-	SourceHeader             innosat.SourcePacketHeader `json:"sourceHeader"`             // Source header from the innosat platform
-	TMHeader                 innosat.TMDataFieldHeader  `json:"tmHeader"`                 // Data header information
-	SID                      aez.SID                    // SID of the Data if any
-	RID                      aez.RID                    // RID of Data if any
-	Data                     Exportable                 `json:"data"`            // The data payload itself, HK report, jpeg image etc.
-	Error                    error                      `json:"error,omitempty"` // First propagated error from the decoding process
-	Buffer                   []byte                     `json:"-"`               // Currently unprocessed data (payload)
+	Origin         OriginDescription          `json:"origin"`         // Describes the origin of the data like filename or data batch name
+	RamsesHeader   ramses.Ramses              `json:"ramsesHeader"`   // Ramses header information
+	RamsesTMHeader ramses.TMHeader            `json:"ramsesTMHeader"` // The CCSDS compliant OHBSE TM Packet header
+	SourceHeader   innosat.SourcePacketHeader `json:"sourceHeader"`   // Source header from the innosat platform
+	TMHeader       innosat.TMHeader           `json:"tmHeader"`       // Data header information
+	SID            aez.SID                    // SID of the Data if any
+	RID            aez.RID                    // RID of Data if any
+	Data           Exportable                 `json:"data"`            // The data payload itself, HK report, jpeg image etc.
+	Error          error                      `json:"error,omitempty"` // First propagated error from the decoding process
+	Buffer         []byte                     `json:"-"`               // Currently unprocessed data (payload)
 }
 
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
@@ -46,7 +46,7 @@ func (record DataRecord) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, record.Origin.CSVHeaders()...)
 	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
-	headers = append(headers, record.OhbseCcsdsTMPacketHeader.CSVHeaders()...)
+	headers = append(headers, record.RamsesTMHeader.CSVHeaders()...)
 	headers = append(headers, record.SourceHeader.CSVHeaders()...)
 	headers = append(headers, record.TMHeader.CSVHeaders()...)
 	headers = append(headers, "SID", "RID")
@@ -62,7 +62,7 @@ func (record DataRecord) CSVRow() []string {
 	var row []string
 	row = append(row, record.Origin.CSVRow()...)
 	row = append(row, record.RamsesHeader.CSVRow()...)
-	row = append(row, record.OhbseCcsdsTMPacketHeader.CSVRow()...)
+	row = append(row, record.RamsesTMHeader.CSVRow()...)
 	row = append(row, record.SourceHeader.CSVRow()...)
 	row = append(row, record.TMHeader.CSVRow()...)
 	row = append(row, record.SID.String(), record.RID.String())

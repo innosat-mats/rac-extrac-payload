@@ -38,7 +38,7 @@ func TestDecodeSource(t *testing.T) {
 				0x01, 0x2e, 0x01, 0x31, 0x01, 0x2d, 0x01, 0x2e, 0x01, 0x20, 0xf7}},
 			SourcePackage{
 				Header:             innosat.SourcePacketHeader{PacketID: 2148, PacketSequenceControl: 34967, PacketLength: 65},
-				Payload:            innosat.TMDataFieldHeader{PUS: 16, ServiceType: 128, ServiceSubType: 25, CUCTimeSeconds: 4633, CUCTimeFraction: 55934},
+				Payload:            innosat.TMHeader{PUS: 16, ServiceType: 128, ServiceSubType: 25, CUCTimeSeconds: 4633, CUCTimeFraction: 55934},
 				ApplicationPayload: []byte{0, 23, 1, 47, 1, 49, 1, 47, 1, 47, 1, 47, 1, 49, 1, 46, 1, 50, 1, 48, 1, 47, 1, 47, 1, 47, 1, 45, 1, 48, 1, 46, 1, 48, 1, 43, 1, 47, 1, 49, 1, 50, 1, 50, 1, 51, 1, 46, 1, 49, 1, 45, 1, 46, 1},
 			},
 			false,

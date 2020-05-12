@@ -13,9 +13,9 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
-var ramesesSize int = binary.Size(ramses.Ramses{})
-var ohbseCcsdsTMPacketSize int = binary.Size(ramses.OhbseCcsdsTMPacket{})
-var minTotalSize int = ramesesSize + ohbseCcsdsTMPacketSize
+var ramesesHeaderSize int = binary.Size(ramses.Ramses{})
+var tmHeaderSize int = binary.Size(ramses.TMHeader{})
+var minTotalSize int = ramesesHeaderSize + tmHeaderSize
 
 func TestGetRecord(t *testing.T) {
 	type args struct {
@@ -173,11 +173,11 @@ func TestDecodeRamses(t *testing.T) {
 					buf: append(
 						append(
 							[]byte{0x90, 0xeb, 17, 0, 0, 0, 0, 0, 42, 0, 0, 0, 10, 0, 0, 0},
-							make([]byte, ohbseCcsdsTMPacketSize+1)...,
+							make([]byte, tmHeaderSize+1)...,
 						),
 						append(
 							[]byte{0x90, 0xeb, 18, 0, 0, 0, 0, 0, 42, 0, 0, 0, 10, 0, 0, 0},
-							make([]byte, ohbseCcsdsTMPacketSize+2)...,
+							make([]byte, tmHeaderSize+2)...,
 						)...,
 					),
 				},
@@ -187,11 +187,11 @@ func TestDecodeRamses(t *testing.T) {
 					buf: append(
 						append(
 							[]byte{0x90, 0xeb, 17, 0, 0, 0, 0, 0, 41, 0, 0, 0, 10, 0, 0, 0},
-							make([]byte, ohbseCcsdsTMPacketSize+1)...,
+							make([]byte, tmHeaderSize+1)...,
 						),
 						append(
 							[]byte{0x90, 0xeb, 18, 0, 0, 0, 0, 0, 41, 0, 0, 0, 10, 0, 0, 0},
-							make([]byte, ohbseCcsdsTMPacketSize+2)...,
+							make([]byte, tmHeaderSize+2)...,
 						)...,
 					),
 				},

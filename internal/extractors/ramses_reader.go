@@ -12,9 +12,9 @@ import (
 
 // Packet is complete Ramses packet
 type Packet struct {
-	Header             ramses.Ramses
-	OhbseCcsdsTMPacket ramses.OhbseCcsdsTMPacket
-	Payload            []byte
+	Header   ramses.Ramses
+	TMHeader ramses.TMHeader
+	Payload  []byte
 }
 
 // StreamBatch tells origin of batch
@@ -76,8 +76,8 @@ func getRecord(stream StreamBatch) common.DataRecord {
 		return common.DataRecord{Origin: stream.Origin, Error: err, Buffer: []byte{}}
 	}
 
-	ccsdsTMPacketHeader := ramses.OhbseCcsdsTMPacket{}
-	err = ccsdsTMPacketHeader.Read(stream.Buf)
+	tmHeader := ramses.TMHeader{}
+	err = tmHeader.Read(stream.Buf)
 	if err != nil && err != io.EOF {
 		return common.DataRecord{
 			Origin:       stream.Origin,
@@ -86,14 +86,15 @@ func getRecord(stream StreamBatch) common.DataRecord {
 			Buffer:       []byte{},
 		}
 	}
-	header.Length -= uint16(binary.Size(ccsdsTMPacketHeader))
+	header.Length -= uint16(binary.Size(tmHeader))
 
 	payload := make([]byte, header.Length)
 	n, _ := stream.Buf.Read(payload)
 	if n != int(header.Length) {
 		return common.DataRecord{
-			Origin:       stream.Origin,
-			RamsesHeader: header,
+			Origin:         stream.Origin,
+			RamsesHeader:   header,
+			RamsesTMHeader: tmHeader,
 			Error: fmt.Errorf(
 				"payload truncaded, only found %v bytes but needed %v (%v)",
 				n,
@@ -105,10 +106,10 @@ func getRecord(stream StreamBatch) common.DataRecord {
 	}
 
 	return common.DataRecord{
-		Origin:                   stream.Origin,
-		RamsesHeader:             header,
-		OhbseCcsdsTMPacketHeader: ccsdsTMPacketHeader,
-		Error:                    nil,
-		Buffer:                   payload,
+		Origin:         stream.Origin,
+		RamsesHeader:   header,
+		RamsesTMHeader: tmHeader,
+		Error:          nil,
+		Buffer:         payload,
 	}
 }
