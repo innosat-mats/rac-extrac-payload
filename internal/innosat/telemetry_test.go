@@ -33,7 +33,7 @@ func TestTMHeader_Time(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -79,7 +79,7 @@ func TestTMHeader_Nanoseconds(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -111,7 +111,7 @@ func TestTMHeader_IsHousekeeping(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -149,7 +149,7 @@ func TestTMHeader_IsTransparentData(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -182,7 +182,7 @@ func TestTMHeader_CSVHeaders(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -213,7 +213,7 @@ func TestTMHeader_CSVRow(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -248,7 +248,7 @@ func TestTMHeader_MarshalJSON(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -290,7 +290,7 @@ func TestTMHeader_IsTCVerification(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}

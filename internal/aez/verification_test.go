@@ -19,7 +19,7 @@ func TestTCAcceptSuccess_CSVSpecifications(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCAcceptSuccess{
+			tcv := TCAcceptSuccessData{
 				TCPID: tt.fields.TCPID,
 				PSC:   tt.fields.PSC,
 			}
@@ -45,7 +45,7 @@ func TestTCAcceptFailure_CSVSpecifications(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCAcceptFailure{
+			tcv := TCAcceptFailureData{
 				TCPID:     tt.fields.TCPID,
 				PSC:       tt.fields.PSC,
 				ErrorCode: tt.fields.ErrorCode,
@@ -71,7 +71,7 @@ func TestTCExecSuccess_CSVSpecifications(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCExecSuccess{
+			tcv := TCExecSuccessData{
 				TCPID: tt.fields.TCPID,
 				PSC:   tt.fields.PSC,
 			}
@@ -97,7 +97,7 @@ func TestTCExecFailure_CSVSpecifications(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCExecFailure{
+			tcv := TCExecFailureData{
 				TCPID:     tt.fields.TCPID,
 				PSC:       tt.fields.PSC,
 				ErrorCode: tt.fields.ErrorCode,
@@ -127,7 +127,7 @@ func TestTCAcceptSuccess_CSVHeaders(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCAcceptSuccess{
+			tcv := TCAcceptSuccessData{
 				TCPID: tt.fields.TCPID,
 				PSC:   tt.fields.PSC,
 			}
@@ -157,7 +157,7 @@ func TestTCAcceptFailure_CSVHeaders(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCAcceptFailure{
+			tcv := TCAcceptFailureData{
 				TCPID:     tt.fields.TCPID,
 				PSC:       tt.fields.PSC,
 				ErrorCode: tt.fields.ErrorCode,
@@ -187,7 +187,7 @@ func TestTCExecSuccess_CSVHeaders(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCExecSuccess{
+			tcv := TCExecSuccessData{
 				TCPID: tt.fields.TCPID,
 				PSC:   tt.fields.PSC,
 			}
@@ -217,7 +217,7 @@ func TestTCExecFailure_CSVHeaders(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCExecFailure{
+			tcv := TCExecFailureData{
 				TCPID:     tt.fields.TCPID,
 				PSC:       tt.fields.PSC,
 				ErrorCode: tt.fields.ErrorCode,
@@ -247,7 +247,7 @@ func TestTCAcceptSuccess_CSVRow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCAcceptSuccess{
+			tcv := TCAcceptSuccessData{
 				TCPID: tt.fields.TCPID,
 				PSC:   tt.fields.PSC,
 			}
@@ -277,7 +277,7 @@ func TestTCAcceptFailure_CSVRow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCAcceptFailure{
+			tcv := TCAcceptFailureData{
 				TCPID:     tt.fields.TCPID,
 				PSC:       tt.fields.PSC,
 				ErrorCode: tt.fields.ErrorCode,
@@ -307,7 +307,7 @@ func TestTCExecSuccess_CSVRow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCExecSuccess{
+			tcv := TCExecSuccessData{
 				TCPID: tt.fields.TCPID,
 				PSC:   tt.fields.PSC,
 			}
@@ -337,7 +337,7 @@ func TestTCExecFailure_CSVRow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tcv := TCExecFailure{
+			tcv := TCExecFailureData{
 				TCPID:     tt.fields.TCPID,
 				PSC:       tt.fields.PSC,
 				ErrorCode: tt.fields.ErrorCode,

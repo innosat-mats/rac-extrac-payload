@@ -8,6 +8,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 func Test_instrumentHK(t *testing.T) {
@@ -144,7 +145,7 @@ func Test_instrumentTransparentData(t *testing.T) {
 
 func Test_instrumentVerification(t *testing.T) {
 	type args struct {
-		subtype uint8
+		subtype innosat.SourcePackageServiceSubtype
 		buf     io.Reader
 	}
 	tests := []struct {
@@ -156,25 +157,25 @@ func Test_instrumentVerification(t *testing.T) {
 		{
 			"TC Acceptance - Success",
 			args{subtype: 1, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCAcceptSuccess{},
+			aez.TCAcceptSuccessData{},
 			false,
 		},
 		{
 			"TC Acceptance - Failure",
 			args{subtype: 2, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCAcceptFailure{},
+			aez.TCAcceptFailureData{},
 			false,
 		},
 		{
 			"TC Execution - Success",
 			args{subtype: 7, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCExecSuccess{},
+			aez.TCExecSuccessData{},
 			false,
 		},
 		{
 			"TC Execution - Failure",
 			args{subtype: 8, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCExecFailure{},
+			aez.TCExecFailureData{},
 			false,
 		},
 		{

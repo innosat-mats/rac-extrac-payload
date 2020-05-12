@@ -21,7 +21,7 @@ func (pus pus) Version() uint8 {
 type TMHeader struct {
 	PUS             pus
 	ServiceType     SourcePackageServiceType
-	ServiceSubType  uint8
+	ServiceSubType  SourcePackageServiceSubtype
 	CUCTimeSeconds  uint32
 	CUCTimeFraction uint16
 }
@@ -54,10 +54,10 @@ func (header *TMHeader) IsTransparentData() bool {
 // IsTCVerification returns true if payload contains TC verification data
 func (header *TMHeader) IsTCVerification() bool {
 	return header.ServiceType == TelecommandVerification &&
-		(header.ServiceSubType == 1 ||
-			header.ServiceSubType == 2 ||
-			header.ServiceSubType == 7 ||
-			header.ServiceSubType == 8)
+		(header.ServiceSubType == TCAcceptSuccess ||
+			header.ServiceSubType == TCAcceptFailure ||
+			header.ServiceSubType == TCExecSuccess ||
+			header.ServiceSubType == TCExecFailure)
 }
 
 // CSVHeaders returns the header row

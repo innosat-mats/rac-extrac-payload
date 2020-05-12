@@ -6,6 +6,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 func instrumentHK(sid aez.SID, buf io.Reader) (common.Exportable, error) {
@@ -58,24 +59,27 @@ func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exportable, e
 	return dataPackage, err
 }
 
-func instrumentVerification(subtype uint8, buf io.Reader) (common.Exportable, error) {
+func instrumentVerification(
+	subtype innosat.SourcePackageServiceSubtype,
+	buf io.Reader,
+) (common.Exportable, error) {
 	var dataPackage common.Exportable
 	var err error
 	switch subtype {
-	case 1: // TC Acceptance Report - Success
-		tcv := aez.TCAcceptSuccess{}
+	case innosat.TCAcceptSuccess:
+		tcv := aez.TCAcceptSuccessData{}
 		err = tcv.Read(buf)
 		dataPackage = tcv
-	case 2: // TC Acceptance Report - Failure
-		tcv := aez.TCAcceptFailure{}
+	case innosat.TCAcceptFailure:
+		tcv := aez.TCAcceptFailureData{}
 		err = tcv.Read(buf)
 		dataPackage = tcv
-	case 7: // TC Execution Report - Success
-		tcv := aez.TCExecSuccess{}
+	case innosat.TCExecSuccess:
+		tcv := aez.TCExecSuccessData{}
 		err = tcv.Read(buf)
 		dataPackage = tcv
-	case 8: // TC Execution Report - Failure
-		tcv := aez.TCExecFailure{}
+	case innosat.TCExecFailure:
+		tcv := aez.TCExecFailureData{}
 		err = tcv.Read(buf)
 		dataPackage = tcv
 	default:

@@ -11,29 +11,29 @@ import (
 	TCAcceptSuccess:
 */
 
-// TCAcceptSuccess Telecommand Acceptance Report - Success
-type TCAcceptSuccess struct {
+// TCAcceptSuccessData Telecommand Acceptance Report - Success
+type TCAcceptSuccessData struct {
 	TCPID uint16 // TCPID is a copy of the Packet ID header field of the TC
 	PSC   uint16 // PSC is a copy if the Sequence Control Header field of the TC
 }
 
 // Read TCAcceptSuccess
-func (tcv *TCAcceptSuccess) Read(buf io.Reader) error {
+func (tcv *TCAcceptSuccessData) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.LittleEndian, tcv)
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCAcceptSuccess) CSVSpecifications() []string {
+func (tcv TCAcceptSuccessData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCAcceptSuccess) CSVHeaders() []string {
+func (tcv TCAcceptSuccessData) CSVHeaders() []string {
 	return csvHeader(tcv)
 }
 
 // CSVRow returns the data row
-func (tcv TCAcceptSuccess) CSVRow() []string {
+func (tcv TCAcceptSuccessData) CSVRow() []string {
 	var row []string
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {
@@ -46,30 +46,30 @@ func (tcv TCAcceptSuccess) CSVRow() []string {
 	TCAcceptFailure:
 */
 
-// TCAcceptFailure Telecommand Acceptance Report - Failure
-type TCAcceptFailure struct {
+// TCAcceptFailureData Telecommand Acceptance Report - Failure
+type TCAcceptFailureData struct {
 	TCPID     uint16 // TCPID is a copy of the Packet ID header field of the TC
 	PSC       uint16 // PSC is a copy if the Sequence Control Header field of the TC
 	ErrorCode uint8  // Error code
 }
 
 // Read TCAcceptFailure
-func (tcv *TCAcceptFailure) Read(buf io.Reader) error {
+func (tcv *TCAcceptFailureData) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.LittleEndian, tcv)
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCAcceptFailure) CSVSpecifications() []string {
+func (tcv TCAcceptFailureData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCAcceptFailure) CSVHeaders() []string {
+func (tcv TCAcceptFailureData) CSVHeaders() []string {
 	return csvHeader(tcv)
 }
 
 // CSVRow returns the data row
-func (tcv TCAcceptFailure) CSVRow() []string {
+func (tcv TCAcceptFailureData) CSVRow() []string {
 	var row []string
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {
@@ -82,29 +82,29 @@ func (tcv TCAcceptFailure) CSVRow() []string {
 	TCExecSuccess:
 */
 
-// TCExecSuccess Telecommand Execution Report - Success
-type TCExecSuccess struct {
+// TCExecSuccessData Telecommand Execution Report - Success
+type TCExecSuccessData struct {
 	TCPID uint16 // TCPID is a copy of the Packet ID header field of the TC
 	PSC   uint16 // PSC is a copy if the Sequence Control Header field of the TC
 }
 
 // Read TCExecSuccess
-func (tcv *TCExecSuccess) Read(buf io.Reader) error {
+func (tcv *TCExecSuccessData) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.LittleEndian, tcv)
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCExecSuccess) CSVSpecifications() []string {
+func (tcv TCExecSuccessData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCExecSuccess) CSVHeaders() []string {
+func (tcv TCExecSuccessData) CSVHeaders() []string {
 	return csvHeader(tcv)
 }
 
 // CSVRow returns the data row
-func (tcv TCExecSuccess) CSVRow() []string {
+func (tcv TCExecSuccessData) CSVRow() []string {
 	var row []string
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {
@@ -113,35 +113,35 @@ func (tcv TCExecSuccess) CSVRow() []string {
 	return row
 }
 
-// TCExecFailure Telecommand Execution Report - Failure
-type TCExecFailure struct {
+/*
+	TCExecFailure:
+*/
+
+// TCExecFailureData Telecommand Execution Report - Failure
+type TCExecFailureData struct {
 	TCPID     uint16 // TCPID is a copy of the Packet ID header field of the TC
 	PSC       uint16 // PSC is a copy if the Sequence Control Header field of the TC
 	ErrorCode uint8  // Error code
 	// TODO? There is also an optional variable length data field
 }
 
-/*
-	TCExecFailure:
-*/
-
 // Read TCExecFailure
-func (tcv *TCExecFailure) Read(buf io.Reader) error {
+func (tcv *TCExecFailureData) Read(buf io.Reader) error {
 	return binary.Read(buf, binary.LittleEndian, tcv)
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCExecFailure) CSVSpecifications() []string {
+func (tcv TCExecFailureData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCExecFailure) CSVHeaders() []string {
+func (tcv TCExecFailureData) CSVHeaders() []string {
 	return csvHeader(tcv)
 }
 
 // CSVRow returns the data row
-func (tcv TCExecFailure) CSVRow() []string {
+func (tcv TCExecFailureData) CSVRow() []string {
 	var row []string
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {

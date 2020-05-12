@@ -211,7 +211,7 @@ func DiskCallbackFactory(
 				}
 			}
 			err = pmOut.writeData(expPkg.CSVRow())
-		case aez.TCAcceptSuccess, aez.TCExecSuccess:
+		case aez.TCAcceptSuccessData, aez.TCExecSuccessData:
 			if tcSuccOut == nil {
 				tcSuccOut, err = csvOutputFactory(output, currentOrigin, "TCVSucc", &expPkg)
 				if err != nil {
@@ -219,7 +219,7 @@ func DiskCallbackFactory(
 				}
 			}
 			err = tcSuccOut.writeData(expPkg.CSVRow())
-		case aez.TCAcceptFailure, aez.TCExecFailure:
+		case aez.TCAcceptFailureData, aez.TCExecFailureData:
 			if tcFailOut == nil {
 				tcFailOut, err = csvOutputFactory(output, currentOrigin, "TCVFail", &expPkg)
 				if err != nil {

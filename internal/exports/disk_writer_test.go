@@ -135,19 +135,19 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptSuccess{},
+					Data:   aez.TCAcceptSuccessData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCExecSuccess{},
+					Data:   aez.TCExecSuccessData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptFailure{},
+					Data:   aez.TCAcceptFailureData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCExecFailure{},
+					Data:   aez.TCExecFailureData{},
 				},
 			},
 			[]wantFile{
@@ -198,19 +198,19 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptSuccess{},
+					Data:   aez.TCAcceptSuccessData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.TCExecSuccess{},
+					Data:   aez.TCExecSuccessData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptFailure{},
+					Data:   aez.TCAcceptFailureData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.TCExecFailure{},
+					Data:   aez.TCExecFailureData{},
 				},
 			},
 			[]wantFile{
