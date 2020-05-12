@@ -57,6 +57,8 @@ func DiskCallbackFactory(
 	var cpruOut csvOutput = nil
 	var statOut csvOutput = nil
 	var pmOut csvOutput = nil
+	var tcSuccOut csvOutput = nil
+	var tcFailOut csvOutput = nil
 
 	if writeImages || writeTimeseries {
 		// Create Directory and File
@@ -151,6 +153,14 @@ func DiskCallbackFactory(
 				pmOut.close()
 				pmOut = nil
 			}
+			if tcSuccOut != nil {
+				tcSuccOut.close()
+				tcSuccOut = nil
+			}
+			if tcFailOut != nil {
+				tcFailOut.close()
+				tcFailOut = nil
+			}
 			currentOrigin = expPkg.OriginName()
 		}
 
@@ -201,6 +211,22 @@ func DiskCallbackFactory(
 				}
 			}
 			err = pmOut.writeData(expPkg.CSVRow())
+		case aez.TCAcceptSuccess, aez.TCExecSuccess:
+			if tcSuccOut == nil {
+				tcSuccOut, err = csvOutputFactory(output, currentOrigin, "TCVSucc", &expPkg)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+			err = tcSuccOut.writeData(expPkg.CSVRow())
+		case aez.TCAcceptFailure, aez.TCExecFailure:
+			if tcFailOut == nil {
+				tcFailOut, err = csvOutputFactory(output, currentOrigin, "TCVFail", &expPkg)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+			err = tcFailOut.writeData(expPkg.CSVRow())
 		}
 		// This error comes from writing a line and most probably would be a column missmatch
 		// that means we should be able to continue and just report the error
@@ -224,6 +250,12 @@ func DiskCallbackFactory(
 		}
 		if pmOut != nil {
 			pmOut.close()
+		}
+		if tcSuccOut != nil {
+			tcSuccOut.close()
+		}
+		if tcFailOut != nil {
+			tcFailOut.close()
 		}
 	}
 

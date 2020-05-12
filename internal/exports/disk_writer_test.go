@@ -133,6 +133,22 @@ func TestDiskCallbackFactory(t *testing.T) {
 					Origin: common.OriginDescription{Name: "File1.rac"},
 					Data:   aez.PMData{},
 				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.TCAcceptSuccess{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.TCExecSuccess{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.TCAcceptFailure{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.TCExecFailure{},
+				},
 			},
 			[]wantFile{
 				{"File1_STAT.csv", 3, false},
@@ -140,6 +156,8 @@ func TestDiskCallbackFactory(t *testing.T) {
 				{"File1_HTR.csv", 4, false},
 				{"File1_PWR.csv", 4, false},
 				{"File1_PM.csv", 4, false},
+				{"File1_TCVSucc.csv", 4, false},
+				{"File1_TCVFail.csv", 4, false},
 			},
 		},
 		{
@@ -178,16 +196,36 @@ func TestDiskCallbackFactory(t *testing.T) {
 					Origin: common.OriginDescription{Name: "File2.rac"},
 					Data:   aez.PMData{},
 				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.TCAcceptSuccess{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File2.rac"},
+					Data:   aez.TCExecSuccess{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
+					Data:   aez.TCAcceptFailure{},
+				},
+				{
+					Origin: common.OriginDescription{Name: "File2.rac"},
+					Data:   aez.TCExecFailure{},
+				},
 			},
 			[]wantFile{
 				{"File1_CPRU.csv", 3, false},
 				{"File1_HTR.csv", 3, false},
 				{"File1_PWR.csv", 3, false},
 				{"File1_PM.csv", 3, false},
+				{"File1_TCVSucc.csv", 3, false},
+				{"File1_TCVFail.csv", 3, false},
 				{"File2_CPRU.csv", 3, false},
 				{"File2_HTR.csv", 3, false},
 				{"File2_PWR.csv", 3, false},
 				{"File2_PM.csv", 3, false},
+				{"File2_TCVSucc.csv", 3, false},
+				{"File2_TCVFail.csv", 3, false},
 			},
 		},
 		{
