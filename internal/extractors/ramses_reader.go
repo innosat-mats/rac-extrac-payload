@@ -3,6 +3,7 @@ package extractors
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 	"sort"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
@@ -39,7 +40,7 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 	sort.SliceStable(
 		records,
 		func(i int, j int) bool {
-			return records[i].RamsesHeader.Nanoseconds() < records[i].RamsesHeader.Nanoseconds()
+			return records[i].RamsesHeader.Nanoseconds() < records[j].RamsesHeader.Nanoseconds()
 		},
 	)
 
@@ -47,7 +48,7 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 		recordChannel <- firstRecord
 		for _, stream := range streamBatch {
 			if stream.Origin.Name != firstRecord.Origin.Name {
-				break
+				continue
 			}
 			for {
 				if stream.Buf.Len() == 0 {
@@ -71,13 +72,13 @@ func getRecord(stream StreamBatch) common.DataRecord {
 	}
 
 	if !header.Valid() {
-		err := fmt.Errorf("Not a valid RAC-file: %v", stream.Origin.Name)
+		err := fmt.Errorf("Not a valid RAC-record (%v)", stream.Origin.Name)
 		return common.DataRecord{Origin: stream.Origin, Error: err, Buffer: []byte{}}
 	}
 
 	ccsdsTMPacketHeader := ramses.OhbseCcsdsTMPacket{}
 	err = ccsdsTMPacketHeader.Read(stream.Buf)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return common.DataRecord{
 			Origin:       stream.Origin,
 			RamsesHeader: header,

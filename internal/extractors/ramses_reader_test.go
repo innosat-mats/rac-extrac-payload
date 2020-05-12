@@ -172,11 +172,11 @@ func TestDecodeRamses(t *testing.T) {
 					origin: common.OriginDescription{Name: "No. 1"},
 					buf: append(
 						append(
-							[]byte{0x90, 0xeb, 17, 0, 0, 0, 0, 0, 42, 0, 10, 0},
+							[]byte{0x90, 0xeb, 17, 0, 0, 0, 0, 0, 42, 0, 0, 0, 10, 0, 0, 0},
 							make([]byte, ohbseCcsdsTMPacketSize+1)...,
 						),
 						append(
-							[]byte{0x90, 0xeb, 18, 0, 0, 0, 0, 0, 42, 0, 10, 0},
+							[]byte{0x90, 0xeb, 18, 0, 0, 0, 0, 0, 42, 0, 0, 0, 10, 0, 0, 0},
 							make([]byte, ohbseCcsdsTMPacketSize+2)...,
 						)...,
 					),
@@ -186,11 +186,11 @@ func TestDecodeRamses(t *testing.T) {
 					origin: common.OriginDescription{Name: "No. 2"},
 					buf: append(
 						append(
-							[]byte{0x90, 0xeb, 17, 0, 0, 0, 0, 0, 41, 0, 10, 0},
+							[]byte{0x90, 0xeb, 17, 0, 0, 0, 0, 0, 41, 0, 0, 0, 10, 0, 0, 0},
 							make([]byte, ohbseCcsdsTMPacketSize+1)...,
 						),
 						append(
-							[]byte{0x90, 0xeb, 18, 0, 0, 0, 0, 0, 41, 0, 10, 0},
+							[]byte{0x90, 0xeb, 18, 0, 0, 0, 0, 0, 41, 0, 0, 0, 10, 0, 0, 0},
 							make([]byte, ohbseCcsdsTMPacketSize+2)...,
 						)...,
 					),
