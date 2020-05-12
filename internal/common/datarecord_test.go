@@ -13,16 +13,16 @@ import (
 
 func TestDataRecord_CSVSpecifications(t *testing.T) {
 	type fields struct {
-		Origin       OriginDescription
-		RamsesHeader ramses.Ramses
-		RamsesSecure ramses.Secure
-		SourceHeader innosat.SourcePacketHeader
-		TMHeader     innosat.TMDataFieldHeader
-		SID          aez.SID
-		RID          aez.RID
-		Data         Exportable
-		Error        error
-		Buffer       []byte
+		Origin         OriginDescription
+		RamsesHeader   ramses.Ramses
+		RamsesTMHeader ramses.TMHeader
+		SourceHeader   innosat.SourcePacketHeader
+		TMHeader       innosat.TMHeader
+		SID            aez.SID
+		RID            aez.RID
+		Data           Exportable
+		Error          error
+		Buffer         []byte
 	}
 	tests := []struct {
 		name   string
@@ -51,16 +51,16 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:       tt.fields.Origin,
-				RamsesHeader: tt.fields.RamsesHeader,
-				RamsesSecure: tt.fields.RamsesSecure,
-				SourceHeader: tt.fields.SourceHeader,
-				TMHeader:     tt.fields.TMHeader,
-				SID:          tt.fields.SID,
-				RID:          tt.fields.RID,
-				Data:         tt.fields.Data,
-				Error:        tt.fields.Error,
-				Buffer:       tt.fields.Buffer,
+				Origin:         tt.fields.Origin,
+				RamsesHeader:   tt.fields.RamsesHeader,
+				RamsesTMHeader: tt.fields.RamsesTMHeader,
+				SourceHeader:   tt.fields.SourceHeader,
+				TMHeader:       tt.fields.TMHeader,
+				SID:            tt.fields.SID,
+				RID:            tt.fields.RID,
+				Data:           tt.fields.Data,
+				Error:          tt.fields.Error,
+				Buffer:         tt.fields.Buffer,
 			}
 			got := record.CSVSpecifications()
 
@@ -73,16 +73,16 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 
 func TestDataRecord_CSVHeaders(t *testing.T) {
 	type fields struct {
-		Origin       OriginDescription
-		RamsesHeader ramses.Ramses
-		RamsesSecure ramses.Secure
-		SourceHeader innosat.SourcePacketHeader
-		TMHeader     innosat.TMDataFieldHeader
-		SID          aez.SID
-		RID          aez.RID
-		Data         Exportable
-		Error        error
-		Buffer       []byte
+		Origin         OriginDescription
+		RamsesHeader   ramses.Ramses
+		RamsesTMHeader ramses.TMHeader
+		SourceHeader   innosat.SourcePacketHeader
+		TMHeader       innosat.TMHeader
+		SID            aez.SID
+		RID            aez.RID
+		Data           Exportable
+		Error          error
+		Buffer         []byte
 	}
 	tests := []struct {
 		name   string
@@ -96,6 +96,9 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 				"File",
 				"ProcessingDate",
 				"RamsesTime",
+				"QualityIndicator",
+				"LossFlag",
+				"VCFrameCounter",
 				"SPSequenceCount",
 				"TMHeaderTime",
 				"TMHeaderNanoseconds",
@@ -111,6 +114,9 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 				"File",
 				"ProcessingDate",
 				"RamsesTime",
+				"QualityIndicator",
+				"LossFlag",
+				"VCFrameCounter",
 				"SPSequenceCount",
 				"TMHeaderTime",
 				"TMHeaderNanoseconds",
@@ -139,16 +145,16 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:       tt.fields.Origin,
-				RamsesHeader: tt.fields.RamsesHeader,
-				RamsesSecure: tt.fields.RamsesSecure,
-				SourceHeader: tt.fields.SourceHeader,
-				TMHeader:     tt.fields.TMHeader,
-				SID:          tt.fields.SID,
-				RID:          tt.fields.RID,
-				Data:         tt.fields.Data,
-				Error:        tt.fields.Error,
-				Buffer:       tt.fields.Buffer,
+				Origin:         tt.fields.Origin,
+				RamsesHeader:   tt.fields.RamsesHeader,
+				RamsesTMHeader: tt.fields.RamsesTMHeader,
+				SourceHeader:   tt.fields.SourceHeader,
+				TMHeader:       tt.fields.TMHeader,
+				SID:            tt.fields.SID,
+				RID:            tt.fields.RID,
+				Data:           tt.fields.Data,
+				Error:          tt.fields.Error,
+				Buffer:         tt.fields.Buffer,
 			}
 			if got := record.CSVHeaders(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DataRecord.CSVHeaders() = %v, want %v", got, tt.want)
@@ -161,16 +167,16 @@ var procDate = time.Now()
 
 func TestDataRecord_CSVRow(t *testing.T) {
 	type fields struct {
-		Origin       OriginDescription
-		RamsesHeader ramses.Ramses
-		RamsesSecure ramses.Secure
-		SourceHeader innosat.SourcePacketHeader
-		TMHeader     innosat.TMDataFieldHeader
-		SID          aez.SID
-		RID          aez.RID
-		Data         Exportable
-		Error        error
-		Buffer       []byte
+		Origin         OriginDescription
+		RamsesHeader   ramses.Ramses
+		RamsesTMHeader ramses.TMHeader
+		SourceHeader   innosat.SourcePacketHeader
+		TMHeader       innosat.TMHeader
+		SID            aez.SID
+		RID            aez.RID
+		Data           Exportable
+		Error          error
+		Buffer         []byte
 	}
 	tests := []struct {
 		name   string
@@ -180,18 +186,22 @@ func TestDataRecord_CSVRow(t *testing.T) {
 		{
 			"Handles missing Data",
 			fields{
-				Origin:       OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
-				RamsesHeader: ramses.Ramses{Date: 24, Time: 42000},
-				SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
-				TMHeader:     innosat.TMDataFieldHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
-				SID:          aez.SIDSTAT,
-				RID:          aez.CCD1,
-				Error:        errors.New("Test"),
+				Origin:         OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
+				RamsesHeader:   ramses.Ramses{Date: 24, Time: 42000},
+				RamsesTMHeader: ramses.TMHeader{LossFlag: 1, VCFrameCounter: 42},
+				SourceHeader:   innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
+				TMHeader:       innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
+				SID:            aez.SIDSTAT,
+				RID:            aez.CCD1,
+				Error:          errors.New("Test"),
 			},
 			[]string{
 				"Sputnik",
 				procDate.Format(time.RFC3339),
 				"2000-01-25T00:00:42Z",
+				"0",
+				"1",
+				"42",
 				"3",
 				"1980-01-06T00:00:42.75Z",
 				"42750000000",
@@ -203,11 +213,12 @@ func TestDataRecord_CSVRow(t *testing.T) {
 		{
 			"Handles missing Error",
 			fields{
-				Origin:       OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
-				RamsesHeader: ramses.Ramses{Date: 24, Time: 42000},
-				SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
-				TMHeader:     innosat.TMDataFieldHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
-				SID:          aez.SIDSTAT,
+				Origin:         OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
+				RamsesHeader:   ramses.Ramses{Date: 24, Time: 42000},
+				RamsesTMHeader: ramses.TMHeader{LossFlag: 1, VCFrameCounter: 42},
+				SourceHeader:   innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
+				TMHeader:       innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
+				SID:            aez.SIDSTAT,
 				Data: aez.STAT{
 					SPID:    1,
 					SPREV:   2,
@@ -231,6 +242,9 @@ func TestDataRecord_CSVRow(t *testing.T) {
 				"Sputnik",
 				procDate.Format(time.RFC3339),
 				"2000-01-25T00:00:42Z",
+				"0",
+				"1",
+				"42",
 				"3",
 				"1980-01-06T00:00:42.75Z",
 				"42750000000",
@@ -259,16 +273,16 @@ func TestDataRecord_CSVRow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:       tt.fields.Origin,
-				RamsesHeader: tt.fields.RamsesHeader,
-				RamsesSecure: tt.fields.RamsesSecure,
-				SourceHeader: tt.fields.SourceHeader,
-				TMHeader:     tt.fields.TMHeader,
-				SID:          tt.fields.SID,
-				RID:          tt.fields.RID,
-				Data:         tt.fields.Data,
-				Error:        tt.fields.Error,
-				Buffer:       tt.fields.Buffer,
+				Origin:         tt.fields.Origin,
+				RamsesHeader:   tt.fields.RamsesHeader,
+				RamsesTMHeader: tt.fields.RamsesTMHeader,
+				SourceHeader:   tt.fields.SourceHeader,
+				TMHeader:       tt.fields.TMHeader,
+				SID:            tt.fields.SID,
+				RID:            tt.fields.RID,
+				Data:           tt.fields.Data,
+				Error:          tt.fields.Error,
+				Buffer:         tt.fields.Buffer,
 			}
 			if got := record.CSVRow(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DataRecord.CSVRow() = %v, want %v", got, tt.want)
@@ -279,16 +293,16 @@ func TestDataRecord_CSVRow(t *testing.T) {
 
 func TestDataRecord_AEZData(t *testing.T) {
 	type fields struct {
-		Origin       OriginDescription
-		RamsesHeader ramses.Ramses
-		RamsesSecure ramses.Secure
-		SourceHeader innosat.SourcePacketHeader
-		TMHeader     innosat.TMDataFieldHeader
-		SID          aez.SID
-		RID          aez.RID
-		Data         Exportable
-		Error        error
-		Buffer       []byte
+		Origin         OriginDescription
+		RamsesHeader   ramses.Ramses
+		RamsesTMHeader ramses.TMHeader
+		SourceHeader   innosat.SourcePacketHeader
+		TMHeader       innosat.TMHeader
+		SID            aez.SID
+		RID            aez.RID
+		Data           Exportable
+		Error          error
+		Buffer         []byte
 	}
 	tests := []struct {
 		name   string
@@ -301,16 +315,16 @@ func TestDataRecord_AEZData(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:       tt.fields.Origin,
-				RamsesHeader: tt.fields.RamsesHeader,
-				RamsesSecure: tt.fields.RamsesSecure,
-				SourceHeader: tt.fields.SourceHeader,
-				TMHeader:     tt.fields.TMHeader,
-				SID:          tt.fields.SID,
-				RID:          tt.fields.RID,
-				Data:         tt.fields.Data,
-				Error:        tt.fields.Error,
-				Buffer:       tt.fields.Buffer,
+				Origin:         tt.fields.Origin,
+				RamsesHeader:   tt.fields.RamsesHeader,
+				RamsesTMHeader: tt.fields.RamsesTMHeader,
+				SourceHeader:   tt.fields.SourceHeader,
+				TMHeader:       tt.fields.TMHeader,
+				SID:            tt.fields.SID,
+				RID:            tt.fields.RID,
+				Data:           tt.fields.Data,
+				Error:          tt.fields.Error,
+				Buffer:         tt.fields.Buffer,
 			}
 			if got := record.AEZData(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DataRecord.AEZData() = %v, want %v", got, tt.want)
@@ -321,16 +335,16 @@ func TestDataRecord_AEZData(t *testing.T) {
 
 func TestDataRecord_OriginName(t *testing.T) {
 	type fields struct {
-		Origin       OriginDescription
-		RamsesHeader ramses.Ramses
-		RamsesSecure ramses.Secure
-		SourceHeader innosat.SourcePacketHeader
-		TMHeader     innosat.TMDataFieldHeader
-		SID          aez.SID
-		RID          aez.RID
-		Data         Exportable
-		Error        error
-		Buffer       []byte
+		Origin              OriginDescription
+		RamsesHeader        ramses.Ramses
+		CcsdsTMPacketHeader ramses.TMHeader
+		SourceHeader        innosat.SourcePacketHeader
+		TMHeader            innosat.TMHeader
+		SID                 aez.SID
+		RID                 aez.RID
+		Data                Exportable
+		Error               error
+		Buffer              []byte
 	}
 	tests := []struct {
 		name   string
@@ -342,16 +356,16 @@ func TestDataRecord_OriginName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:       tt.fields.Origin,
-				RamsesHeader: tt.fields.RamsesHeader,
-				RamsesSecure: tt.fields.RamsesSecure,
-				SourceHeader: tt.fields.SourceHeader,
-				TMHeader:     tt.fields.TMHeader,
-				SID:          tt.fields.SID,
-				RID:          tt.fields.RID,
-				Data:         tt.fields.Data,
-				Error:        tt.fields.Error,
-				Buffer:       tt.fields.Buffer,
+				Origin:         tt.fields.Origin,
+				RamsesHeader:   tt.fields.RamsesHeader,
+				RamsesTMHeader: tt.fields.CcsdsTMPacketHeader,
+				SourceHeader:   tt.fields.SourceHeader,
+				TMHeader:       tt.fields.TMHeader,
+				SID:            tt.fields.SID,
+				RID:            tt.fields.RID,
+				Data:           tt.fields.Data,
+				Error:          tt.fields.Error,
+				Buffer:         tt.fields.Buffer,
 			}
 			if got := record.OriginName(); got != tt.want {
 				t.Errorf("DataRecord.OriginName() = %v, want %v", got, tt.want)
@@ -362,16 +376,16 @@ func TestDataRecord_OriginName(t *testing.T) {
 
 func TestDataRecord_RemainingBuffer(t *testing.T) {
 	type fields struct {
-		Origin       OriginDescription
-		RamsesHeader ramses.Ramses
-		RamsesSecure ramses.Secure
-		SourceHeader innosat.SourcePacketHeader
-		TMHeader     innosat.TMDataFieldHeader
-		SID          aez.SID
-		RID          aez.RID
-		Data         Exportable
-		Error        error
-		Buffer       []byte
+		Origin              OriginDescription
+		RamsesHeader        ramses.Ramses
+		CcsdsTMPacketHeader ramses.TMHeader
+		SourceHeader        innosat.SourcePacketHeader
+		TMHeader            innosat.TMHeader
+		SID                 aez.SID
+		RID                 aez.RID
+		Data                Exportable
+		Error               error
+		Buffer              []byte
 	}
 	tests := []struct {
 		name   string
@@ -385,16 +399,16 @@ func TestDataRecord_RemainingBuffer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:       tt.fields.Origin,
-				RamsesHeader: tt.fields.RamsesHeader,
-				RamsesSecure: tt.fields.RamsesSecure,
-				SourceHeader: tt.fields.SourceHeader,
-				TMHeader:     tt.fields.TMHeader,
-				SID:          tt.fields.SID,
-				RID:          tt.fields.RID,
-				Data:         tt.fields.Data,
-				Error:        tt.fields.Error,
-				Buffer:       tt.fields.Buffer,
+				Origin:         tt.fields.Origin,
+				RamsesHeader:   tt.fields.RamsesHeader,
+				RamsesTMHeader: tt.fields.CcsdsTMPacketHeader,
+				SourceHeader:   tt.fields.SourceHeader,
+				TMHeader:       tt.fields.TMHeader,
+				SID:            tt.fields.SID,
+				RID:            tt.fields.RID,
+				Data:           tt.fields.Data,
+				Error:          tt.fields.Error,
+				Buffer:         tt.fields.Buffer,
 			}
 			if got := record.RemainingBuffer(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DataRecord.RemainingBuffer() = %v, want %v", got, tt.want)
@@ -405,16 +419,16 @@ func TestDataRecord_RemainingBuffer(t *testing.T) {
 
 func TestDataRecord_ParsingError(t *testing.T) {
 	type fields struct {
-		Origin       OriginDescription
-		RamsesHeader ramses.Ramses
-		RamsesSecure ramses.Secure
-		SourceHeader innosat.SourcePacketHeader
-		TMHeader     innosat.TMDataFieldHeader
-		SID          aez.SID
-		RID          aez.RID
-		Data         Exportable
-		Error        error
-		Buffer       []byte
+		Origin              OriginDescription
+		RamsesHeader        ramses.Ramses
+		CcsdsTMPacketHeader ramses.TMHeader
+		SourceHeader        innosat.SourcePacketHeader
+		TMHeader            innosat.TMHeader
+		SID                 aez.SID
+		RID                 aez.RID
+		Data                Exportable
+		Error               error
+		Buffer              []byte
 	}
 	tests := []struct {
 		name       string
@@ -426,16 +440,16 @@ func TestDataRecord_ParsingError(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:       tt.fields.Origin,
-				RamsesHeader: tt.fields.RamsesHeader,
-				RamsesSecure: tt.fields.RamsesSecure,
-				SourceHeader: tt.fields.SourceHeader,
-				TMHeader:     tt.fields.TMHeader,
-				SID:          tt.fields.SID,
-				RID:          tt.fields.RID,
-				Data:         tt.fields.Data,
-				Error:        tt.fields.Error,
-				Buffer:       tt.fields.Buffer,
+				Origin:         tt.fields.Origin,
+				RamsesHeader:   tt.fields.RamsesHeader,
+				RamsesTMHeader: tt.fields.CcsdsTMPacketHeader,
+				SourceHeader:   tt.fields.SourceHeader,
+				TMHeader:       tt.fields.TMHeader,
+				SID:            tt.fields.SID,
+				RID:            tt.fields.RID,
+				Data:           tt.fields.Data,
+				Error:          tt.fields.Error,
+				Buffer:         tt.fields.Buffer,
 			}
 			if errMsg := record.ParsingError().Error(); errMsg != tt.wantErrMsg {
 				t.Errorf("DataRecord.ParsingError() error = %v, wantErr %v", errMsg, tt.wantErrMsg)

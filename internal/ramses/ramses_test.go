@@ -67,27 +67,6 @@ func TestRamses_Valid(t *testing.T) {
 	}
 }
 
-func TestRamses_SecureTrans(t *testing.T) {
-	tests := []struct {
-		name string
-		r    *Ramses
-		want bool
-	}{
-		{
-			"should be true",
-			&Ramses{},
-			true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.r.SecureTrans(); got != tt.want {
-				t.Errorf("Ramses.SecureTrans() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestRamses_CSVSpecifications(t *testing.T) {
 	type fields struct {
 		Synch  uint16

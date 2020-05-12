@@ -35,11 +35,6 @@ func (ramses *Ramses) Valid() bool {
 	return ramses.Synch == 0xeb90
 }
 
-//SecureTrans always true?
-func (ramses *Ramses) SecureTrans() bool {
-	return true
-}
-
 // CSVSpecifications returns the specs used in creating the struct
 func (ramses Ramses) CSVSpecifications() []string {
 	return []string{"RAMSES", Specification}
