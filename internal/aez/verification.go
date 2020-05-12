@@ -29,17 +29,21 @@ func (tcv TCAcceptSuccessData) CSVSpecifications() []string {
 
 // CSVHeaders returns the header row
 func (tcv TCAcceptSuccessData) CSVHeaders() []string {
-	return csvHeader(tcv)
+	var headers []string
+	headers = append(headers, "TCV")
+	headers = append(headers, csvHeader(tcv)...)
+	return append(headers, "ErrorCode")
 }
 
 // CSVRow returns the data row
 func (tcv TCAcceptSuccessData) CSVRow() []string {
 	var row []string
+	row = append(row, "Accept")
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
-	return row
+	return append(row, "")
 }
 
 /*
@@ -65,12 +69,15 @@ func (tcv TCAcceptFailureData) CSVSpecifications() []string {
 
 // CSVHeaders returns the header row
 func (tcv TCAcceptFailureData) CSVHeaders() []string {
-	return csvHeader(tcv)
+	var headers []string
+	headers = append(headers, "TCV")
+	return append(headers, csvHeader(tcv)...)
 }
 
 // CSVRow returns the data row
 func (tcv TCAcceptFailureData) CSVRow() []string {
 	var row []string
+	row = append(row, "Accept")
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
@@ -100,17 +107,21 @@ func (tcv TCExecSuccessData) CSVSpecifications() []string {
 
 // CSVHeaders returns the header row
 func (tcv TCExecSuccessData) CSVHeaders() []string {
-	return csvHeader(tcv)
+	var headers []string
+	headers = append(headers, "TCV")
+	headers = append(headers, csvHeader(tcv)...)
+	return append(headers, "ErrorCode")
 }
 
 // CSVRow returns the data row
 func (tcv TCExecSuccessData) CSVRow() []string {
 	var row []string
+	row = append(row, "Exec")
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
-	return row
+	return append(row, "")
 }
 
 /*
@@ -137,12 +148,15 @@ func (tcv TCExecFailureData) CSVSpecifications() []string {
 
 // CSVHeaders returns the header row
 func (tcv TCExecFailureData) CSVHeaders() []string {
-	return csvHeader(tcv)
+	var headers []string
+	headers = append(headers, "TCV")
+	return append(headers, csvHeader(tcv)...)
 }
 
 // CSVRow returns the data row
 func (tcv TCExecFailureData) CSVRow() []string {
 	var row []string
+	row = append(row, "Exec")
 	val := reflect.Indirect(reflect.ValueOf(tcv))
 	for i := 0; i < val.NumField(); i++ {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))

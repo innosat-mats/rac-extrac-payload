@@ -39,7 +39,7 @@ func TestTCExecFailure_CSVSpecifications(t *testing.T) {
 
 func TestTCAcceptSuccess_CSVHeaders(t *testing.T) {
 	tcv := TCAcceptSuccessData{}
-	want := []string{"TCPID", "PSC"}
+	want := []string{"TCV", "TCPID", "PSC", "ErrorCode"}
 	if got := tcv.CSVHeaders(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCAcceptSuccessData.CSVHeaders() = %v, want %v", got, want)
 	}
@@ -47,7 +47,7 @@ func TestTCAcceptSuccess_CSVHeaders(t *testing.T) {
 
 func TestTCAcceptFailure_CSVHeaders(t *testing.T) {
 	tcv := TCAcceptFailureData{}
-	want := []string{"TCPID", "PSC", "ErrorCode"}
+	want := []string{"TCV", "TCPID", "PSC", "ErrorCode"}
 	if got := tcv.CSVHeaders(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCAcceptFailureData.CSVHeaders() = %v, want %v", got, want)
 	}
@@ -55,7 +55,7 @@ func TestTCAcceptFailure_CSVHeaders(t *testing.T) {
 
 func TestTCExecSuccess_CSVHeaders(t *testing.T) {
 	tcv := TCExecSuccessData{}
-	want := []string{"TCPID", "PSC"}
+	want := []string{"TCV", "TCPID", "PSC", "ErrorCode"}
 	if got := tcv.CSVHeaders(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCExecSuccessData.CSVHeaders() = %v, want %v", got, want)
 	}
@@ -63,7 +63,7 @@ func TestTCExecSuccess_CSVHeaders(t *testing.T) {
 
 func TestTCExecFailure_CSVHeaders(t *testing.T) {
 	tcv := TCExecFailureData{}
-	want := []string{"TCPID", "PSC", "ErrorCode"}
+	want := []string{"TCV", "TCPID", "PSC", "ErrorCode"}
 	if got := tcv.CSVHeaders(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCExecFailureData.CSVHeaders() = %v, want %v", got, want)
 	}
@@ -71,7 +71,7 @@ func TestTCExecFailure_CSVHeaders(t *testing.T) {
 
 func TestTCAcceptSuccess_CSVRow(t *testing.T) {
 	tcv := TCAcceptSuccessData{1, 2}
-	want := []string{"1", "2"}
+	want := []string{"Accept", "1", "2", ""}
 	if got := tcv.CSVRow(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCAcceptSuccessData.CSVRow() = %v, want %v", got, want)
 	}
@@ -79,7 +79,7 @@ func TestTCAcceptSuccess_CSVRow(t *testing.T) {
 
 func TestTCAcceptFailure_CSVRow(t *testing.T) {
 	tcv := TCAcceptFailureData{1, 2, 3}
-	want := []string{"1", "2", "3"}
+	want := []string{"Accept", "1", "2", "3"}
 	if got := tcv.CSVRow(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCAcceptFailureData.CSVRow() = %v, want %v", got, want)
 	}
@@ -87,7 +87,7 @@ func TestTCAcceptFailure_CSVRow(t *testing.T) {
 
 func TestTCExecSuccess_CSVRow(t *testing.T) {
 	tcv := TCExecSuccessData{1, 2}
-	want := []string{"1", "2"}
+	want := []string{"Exec", "1", "2", ""}
 	if got := tcv.CSVRow(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCExecSuccessData.CSVRow() = %v, want %v", got, want)
 	}
@@ -95,7 +95,7 @@ func TestTCExecSuccess_CSVRow(t *testing.T) {
 
 func TestTCExecFailure_CSVRow(t *testing.T) {
 	tcv := TCExecFailureData{1, 2, 3}
-	want := []string{"1", "2", "3"}
+	want := []string{"Exec", "1", "2", "3"}
 	if got := tcv.CSVRow(); !reflect.DeepEqual(got, want) {
 		t.Errorf("TCExecFailureData.CSVRow() = %v, want %v", got, want)
 	}
