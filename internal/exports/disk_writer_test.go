@@ -23,7 +23,7 @@ func Test_csvName(t *testing.T) {
 		want string
 	}{
 		{"Case 1", args{".", "somefile.rac", "TEST"}, "somefile_TEST.csv"},
-		{"Case 2", args{"my/dir", "somefile", "TEST"}, "my/dir/somefile_TEST.csv"},
+		{"Case 2", args{"my/dir", "somefile", "TEST"}, filepath.FromSlash("my/dir/somefile_TEST.csv")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -246,7 +246,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Setup and cleanup of output directory
-			dir, err := ioutil.TempDir("/tmp", "innosat-mats")
+			dir, err := ioutil.TempDir("", "innosat-mats")
 			if err != nil {
 				t.Errorf("DiskCallbackFactory() could not setup output directory '%v'", err)
 			}

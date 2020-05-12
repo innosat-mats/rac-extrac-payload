@@ -9,7 +9,7 @@ import (
 )
 
 func getTestFile() (*csvFile, *os.File, error) {
-	file, err := ioutil.TempFile("/tmp", "innosat-mats-test")
+	file, err := ioutil.TempFile("", "innosat-mats-test")
 	if err != nil {
 		return nil, file, err
 	}
