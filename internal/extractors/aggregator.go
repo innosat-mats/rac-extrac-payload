@@ -28,7 +28,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			// Produce error for unfinished multipack lingering
 			if multiPackStarted {
 				target <- makeUnfinishedMultiPackError(multiPackBuffer, sourcePacket)
-				multiPackBuffer.Reset()
+				multiPackBuffer = bytes.NewBuffer([]byte{})
 				multiPackStarted = false
 			}
 
@@ -43,7 +43,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			// Start new multipack
 			buffer := bytes.NewBuffer(sourcePacket.Buffer)
 			multiPackStarted = true
-			multiPackBuffer.Reset()
+			multiPackBuffer = bytes.NewBuffer([]byte{})
 			multiPackStart = sourcePacket
 			_, err := multiPackBuffer.ReadFrom(buffer)
 			if err != nil && err != io.EOF {
@@ -86,7 +86,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			}
 			multiPackStart.Buffer = multiPackBuffer.Bytes()
 			target <- multiPackStart
-			multiPackBuffer.Reset()
+			multiPackBuffer = bytes.NewBuffer([]byte{})
 			multiPackStart = common.DataRecord{}
 			multiPackStarted = false
 
