@@ -11,9 +11,9 @@ import (
 
 // Packet is complete Ramses packet
 type Packet struct {
-	Header             ramses.Ramses
-	OhbseCcsdsTMPacket ramses.OhbseCcsdsTMPacket
-	Payload            []byte
+	Header   ramses.Ramses
+	TMHeader ramses.TMHeader
+	Payload  []byte
 }
 
 // StreamBatch tells origin of batch
@@ -44,13 +44,13 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 				break
 			}
 
-			ccsdsTMPacketHeader := ramses.OhbseCcsdsTMPacket{}
-			err = ccsdsTMPacketHeader.Read(stream.Buf)
+			tmHeader := ramses.TMHeader{}
+			err = tmHeader.Read(stream.Buf)
 			if err != nil {
 				recordChannel <- common.DataRecord{Origin: stream.Origin, RamsesHeader: header, Error: err, Buffer: []byte{}}
 				break
 			}
-			header.Length -= uint16(binary.Size(ccsdsTMPacketHeader))
+			header.Length -= uint16(binary.Size(tmHeader))
 
 			payload := make([]byte, header.Length)
 			_, err = stream.Buf.Read(payload)
@@ -59,11 +59,11 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 				break
 			}
 			recordChannel <- common.DataRecord{
-				Origin:                   stream.Origin,
-				RamsesHeader:             header,
-				OhbseCcsdsTMPacketHeader: ccsdsTMPacketHeader,
-				Error:                    nil,
-				Buffer:                   payload,
+				Origin:         stream.Origin,
+				RamsesHeader:   header,
+				RamsesTMHeader: tmHeader,
+				Error:          nil,
+				Buffer:         payload,
 			}
 		}
 	}
