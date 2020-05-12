@@ -29,8 +29,10 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 			binary.Read(buffer, binary.BigEndian, &rid)
 			sourcePacket.RID = rid
 			exportable, err = instrumentTransparentData(rid, buffer)
+		case sourcePacket.TMHeader.IsTCVerification():
+			exportable, err = instrumentVerification(sourcePacket.TMHeader.ServiceSubType, buffer)
 		default:
-			err = errors.New("the TMHeader isn't recognized as either housekeeping or transparent data")
+			err = errors.New("the TMHeader isn't recognized as either housekeeping, transparent or verification data")
 			exportable = nil
 		}
 		if err != io.EOF {

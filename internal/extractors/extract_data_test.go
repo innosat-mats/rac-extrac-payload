@@ -68,13 +68,13 @@ func Example() {
 	// CCD3  got stop packet without a start packet
 	// CCD3  <nil>
 	//  STAT <nil>
-	//   the TMHeader isn't recognized as either housekeeping or transparent data
-	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	//   the TMHeader isn't recognized as either housekeeping, transparent or verification data
+	//   the TMHeader isn't recognized as either housekeeping, transparent or verification data
 	// CCD3  got stop packet without a start packet
 	// CCD3  <nil>
 	//  STAT <nil>
-	//   the TMHeader isn't recognized as either housekeeping or transparent data
-	//   the TMHeader isn't recognized as either housekeeping or transparent data
+	//   the TMHeader isn't recognized as either housekeeping, transparent or verification data
+	//   the TMHeader isn't recognized as either housekeeping, transparent or verification data
 }
 
 func simpleOutput(expPack common.ExportablePackage) {

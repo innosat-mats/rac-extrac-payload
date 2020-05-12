@@ -141,3 +141,59 @@ func Test_instrumentTransparentData(t *testing.T) {
 		})
 	}
 }
+
+func Test_instrumentVerification(t *testing.T) {
+	type args struct {
+		subtype uint8
+		buf     io.Reader
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    common.Exportable
+		wantErr bool
+	}{
+		{
+			"TC Acceptance - Success",
+			args{subtype: 1, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCAcceptSuccess{},
+			false,
+		},
+		{
+			"TC Acceptance - Failure",
+			args{subtype: 2, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCAcceptFailure{},
+			false,
+		},
+		{
+			"TC Execution - Success",
+			args{subtype: 7, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCExecSuccess{},
+			false,
+		},
+		{
+			"TC Execution - Failure",
+			args{subtype: 8, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCExecFailure{},
+			false,
+		},
+		{
+			"unknown",
+			args{subtype: 42, buf: bytes.NewReader(make([]byte, 100))},
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := instrumentVerification(tt.args.subtype, tt.args.buf)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("instrumentVerification() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("instrumentVerification() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

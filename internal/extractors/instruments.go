@@ -57,3 +57,29 @@ func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exportable, e
 	}
 	return dataPackage, err
 }
+
+func instrumentVerification(subtype uint8, buf io.Reader) (common.Exportable, error) {
+	var dataPackage common.Exportable
+	var err error
+	switch subtype {
+	case 1: // TC Acceptance Report - Success
+		tcv := aez.TCAcceptSuccess{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	case 2: // TC Acceptance Report - Failure
+		tcv := aez.TCAcceptFailure{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	case 7: // TC Execution Report - Success
+		tcv := aez.TCExecSuccess{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	case 8: // TC Execution Report - Failure
+		tcv := aez.TCExecFailure{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	default:
+		err = fmt.Errorf("unhandled TC Verification subtype %v", subtype)
+	}
+	return dataPackage, err
+}
