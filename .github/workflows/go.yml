@@ -13,11 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.13
+    - name: Set up Go 1.14
       uses: actions/setup-go@v1
       with:
-        go-version: 1.13
+        go-version: 1.14
       id: go
+      
+    - name: install mingw
+      run : sudo apt-get install -y gcc-mingw-w64
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
@@ -30,8 +33,22 @@ jobs:
             dep ensure
         fi
 
-    - name: Test
-      run: make test
-      
     - name: Build
       run: make build
+
+    - name: Test
+      run: make test
+
+    # # TODO: wait for #https://github.com/actions/virtual-environments/issues/228
+    # - name: Build windows
+    #   run: CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o rac.exe ./cmd/rac  
+
+    - name: Build linux 
+      run: go build -o rac ./cmd/rac 
+
+
+    - name: binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: CLI
+        path: ./rac*
