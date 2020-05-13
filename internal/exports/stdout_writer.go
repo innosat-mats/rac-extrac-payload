@@ -13,7 +13,7 @@ func StdoutCallbackFactory(
 	writeTimeseries bool,
 ) (common.Callback, common.CallbackTeardown) {
 
-	return func(pkg common.ExportablePackage) {
+	return func(pkg common.DataRecord) {
 		if writeTimeseries {
 			fmt.Fprintf(out, "%+v\n", pkg)
 		}

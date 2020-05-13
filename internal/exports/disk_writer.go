@@ -23,7 +23,7 @@ func csvName(dir string, originName string, packetType string) string {
 	return filepath.Join(dir, name)
 }
 
-func csvOutputFactory(dir string, originName string, packetType string, pkg *common.ExportablePackage) (csvOutput, error) {
+func csvOutputFactory(dir string, originName string, packetType string, pkg *common.DataRecord) (csvOutput, error) {
 	outPath := csvName(dir, originName, packetType)
 
 	out, err := os.Create(outPath)
@@ -68,15 +68,14 @@ func DiskCallbackFactory(
 		}
 	}
 
-	callback := func(expPkg common.ExportablePackage) {
-		err = expPkg.ParsingError()
-		if err != nil {
-			log.Println(err)
+	callback := func(pkg common.DataRecord) {
+		if pkg.Error != nil {
+			log.Println(pkg.Error)
 		}
 		if writeImages {
-			switch expPkg.AEZData().(type) {
+			switch pkg.Data.(type) {
 			case aez.CCDImage:
-				ccdImage, ok := expPkg.AEZData().(aez.CCDImage)
+				ccdImage, ok := pkg.Data.(aez.CCDImage)
 				if !ok {
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
@@ -84,7 +83,7 @@ func DiskCallbackFactory(
 				imgFileName := getGrayscaleImageName(output, ccdImage.PackData)
 
 				imgData := getImageData(
-					expPkg.RemainingBuffer(),
+					pkg.Buffer,
 					ccdImage.PackData,
 					imgFileName,
 				)
@@ -106,24 +105,20 @@ func DiskCallbackFactory(
 
 				png.Encode(imgFile, img)
 
-				// Write metadata only supports DataRecord
-				pkg, ok := expPkg.(common.DataRecord)
-				if ok {
-					ext := filepath.Ext(imgFileName)
-					jsonFileName := fmt.Sprintf(
-						"%v.json",
-						imgFileName[0:len(imgFileName)-len(ext)],
-					)
-					jsonFile, err := os.Create(jsonFileName)
-					defer jsonFile.Close()
-					if err != nil {
-						log.Printf("failed creating %s: %s", jsonFileName, err)
-						panic(err.Error())
-					}
-					err = json.NewEncoder(jsonFile).Encode(&pkg)
-					if err != nil {
-						log.Printf("failed to encode json into %s", jsonFileName)
-					}
+				ext := filepath.Ext(imgFileName)
+				jsonFileName := fmt.Sprintf(
+					"%v.json",
+					imgFileName[0:len(imgFileName)-len(ext)],
+				)
+				jsonFile, err := os.Create(jsonFileName)
+				defer jsonFile.Close()
+				if err != nil {
+					log.Printf("failed creating %s: %s", jsonFileName, err)
+					panic(err.Error())
+				}
+				err = json.NewEncoder(jsonFile).Encode(&pkg)
+				if err != nil {
+					log.Printf("failed to encode json into %s", jsonFileName)
 				}
 			}
 		}
@@ -132,7 +127,7 @@ func DiskCallbackFactory(
 			return
 		}
 		// Close streams from previous file
-		if expPkg.OriginName() != currentOrigin {
+		if pkg.Origin.Name != currentOrigin {
 			if pwrOut != nil {
 				pwrOut.close()
 				pwrOut = nil
@@ -161,72 +156,72 @@ func DiskCallbackFactory(
 				tcvOut.close()
 				tcvOut = nil
 			}
-			currentOrigin = expPkg.OriginName()
+			currentOrigin = pkg.Origin.Name
 		}
 
 		// We have nowhere to write partial extraction of record so we discard
-		if expPkg.AEZData() == nil {
+		if pkg.Data == nil {
 			return
 		}
 
 		// Write to the dedicated target stream
-		switch expPkg.AEZData().(type) {
+		switch pkg.Data.(type) {
 		case aez.STAT:
 			if statOut == nil {
-				statOut, err = csvOutputFactory(output, currentOrigin, "STAT", &expPkg)
+				statOut, err = csvOutputFactory(output, currentOrigin, "STAT", &pkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = statOut.writeData(expPkg.CSVRow())
+			err = statOut.writeData(pkg.CSVRow())
 		case aez.HTR:
 			if htrOut == nil {
-				htrOut, err = csvOutputFactory(output, currentOrigin, "HTR", &expPkg)
+				htrOut, err = csvOutputFactory(output, currentOrigin, "HTR", &pkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = htrOut.writeData(expPkg.CSVRow())
+			err = htrOut.writeData(pkg.CSVRow())
 		case aez.PWR:
 			if pwrOut == nil {
-				pwrOut, err = csvOutputFactory(output, currentOrigin, "PWR", &expPkg)
+				pwrOut, err = csvOutputFactory(output, currentOrigin, "PWR", &pkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = pwrOut.writeData(expPkg.CSVRow())
+			err = pwrOut.writeData(pkg.CSVRow())
 		case aez.CPRU:
 			if cpruOut == nil {
-				cpruOut, err = csvOutputFactory(output, currentOrigin, "CPRU", &expPkg)
+				cpruOut, err = csvOutputFactory(output, currentOrigin, "CPRU", &pkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = cpruOut.writeData(expPkg.CSVRow())
+			err = cpruOut.writeData(pkg.CSVRow())
 		case aez.PMData:
 			if pmOut == nil {
-				pmOut, err = csvOutputFactory(output, currentOrigin, "PM", &expPkg)
+				pmOut, err = csvOutputFactory(output, currentOrigin, "PM", &pkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = pmOut.writeData(expPkg.CSVRow())
+			err = pmOut.writeData(pkg.CSVRow())
 		case aez.CCDImage:
 			if ccdOut == nil {
-				ccdOut, err = csvOutputFactory(output, currentOrigin, "CCD", &expPkg)
+				ccdOut, err = csvOutputFactory(output, currentOrigin, "CCD", &pkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = ccdOut.writeData(expPkg.CSVRow())
+			err = ccdOut.writeData(pkg.CSVRow())
 		case aez.TCAcceptSuccessData, aez.TCAcceptFailureData, aez.TCExecSuccessData, aez.TCExecFailureData:
 			if tcvOut == nil {
-				tcvOut, err = csvOutputFactory(output, currentOrigin, "TCV", &expPkg)
+				tcvOut, err = csvOutputFactory(output, currentOrigin, "TCV", &pkg)
 				if err != nil {
 					log.Fatal(err)
 				}
 			}
-			err = tcvOut.writeData(expPkg.CSVRow())
+			err = tcvOut.writeData(pkg.CSVRow())
 		}
 		// This error comes from writing a line and most probably would be a column missmatch
 		// that means we should be able to continue and just report the error
