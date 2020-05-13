@@ -82,11 +82,7 @@ func TestGetRecord(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			reader, err := common.NewRemainingReader(tt.args.buf)
-			if err != nil {
-				t.Errorf("Could not create reader: %v", err)
-			}
-			got := getRecord(StreamBatch{Buf: reader})
+			got, _ := getRecord(StreamBatch{Buf: tt.args.buf})
 			if !reflect.DeepEqual(got.Buffer, tt.want) {
 				t.Errorf("Package.Payload = %v, want %v", got.Buffer, tt.want)
 			}
@@ -99,23 +95,49 @@ func TestGetRecord(t *testing.T) {
 	}
 }
 
-func TestGetRecord_FromFileWithTooShortPayload(t *testing.T) {
-	file, err := ioutil.TempFile("", "test-file")
-	defer os.Remove(file.Name())
-	if err != nil {
-		t.Errorf("Could not create testfile %v", err)
-		return
+func TestGetRecord_FromFile(t *testing.T) {
+	type params struct {
+		fileContent []byte
+		wantDone    bool
+		wantErr     bool
 	}
-	file.Write(append([]byte{0x90, 0xeb, 18, 0}, make([]byte, minTotalSize-4+1)...))
-	file.Seek(0, 0)
-	reader, err := common.NewRemainingReader(file)
-	if err != nil {
-		t.Errorf("Could not create reader: %v", err)
+	tests := []struct {
+		name   string
+		params params
+	}{
+		{
+			"Too short file",
+			params{
+				fileContent: append([]byte{0x90, 0xeb, 18, 0}, make([]byte, minTotalSize-4+1)...),
+				wantDone:    false,
+				wantErr:     true,
+			},
+		},
+		{
+			"No more record / empty file",
+			params{
+				fileContent: []byte{},
+				wantDone:    true,
+				wantErr:     false,
+			},
+		},
 	}
-
-	got := getRecord(StreamBatch{Buf: reader})
-	if got.Error == nil {
-		t.Errorf("getRecord() expected to return error, but didn't, %v", got.Error)
+	for _, tt := range tests {
+		file, err := ioutil.TempFile("", "test-file")
+		defer os.Remove(file.Name())
+		if err != nil {
+			t.Errorf("Could not create testfile %v", err)
+			return
+		}
+		file.Write(tt.params.fileContent)
+		file.Seek(0, 0)
+		got, done := getRecord(StreamBatch{Buf: file})
+		if done != tt.params.wantDone {
+			t.Errorf("getRecord() done = %v, want %v", done, tt.params.wantDone)
+		}
+		if (got.Error != nil) != tt.params.wantErr {
+			t.Errorf("getRecord() error = %v, wantError %v", got.Error, tt.params.wantErr)
+		}
 	}
 }
 
@@ -138,6 +160,39 @@ func TestDecodeRamses(t *testing.T) {
 			"Works with no input",
 			[]streams{},
 			[]outcome{},
+		},
+		{
+			"Emtpy stream gives no output",
+			[]streams{{}},
+			[]outcome{},
+		},
+		{
+			"Terminates on first invalid record",
+			[]streams{
+				{
+					origin: common.OriginDescription{Name: "No. 1"},
+					buf: append(append(
+						//OK record
+						append([]byte{0x90, 0xeb, 17, 0}, make([]byte, minTotalSize-4+1)...),
+						//Invalid record but correct size
+						append([]byte{0x42, 0xeb, 17, 0}, make([]byte, minTotalSize-4+1)...)...,
+					),
+						//OK record
+						append([]byte{0x90, 0xeb, 17, 0}, make([]byte, minTotalSize-4+1)...)...,
+					),
+				},
+			},
+			[]outcome{
+				{
+					originName: "No. 1",
+					buf:        []byte{0},
+				},
+				{
+					originName: "No. 1",
+					buf:        []byte{},
+					wantErr:    true,
+				},
+			},
 		},
 		{
 			"Reports errors first",
@@ -221,14 +276,8 @@ func TestDecodeRamses(t *testing.T) {
 			packs := make(chan common.DataRecord)
 			streams := make([]StreamBatch, len(tt.streams))
 			for i := range streams {
-				buf := bytes.NewReader(tt.streams[i].buf)
-				reader, err := common.NewRemainingReader(buf)
-				if err != nil {
-					t.Errorf("Could not create a RemainingReader for stream %v", i)
-					return
-				}
 				streams[i] = StreamBatch{
-					Buf:    reader,
+					Buf:    bytes.NewReader(tt.streams[i].buf),
 					Origin: tt.streams[i].origin,
 				}
 			}

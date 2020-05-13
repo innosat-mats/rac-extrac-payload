@@ -76,12 +76,8 @@ func processFiles(
 		if err != nil {
 			return err
 		}
-		reader, err := common.NewRemainingReader(f)
-		if err != nil {
-			return err
-		}
 		batch[n] = extractors.StreamBatch{
-			Buf: reader,
+			Buf: f,
 			Origin: common.OriginDescription{
 				Name:           filename,
 				ProcessingDate: time.Now(),

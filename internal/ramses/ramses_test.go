@@ -1,7 +1,9 @@
 package ramses
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"reflect"
 	"testing"
 	"time"
@@ -261,6 +263,54 @@ func TestRamses_Nanoseconds(t *testing.T) {
 			}
 			if got := ramses.Nanoseconds(); got != tt.want {
 				t.Errorf("Ramses.Nanoseconds() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRamses_Read(t *testing.T) {
+	tests := []struct {
+		name          string
+		buf           []byte
+		wantErr       bool
+		wantEOF       bool
+		ramsesOutcome Ramses
+	}{
+		{
+			"Returns EOF if no bytes in buffer",
+			[]byte{},
+			true,
+			true,
+			Ramses{},
+		},
+		{
+			"Returns non-EOF err on shorter than needed buffer",
+			[]byte{0xaa, 0xab},
+			true,
+			false,
+			Ramses{},
+		},
+		{
+			"Reads into ramses",
+			append([]byte{0x90, 0xeb, 0x48, 0x00}, make([]byte, 12)...),
+			false,
+			false,
+			Ramses{Synch: 0xeb90, Length: 0x0048},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := Ramses{}
+			reader := bytes.NewReader(tt.buf)
+			err := ramses.Read(reader)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Ramses.Read() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if (err == io.EOF) != tt.wantEOF {
+				t.Errorf("Ramses.Read() error = %v, wantEOF %v", err, tt.wantEOF)
+			}
+			if !tt.wantErr && !reflect.DeepEqual(ramses, tt.ramsesOutcome) {
+				t.Errorf("Ramses.Read() => %+v, want %+v", ramses, tt.ramsesOutcome)
 			}
 		})
 	}

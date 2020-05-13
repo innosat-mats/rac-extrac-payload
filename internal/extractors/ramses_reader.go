@@ -19,7 +19,7 @@ type Packet struct {
 
 // StreamBatch tells origin of batch
 type StreamBatch struct {
-	Buf    *common.RemainingReader
+	Buf    io.Reader
 	Origin common.OriginDescription
 }
 
@@ -29,7 +29,10 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 	var records []common.DataRecord
 
 	for _, stream := range streamBatch {
-		record := getRecord(stream)
+		record, done := getRecord(stream)
+		if done {
+			continue
+		}
 		if record.Error != nil {
 			recordChannel <- record
 		} else {
@@ -51,10 +54,10 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 				continue
 			}
 			for {
-				if stream.Buf.Len() == 0 {
+				record, done := getRecord(stream)
+				if done {
 					break
 				}
-				record := getRecord(stream)
 				recordChannel <- record
 				if record.Error != nil {
 					break
@@ -64,20 +67,25 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 	}
 }
 
-func getRecord(stream StreamBatch) common.DataRecord {
+// getRecord returns next record and a flag if stream was actually done prior to this record
+func getRecord(stream StreamBatch) (common.DataRecord, bool) {
 	header := ramses.Ramses{}
 	err := header.Read(stream.Buf)
 	if err != nil {
+		// EOF for reading Ramses just means we have no more records so not really an error
+		if err == io.EOF {
+			return common.DataRecord{}, true
+		}
 		return common.DataRecord{
 			Origin: stream.Origin,
 			Error:  fmt.Errorf("could not parse ramses header: %v (%v)", err, stream.Origin.Name),
 			Buffer: []byte{},
-		}
+		}, false
 	}
 
 	if !header.Valid() {
 		err := fmt.Errorf("Not a valid RAC-record %v (%s)", header, stream.Origin.Name)
-		return common.DataRecord{Origin: stream.Origin, Error: err, Buffer: []byte{}}
+		return common.DataRecord{Origin: stream.Origin, Error: err, Buffer: []byte{}}, false
 	}
 
 	tmHeader := ramses.TMHeader{}
@@ -88,7 +96,7 @@ func getRecord(stream StreamBatch) common.DataRecord {
 			RamsesHeader: header,
 			Error:        fmt.Errorf("could not parse OHBSE CCDS TM Packet header: %v (%v)", err, stream.Origin.Name),
 			Buffer:       []byte{},
-		}
+		}, false
 	}
 	header.Length -= uint16(binary.Size(tmHeader))
 
@@ -106,7 +114,7 @@ func getRecord(stream StreamBatch) common.DataRecord {
 				stream.Origin.Name,
 			),
 			Buffer: []byte{},
-		}
+		}, false
 	}
 
 	return common.DataRecord{
@@ -115,5 +123,5 @@ func getRecord(stream StreamBatch) common.DataRecord {
 		RamsesTMHeader: tmHeader,
 		Error:          nil,
 		Buffer:         payload,
-	}
+	}, false
 }
