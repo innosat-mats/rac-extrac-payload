@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
@@ -38,6 +39,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 	type args struct {
 		writeImages     bool
 		writeTimeseries bool
+		wg              *sync.WaitGroup
 	}
 	type wantFile struct {
 		base           string
@@ -280,6 +282,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.args.wg = &sync.WaitGroup{}
 			// Setup and cleanup of output directory
 			dir, err := ioutil.TempDir("", "innosat-mats")
 			if err != nil {
@@ -288,7 +291,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 			defer os.RemoveAll(dir)
 
 			// Produce callback and teardown
-			callback, teardown := DiskCallbackFactory(dir, tt.args.writeImages, tt.args.writeTimeseries)
+			callback, teardown := DiskCallbackFactory(dir, tt.args.writeImages, tt.args.writeTimeseries, tt.args.wg)
 
 			// Invoke callback and then teardown
 			for _, pkg := range tt.callbackArgs {

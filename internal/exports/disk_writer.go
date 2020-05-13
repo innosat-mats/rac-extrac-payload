@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
@@ -49,6 +50,7 @@ func DiskCallbackFactory(
 	output string,
 	writeImages bool,
 	writeTimeseries bool,
+	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown) {
 	var currentOrigin string = ""
 	var err error
@@ -97,14 +99,17 @@ func DiskCallbackFactory(
 					imgFileName,
 				)
 
-				imgFile, err := os.Create(imgFileName)
-				defer imgFile.Close()
-				if err != nil {
-					log.Printf("failed creating %s: %s", imgFileName, err)
-					panic(err.Error())
-				}
-
-				png.Encode(imgFile, img)
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					imgFile, err := os.Create(imgFileName)
+					if err != nil {
+						log.Printf("failed creating %s: %s", imgFileName, err)
+						panic(err.Error())
+					}
+					defer imgFile.Close()
+					png.Encode(imgFile, img)
+				}()
 
 				// Write metadata only supports DataRecord
 				pkg, ok := expPkg.(common.DataRecord)
@@ -257,6 +262,7 @@ func DiskCallbackFactory(
 		if tcvOut != nil {
 			tcvOut.close()
 		}
+		wg.Wait()
 	}
 
 	return callback, teardown
