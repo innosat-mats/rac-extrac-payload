@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -19,6 +20,7 @@ func Test_getCallback(t *testing.T) {
 		outputDirectory string
 		skipImages      bool
 		skipTimeseries  bool
+		wg              *sync.WaitGroup
 	}
 	tests := []struct {
 		name    string
@@ -31,7 +33,7 @@ func Test_getCallback(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, _, err := getCallback(tt.args.stdout, tt.args.outputDirectory, tt.args.skipImages, tt.args.skipTimeseries)
+			_, _, err := getCallback(tt.args.stdout, tt.args.outputDirectory, tt.args.skipImages, tt.args.skipTimeseries, tt.args.wg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getCallback() error = %v, wantErr %v", err, tt.wantErr)
 				return
