@@ -6,6 +6,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 func instrumentHK(sid aez.SID, buf io.Reader) (common.Exportable, error) {
@@ -54,6 +55,35 @@ func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exportable, e
 		dataPackage = pmData
 	default:
 		err = fmt.Errorf("unhandled RID %v", rid)
+	}
+	return dataPackage, err
+}
+
+func instrumentVerification(
+	subtype innosat.SourcePackageServiceSubtype,
+	buf io.Reader,
+) (common.Exportable, error) {
+	var dataPackage common.Exportable
+	var err error
+	switch subtype {
+	case innosat.TCAcceptSuccess:
+		tcv := aez.TCAcceptSuccessData{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	case innosat.TCAcceptFailure:
+		tcv := aez.TCAcceptFailureData{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	case innosat.TCExecSuccess:
+		tcv := aez.TCExecSuccessData{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	case innosat.TCExecFailure:
+		tcv := aez.TCExecFailureData{}
+		err = tcv.Read(buf)
+		dataPackage = tcv
+	default:
+		err = fmt.Errorf("unhandled TC Verification subtype %v", subtype)
 	}
 	return dataPackage, err
 }
