@@ -6,76 +6,51 @@ import (
 )
 
 func TestCCDImage_CSVSpecifications(t *testing.T) {
-	type fields struct {
-		PackData   CCDImagePackData
-		BadColumns []uint16
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   []string
-	}{
-		{"Returns spec array", fields{}, []string{"Specification", Specification}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ccd := CCDImage{
-				PackData:   tt.fields.PackData,
-				BadColumns: tt.fields.BadColumns,
-			}
-			if got := ccd.CSVSpecifications(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CCDImage.CSVSpecifications() = %v, want %v", got, tt.want)
-			}
-		})
+	ccd := CCDImage{}
+	want := []string{"Specification", Specification}
+	if got := ccd.CSVSpecifications(); !reflect.DeepEqual(got, want) {
+		t.Errorf("CCDImage.CSVSpecifications() = %v, want %v", got, want)
 	}
 }
 
-func TestCCDImage_CSVHeaders(t *testing.T) {
-	type fields struct {
-		PackData   CCDImagePackData
-		BadColumns []uint16
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   []string
-	}{
-		{"Retruns no headers (for now)", fields{}, []string{}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ccd := CCDImage{
-				PackData:   tt.fields.PackData,
-				BadColumns: tt.fields.BadColumns,
+func TestCCDImage_CSVHeaders_AddsBC(t *testing.T) {
+	ccdI := CCDImage{}
+	ccdIPD := CCDImagePackData{}
+	headersI := ccdI.CSVHeaders()
+	headersIPD := ccdIPD.CSVHeaders()
+	wantBC := "BC"
+	for i, header := range headersI {
+		if i < len(headersIPD) {
+			if header != headersIPD[i] {
+				t.Errorf("%v: got %v, want %v", i, header, headersIPD[i])
 			}
-			if got := ccd.CSVHeaders(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CCDImage.CSVHeaders() = %v, want %v", got, tt.want)
+		} else if i == len(headersIPD) {
+			if header != wantBC {
+				t.Errorf("%v: got %v, want %v", i, header, wantBC)
 			}
-		})
+		} else {
+			t.Errorf("Unexpected %vth header %v", i, header)
+		}
 	}
 }
 
-func TestCCDImage_CSVRow(t *testing.T) {
-	type fields struct {
-		PackData   CCDImagePackData
-		BadColumns []uint16
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   []string
-	}{
-		{"Returns no data row (for now)", fields{}, []string{}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ccd := CCDImage{
-				PackData:   tt.fields.PackData,
-				BadColumns: tt.fields.BadColumns,
+func TestCCDImage_CSVRow_AddsBC(t *testing.T) {
+	ccdI := CCDImage{BadColumns: []uint16{42, 6, 7}}
+	ccdIPD := CCDImagePackData{}
+	rowI := ccdI.CSVRow()
+	rowIPD := ccdIPD.CSVRow()
+	wantBC := "[42 6 7]"
+	for i, value := range rowI {
+		if i < len(rowIPD) {
+			if value != rowIPD[i] {
+				t.Errorf("%v: got %v, want %v", i, value, rowIPD[i])
 			}
-			if got := ccd.CSVRow(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CCDImage.CSVRow() = %v, want %v", got, tt.want)
+		} else if i == len(rowIPD) {
+			if value != wantBC {
+				t.Errorf("%v: got %v, want %v", i, value, wantBC)
 			}
-		})
+		} else {
+			t.Errorf("Unexpected %vth column %v", i, value)
+		}
 	}
 }

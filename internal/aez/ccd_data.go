@@ -27,7 +27,7 @@ func (mode WDWMode) String() string {
 	case WDWModeAutomatic:
 		return "Automatic"
 	default:
-		return ""
+		return fmt.Sprintf("Unrecognized WDWMode: %v", int(mode))
 	}
 }
 
@@ -74,6 +74,7 @@ func (wdw Wdw) InputDataWindow() (int, int, error) {
 type NCBin uint16
 
 // FPGAColumns returns number FPGA columns to bin, Bit[11..8]
+//  the value is encoded as 2^x
 func (ncBin NCBin) FPGAColumns() int {
 	return 1 << ((ncBin >> 8) & 0x0f)
 }
@@ -102,7 +103,7 @@ func (mode CCDGainMode) String() string {
 	case LowSignalMode:
 		return "Low"
 	default:
-		return ""
+		return fmt.Sprintf("Unrecognized CCDGainMode: %v", int(mode))
 	}
 }
 
