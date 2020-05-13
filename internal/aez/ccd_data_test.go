@@ -416,3 +416,119 @@ func TestCCDImagePackData_Read(t *testing.T) {
 		})
 	}
 }
+
+func TestCCDImagePackData_CSVHeaders_EqualLengthAs_CSVRow(t *testing.T) {
+	ccd := CCDImagePackData{}
+	headers := ccd.CSVHeaders()
+	row := ccd.CSVRow()
+	if len(headers) != len(row) {
+		t.Errorf(
+			"CCDImagePackData.CSVHeaders() length %v != CCDImagePackData.CSVRow() length %v",
+			len(headers),
+			len(row),
+		)
+	}
+}
+
+func TestWDWMode_String(t *testing.T) {
+	tests := []struct {
+		name string
+		mode WDWMode
+		want string
+	}{
+		{"WDWModeAutomatic => Automatic", WDWModeAutomatic, "Automatic"},
+		{"WDWModeManual => Manual", WDWModeManual, "Manual"},
+		{"Else unrecognized", WDWMode(42), "Unrecognized WDWMode: 42"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.mode.String(); got != tt.want {
+				t.Errorf("WDWMode.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCCDGainMode_String(t *testing.T) {
+	tests := []struct {
+		name string
+		mode CCDGainMode
+		want string
+	}{
+		{"HighSignalMode => High", HighSignalMode, "High"},
+		{"LowSignalMode => Low", LowSignalMode, "Low"},
+		{"Else unrecognized", CCDGainMode(42), "Unrecognized CCDGainMode: 42"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.mode.String(); got != tt.want {
+				t.Errorf("CCDGainMode.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCCDImagePackData_CSVRow(t *testing.T) {
+	ccd := CCDImagePackData{
+		CCDSEL:  5,
+		EXPTS:   10,
+		EXPTSS:  0xc000,
+		WDW:     0x83,
+		WDWOV:   13,
+		JPEGQ:   101,
+		FRAME:   14,
+		NROW:    15,
+		NRBIN:   16,
+		NRSKIP:  17,
+		NCOL:    18,
+		NCBIN:   0xf648, // 0x6 -> 2^6 and then 0x48 -> 72
+		NCSKIP:  19,
+		NFLUSH:  20,
+		TEXPMS:  21,
+		GAIN:    0x1100, // Low and Full
+		TEMP:    22,
+		FBINOV:  23,
+		LBLNK:   24,
+		TBLNK:   25,
+		ZERO:    26,
+		TIMING1: 27,
+		TIMING2: 28,
+		VERSION: 29,
+		TIMING3: 30,
+		NBC:     31,
+	}
+	want := []string{
+		"5",
+		"10750000000",
+		"1980-01-06T00:00:10.75Z",
+		"Automatic",
+		"14..3",
+		"13",
+		"101",
+		"14",
+		"15",
+		"16",
+		"17",
+		"18",
+		"64",
+		"72",
+		"19",
+		"20",
+		"21",
+		"Low",
+		"Full",
+		"22",
+		"23",
+		"24",
+		"25",
+		"26",
+		"27",
+		"28",
+		"29",
+		"30",
+		"31",
+	}
+	if got := ccd.CSVRow(); !reflect.DeepEqual(got, want) {
+		t.Errorf("CCDImagePackData.CSVRow() = %v, want %v", got, want)
+	}
+}

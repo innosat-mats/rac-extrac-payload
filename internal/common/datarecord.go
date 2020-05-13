@@ -76,23 +76,3 @@ func (record DataRecord) CSVRow() []string {
 	}
 	return row
 }
-
-// AEZData returns the exportable aez data
-func (record DataRecord) AEZData() interface{} {
-	return record.Data
-}
-
-// OriginName returns the name of file/key that is source of data record
-func (record DataRecord) OriginName() string {
-	return record.Origin.Name
-}
-
-// RemainingBuffer returns the buffer in the packet not yet parsed
-func (record DataRecord) RemainingBuffer() []byte {
-	return record.Buffer
-}
-
-// ParsingError returns the error if any
-func (record DataRecord) ParsingError() error {
-	return record.Error
-}

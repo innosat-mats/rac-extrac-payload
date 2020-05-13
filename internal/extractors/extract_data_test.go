@@ -116,11 +116,6 @@ func Example() {
 	//   checksum bad 32488
 }
 
-func simpleOutput(expPack common.ExportablePackage) {
-	pkg, ok := expPack.(common.DataRecord)
-	if !ok {
-		fmt.Println("Uknown package")
-	} else {
-		fmt.Println(pkg.RID, pkg.SID, pkg.Error)
-	}
+func simpleOutput(pkg common.DataRecord) {
+	fmt.Println(pkg.RID, pkg.SID, pkg.Error)
 }

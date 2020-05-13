@@ -1,5 +1,7 @@
 package aez
 
+import "fmt"
+
 // CCDImage is a container for the invariant CCDImagePackData header and the variable BadColumns that follow
 type CCDImage struct {
 	PackData   CCDImagePackData
@@ -13,10 +15,11 @@ func (ccd CCDImage) CSVSpecifications() []string {
 
 // CSVHeaders returns the exportable field names
 func (ccd CCDImage) CSVHeaders() []string {
-	return []string{}
+	return append(ccd.PackData.CSVHeaders(), "BC")
 }
 
 // CSVRow returns the exportable field values
 func (ccd CCDImage) CSVRow() []string {
-	return []string{}
+	row := ccd.PackData.CSVRow()
+	return append(row, fmt.Sprintf("%v", ccd.BadColumns))
 }
