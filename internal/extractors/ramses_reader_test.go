@@ -60,7 +60,7 @@ func TestGetRecord(t *testing.T) {
 			false,
 		},
 		{
-			"a package with to short payload",
+			"a package with too short payload",
 			args{
 				bytes.NewReader(
 					append([]byte{0x90, 0xeb, 18, 0}, make([]byte, minTotalSize-4+1)...),
