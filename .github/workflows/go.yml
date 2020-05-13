@@ -20,9 +20,9 @@ jobs:
       run : sudo apt-get install -y gcc-mingw-w64
 
     - name: Check out code into the Go module directory
-       uses: actions/checkout@v1
-       with:
-         ref: ${{ github.head_ref }} 
+      uses: actions/checkout@v1
+      with:
+        ref: ${{ github.head_ref }} 
 
     - name: Get dependencies
       run: |
