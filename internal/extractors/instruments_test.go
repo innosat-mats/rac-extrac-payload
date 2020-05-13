@@ -8,6 +8,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 func Test_instrumentHK(t *testing.T) {
@@ -137,6 +138,62 @@ func Test_instrumentTransparentData(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("instrumentTransparentData() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_instrumentVerification(t *testing.T) {
+	type args struct {
+		subtype innosat.SourcePackageServiceSubtype
+		buf     io.Reader
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    common.Exportable
+		wantErr bool
+	}{
+		{
+			"TC Acceptance - Success",
+			args{subtype: 1, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCAcceptSuccessData{},
+			false,
+		},
+		{
+			"TC Acceptance - Failure",
+			args{subtype: 2, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCAcceptFailureData{},
+			false,
+		},
+		{
+			"TC Execution - Success",
+			args{subtype: 7, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCExecSuccessData{},
+			false,
+		},
+		{
+			"TC Execution - Failure",
+			args{subtype: 8, buf: bytes.NewReader(make([]byte, 100))},
+			aez.TCExecFailureData{},
+			false,
+		},
+		{
+			"unknown",
+			args{subtype: 42, buf: bytes.NewReader(make([]byte, 100))},
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := instrumentVerification(tt.args.subtype, tt.args.buf)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("instrumentVerification() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("instrumentVerification() = %v, want %v", got, tt.want)
 			}
 		})
 	}
