@@ -57,6 +57,7 @@ func DiskCallbackFactory(
 	var cpruOut csvOutput = nil
 	var statOut csvOutput = nil
 	var pmOut csvOutput = nil
+	var tcvOut csvOutput = nil
 
 	if writeImages || writeTimeseries {
 		// Create Directory and File
@@ -151,6 +152,10 @@ func DiskCallbackFactory(
 				pmOut.close()
 				pmOut = nil
 			}
+			if tcvOut != nil {
+				tcvOut.close()
+				tcvOut = nil
+			}
 			currentOrigin = expPkg.OriginName()
 		}
 
@@ -201,6 +206,14 @@ func DiskCallbackFactory(
 				}
 			}
 			err = pmOut.writeData(expPkg.CSVRow())
+		case aez.TCAcceptSuccessData, aez.TCAcceptFailureData, aez.TCExecSuccessData, aez.TCExecFailureData:
+			if tcvOut == nil {
+				tcvOut, err = csvOutputFactory(output, currentOrigin, "TCV", &expPkg)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+			err = tcvOut.writeData(expPkg.CSVRow())
 		}
 		// This error comes from writing a line and most probably would be a column missmatch
 		// that means we should be able to continue and just report the error
@@ -224,6 +237,9 @@ func DiskCallbackFactory(
 		}
 		if pmOut != nil {
 			pmOut.close()
+		}
+		if tcvOut != nil {
+			tcvOut.close()
 		}
 	}
 

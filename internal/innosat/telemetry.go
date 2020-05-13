@@ -21,7 +21,7 @@ func (pus pus) Version() uint8 {
 type TMHeader struct {
 	PUS             pus
 	ServiceType     SourcePackageServiceType
-	ServiceSubType  uint8
+	ServiceSubType  SourcePackageServiceSubtype
 	CUCTimeSeconds  uint32
 	CUCTimeFraction uint16
 }
@@ -41,7 +41,7 @@ func (header *TMHeader) Nanoseconds() int64 {
 	return ccsds.UnsegmentedTimeNanoseconds(header.CUCTimeSeconds, header.CUCTimeFraction)
 }
 
-// IsHousekeeping returns if payload contains housekeeping data
+// IsHousekeeping returns true if payload contains housekeeping data
 func (header *TMHeader) IsHousekeeping() bool {
 	return header.ServiceType == HousekeepingDiagnosticDataReporting && header.ServiceSubType == 25
 }
@@ -49,6 +49,15 @@ func (header *TMHeader) IsHousekeeping() bool {
 // IsTransparentData can be either CCD or Photometer data
 func (header *TMHeader) IsTransparentData() bool {
 	return header.ServiceType == 128 && header.ServiceSubType == 25
+}
+
+// IsTCVerification returns true if payload contains TC verification data
+func (header *TMHeader) IsTCVerification() bool {
+	return header.ServiceType == TelecommandVerification &&
+		(header.ServiceSubType == TCAcceptSuccess ||
+			header.ServiceSubType == TCAcceptFailure ||
+			header.ServiceSubType == TCExecSuccess ||
+			header.ServiceSubType == TCExecFailure)
 }
 
 // CSVHeaders returns the header row

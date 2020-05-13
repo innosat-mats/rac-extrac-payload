@@ -41,3 +41,17 @@ const (
 	// OnBoardParameterManagement ...
 	OnBoardParameterManagement SourcePackageServiceType = 129
 )
+
+// SourcePackageServiceSubtype service subtype type (different meaning for each service)
+type SourcePackageServiceSubtype uint8
+
+const (
+	// TCExecFailure subtype for Telecommand Execution Report - Failure
+	TCExecFailure SourcePackageServiceSubtype = 8
+	// TCAcceptSuccess subtype for Telecommand Failure Report - success
+	TCAcceptSuccess SourcePackageServiceSubtype = 1
+	// TCAcceptFailure subtype for Telecommand Failure Report - Failure
+	TCAcceptFailure SourcePackageServiceSubtype = 2
+	// TCExecSuccess subtype for Telecommand Execution Report - Success
+	TCExecSuccess SourcePackageServiceSubtype = 7
+)

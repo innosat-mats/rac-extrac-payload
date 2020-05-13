@@ -33,7 +33,7 @@ func TestTMHeader_Time(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -79,7 +79,7 @@ func TestTMHeader_Nanoseconds(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -111,7 +111,7 @@ func TestTMHeader_IsHousekeeping(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -149,7 +149,7 @@ func TestTMHeader_IsTransparentData(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -182,7 +182,7 @@ func TestTMHeader_CSVHeaders(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -213,7 +213,7 @@ func TestTMHeader_CSVRow(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -248,7 +248,7 @@ func TestTMHeader_MarshalJSON(t *testing.T) {
 	type fields struct {
 		PUS             pus
 		ServiceType     SourcePackageServiceType
-		ServiceSubType  uint8
+		ServiceSubType  SourcePackageServiceSubtype
 		CUCTimeSeconds  uint32
 		CUCTimeFraction uint16
 	}
@@ -281,6 +281,43 @@ func TestTMHeader_MarshalJSON(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("TMHeader.MarshalJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTMHeader_IsTCVerification(t *testing.T) {
+	type fields struct {
+		PUS             pus
+		ServiceType     SourcePackageServiceType
+		ServiceSubType  SourcePackageServiceSubtype
+		CUCTimeSeconds  uint32
+		CUCTimeFraction uint16
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		{"Service type 1 and sub 1 is", fields{ServiceType: 1, ServiceSubType: 1}, true},
+		{"Service type 1 and sub 2 is", fields{ServiceType: 1, ServiceSubType: 2}, true},
+		{"Service type 1 and sub 7 is", fields{ServiceType: 1, ServiceSubType: 7}, true},
+		{"Service type 1 and sub 8 is", fields{ServiceType: 1, ServiceSubType: 8}, true},
+		{"Service type 1 and sub 42 is not", fields{ServiceType: 1, ServiceSubType: 42}, false},
+		{"Service type 1 is not", fields{ServiceType: 1}, false},
+		{"Service subtype 1 is not", fields{ServiceSubType: 1}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmdfh := &TMHeader{
+				PUS:             tt.fields.PUS,
+				ServiceType:     tt.fields.ServiceType,
+				ServiceSubType:  tt.fields.ServiceSubType,
+				CUCTimeSeconds:  tt.fields.CUCTimeSeconds,
+				CUCTimeFraction: tt.fields.CUCTimeFraction,
+			}
+			if got := tmdfh.IsTCVerification(); got != tt.want {
+				t.Errorf("TMHeader.IsTCVerification() = %v, want %v", got, tt.want)
 			}
 		})
 	}
