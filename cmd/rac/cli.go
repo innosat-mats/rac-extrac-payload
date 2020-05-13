@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
@@ -77,7 +76,6 @@ func processFiles(
 		if err != nil {
 			return err
 		}
-
 		batch[n] = extractors.StreamBatch{
 			Buf: f,
 			Origin: common.OriginDescription{
@@ -100,7 +98,6 @@ func init() {
 }
 
 func main() {
-	runtime.GOMAXPROCS(1)
 	flag.Parse()
 	inputFiles := flag.Args()
 	if len(inputFiles) == 0 {

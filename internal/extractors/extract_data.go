@@ -30,6 +30,10 @@ func ExtractData(callback common.Callback, streamBatch ...StreamBatch) {
 	}()
 
 	for record := range ramsesChannel {
+		if record.Error != nil {
+			innosatChannel <- record
+			continue
+		}
 		innosatPackage, err := DecodeSource(record.Buffer)
 		if err != nil {
 			record.Error = err
