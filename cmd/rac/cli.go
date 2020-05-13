@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
@@ -42,6 +43,7 @@ func getCallback(
 	outputDirectory string,
 	skipImages bool,
 	skipTimeseries bool,
+	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown, error) {
 	if outputDirectory == "" && !stdout {
 		flag.Usage()
@@ -60,6 +62,7 @@ func getCallback(
 		outputDirectory,
 		!skipImages,
 		!skipTimeseries,
+		wg,
 	)
 	return callback, teardown, nil
 }
@@ -98,13 +101,14 @@ func init() {
 }
 
 func main() {
+	var wg sync.WaitGroup
 	flag.Parse()
 	inputFiles := flag.Args()
 	if len(inputFiles) == 0 {
 		flag.Usage()
 		log.Fatal("No rac-files supplied")
 	}
-	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries)
+	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries, &wg)
 	if err != nil {
 		log.Fatal(err)
 	}
