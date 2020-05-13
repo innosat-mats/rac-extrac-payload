@@ -76,7 +76,6 @@ func processFiles(
 		if err != nil {
 			return err
 		}
-
 		batch[n] = extractors.StreamBatch{
 			Buf: f,
 			Origin: common.OriginDescription{

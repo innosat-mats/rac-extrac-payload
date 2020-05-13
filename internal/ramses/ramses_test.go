@@ -1,7 +1,9 @@
 package ramses
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"reflect"
 	"testing"
 	"time"
@@ -217,6 +219,98 @@ func TestRamses_MarshalJSON(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Ramses.MarshalJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRamses_Nanoseconds(t *testing.T) {
+	type fields struct {
+		Synch  uint16
+		Length uint16
+		Port   uint16
+		Type   uint8
+		Secure uint8
+		Time   uint32
+		Date   int32
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   int64
+	}{
+		{
+			"Returns 0",
+			fields{},
+			0,
+		},
+		{
+			"Returns expected value",
+			fields{Time: 42, Date: 10},
+			10*3600*24*1000000000 + 42*1000000,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := &Ramses{
+				Synch:  tt.fields.Synch,
+				Length: tt.fields.Length,
+				Port:   tt.fields.Port,
+				Type:   tt.fields.Type,
+				Secure: tt.fields.Secure,
+				Time:   tt.fields.Time,
+				Date:   tt.fields.Date,
+			}
+			if got := ramses.Nanoseconds(); got != tt.want {
+				t.Errorf("Ramses.Nanoseconds() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRamses_Read(t *testing.T) {
+	tests := []struct {
+		name          string
+		buf           []byte
+		wantErr       bool
+		wantEOF       bool
+		ramsesOutcome Ramses
+	}{
+		{
+			"Returns EOF if no bytes in buffer",
+			[]byte{},
+			true,
+			true,
+			Ramses{},
+		},
+		{
+			"Returns non-EOF err on shorter than needed buffer",
+			[]byte{0xaa, 0xab},
+			true,
+			false,
+			Ramses{},
+		},
+		{
+			"Reads into ramses",
+			append([]byte{0x90, 0xeb, 0x48, 0x00}, make([]byte, 12)...),
+			false,
+			false,
+			Ramses{Synch: 0xeb90, Length: 0x0048},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ramses := Ramses{}
+			reader := bytes.NewReader(tt.buf)
+			err := ramses.Read(reader)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Ramses.Read() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if (err == io.EOF) != tt.wantEOF {
+				t.Errorf("Ramses.Read() error = %v, wantEOF %v", err, tt.wantEOF)
+			}
+			if !tt.wantErr && !reflect.DeepEqual(ramses, tt.ramsesOutcome) {
+				t.Errorf("Ramses.Read() => %+v, want %+v", ramses, tt.ramsesOutcome)
 			}
 		})
 	}
