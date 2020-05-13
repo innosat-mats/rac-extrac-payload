@@ -28,11 +28,15 @@ func Test_makeUnfinishedMultiPackError(t *testing.T) {
 			"Adds error and buffer to DataRecord",
 			args{
 				multiPackBuffer: bytes.NewBuffer([]byte("Hello")),
-				sourcePacket:    common.DataRecord{RID: aez.CCD4},
+				sourcePacket: common.DataRecord{
+					Origin: common.OriginDescription{Name: "myname"},
+					RID:    aez.CCD4,
+				},
 			},
 			common.DataRecord{
+				Origin: common.OriginDescription{Name: "myname"},
 				RID:    aez.CCD4,
-				Error:  fmt.Errorf("orphaned multi-package data without termination detected"),
+				Error:  errors.New("orphaned multi-package data without termination detected (myname)"),
 				Buffer: []byte("Hello"),
 			},
 		},
@@ -68,11 +72,10 @@ func TestAggregator(t *testing.T) {
 			[]outcome{{wantErr: true, partialErrMsg: "Hello"}},
 		},
 		{
-			"Three continuation packages makes one error for lacking start and one for lacking end",
+			"Three continuation packages makes one error for lacking end",
 			[]common.DataRecord{{Buffer: []byte("42")}, {Buffer: []byte("42")}, {Buffer: []byte("42")}},
 			[]outcome{
 				// For the unexpected start error we don't care about removing SID/RID
-				{wantErr: true, partialErrMsg: "continuation packet", bufferLength: 2},
 				{wantErr: true, partialErrMsg: "dangling final multipacket"},
 			},
 		},

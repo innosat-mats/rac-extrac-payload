@@ -17,6 +17,10 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 	var err error
 	var buffer *bytes.Buffer
 	for sourcePacket := range source {
+		if sourcePacket.Error != nil {
+			target <- sourcePacket
+			continue
+		}
 		buffer = bytes.NewBuffer(sourcePacket.Buffer)
 		switch {
 		case sourcePacket.TMHeader.IsHousekeeping():
