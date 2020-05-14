@@ -2,9 +2,12 @@ package exports
 
 import (
 	"bytes"
+	"fmt"
 	"image/png"
 	"io"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -33,14 +36,27 @@ func upload(uploader *s3manager.Uploader, key string, pngBuffer io.Reader) {
 // AWSS3CallbackFactory generates callbacks for writing to S3 instead of disk
 func AWSS3CallbackFactory(
 	project string,
+	awsDescriptionPath string,
 	writeImages bool,
 	writeTimeseries bool,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown) {
 
 	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String(awsS3Region)}))
-
 	uploader := s3manager.NewUploader(sess)
+
+	if awsDescriptionPath != "" {
+		awsDescription, err := os.Open(awsDescriptionPath)
+		if err != nil {
+			log.Fatalf("Could not find %v: %v", awsDescriptionPath, err)
+		}
+		wg.Add(1)
+		go func() {
+			key := fmt.Sprintf("%v/ABOUT%v", project, filepath.Ext(awsDescriptionPath))
+			upload(uploader, key, awsDescription)
+			wg.Done()
+		}()
+	}
 
 	callback := func(pkg common.DataRecord) {
 		if pkg.Error != nil {

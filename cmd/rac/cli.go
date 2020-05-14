@@ -19,6 +19,7 @@ var skipTimeseries *bool
 var project *string
 var stdout *bool
 var aws *bool
+var awsDescription *string
 
 //myUsage replaces default usage since it doesn't include information on non-flags
 func myUsage() {
@@ -45,6 +46,7 @@ func getCallback(
 	project string,
 	skipImages bool,
 	skipTimeseries bool,
+	awsDescription string,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown, error) {
 	if project == "" && !toStdout {
@@ -62,6 +64,7 @@ func getCallback(
 	} else if toAws {
 		callback, teardown := exports.AWSS3CallbackFactory(
 			project,
+			awsDescription,
 			!skipImages,
 			!skipTimeseries,
 			wg,
@@ -108,6 +111,7 @@ func init() {
 	project = flag.String("project", "", "Name for experiments, when outputting to disk a directory will be created with this name, when sending to AWS files will have this as a prefix")
 	stdout = flag.Bool("stdout", false, "Output to standard out instead of to disk (only timeseries)\n(Default: false)")
 	aws = flag.Bool("aws", false, "Output to aws instead of disk (requires credentials and permissions)")
+	awsDescription = flag.String("description", "", "Path to a file containing a project description to be uploaded to AWS")
 	flag.Usage = myUsage
 }
 
@@ -119,7 +123,15 @@ func main() {
 		flag.Usage()
 		log.Fatal("No rac-files supplied")
 	}
-	callback, teardown, err := getCallback(*stdout, *aws, *project, *skipImages, *skipTimeseries, &wg)
+	callback, teardown, err := getCallback(
+		*stdout,
+		*aws,
+		*project,
+		*skipImages,
+		*skipTimeseries,
+		*awsDescription,
+		&wg,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -41,6 +41,7 @@ func Test_getCallback(t *testing.T) {
 				tt.args.outputDirectory,
 				tt.args.skipImages,
 				tt.args.skipTimeseries,
+				"",
 				tt.args.wg,
 			)
 			if (err != nil) != tt.wantErr {
