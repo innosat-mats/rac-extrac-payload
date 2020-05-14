@@ -1,6 +1,7 @@
 package aez
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
 )
@@ -52,5 +53,18 @@ func TestCCDImage_CSVRow_AddsBC(t *testing.T) {
 		} else {
 			t.Errorf("Unexpected %vth column %v", i, value)
 		}
+	}
+}
+
+func TestCCDImage_MarshalJSON(t *testing.T) {
+	ccd := &CCDImage{}
+	got, err := ccd.MarshalJSON()
+	if err != nil {
+		t.Errorf("CCDImage.MarshalJSON() error = %v", err)
+		return
+	}
+	var js map[string]interface{}
+	if json.Unmarshal(got, &js) != nil {
+		t.Errorf("DataRecord.MarshalJSON() = %v, not a valid json", string(got))
 	}
 }

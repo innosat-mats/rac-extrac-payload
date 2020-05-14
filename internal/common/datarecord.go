@@ -1,6 +1,9 @@
 package common
 
 import (
+	"encoding/json"
+	"strings"
+
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
@@ -8,16 +11,62 @@ import (
 
 // DataRecord holds the full decode from one or many Ramses packages
 type DataRecord struct {
-	Origin         OriginDescription          `json:"origin"`         // Describes the origin of the data like filename or data batch name
-	RamsesHeader   ramses.Ramses              `json:"ramsesHeader"`   // Ramses header information
-	RamsesTMHeader ramses.TMHeader            `json:"ramsesTMHeader"` // The CCSDS compliant OHBSE TM Packet header
-	SourceHeader   innosat.SourcePacketHeader `json:"sourceHeader"`   // Source header from the innosat platform
-	TMHeader       innosat.TMHeader           `json:"tmHeader"`       // Data header information
+	Origin         OriginDescription          // Describes the origin of the data like filename or data batch name
+	RamsesHeader   ramses.Ramses              // Ramses header information
+	RamsesTMHeader ramses.TMHeader            // The CCSDS compliant OHBSE TM Packet header
+	SourceHeader   innosat.SourcePacketHeader // Source header from the innosat platform
+	TMHeader       innosat.TMHeader           // Data header information
 	SID            aez.SID                    // SID of the Data if any
 	RID            aez.RID                    // RID of Data if any
-	Data           Exporter                   `json:"data"`            // The data payload itself, HK report, jpeg image etc.
-	Error          error                      `json:"error,omitempty"` // First propagated error from the decoding process
-	Buffer         []byte                     `json:"-"`               // Currently unprocessed data (payload)
+	Data           Exporter                   // The data payload itself, HK report, jpeg image etc.
+	Error          error                      // First propagated error from the decoding process
+	Buffer         []byte                     // Currently unprocessed data (payload)
+}
+
+// MarshalJSON makes a custom json of what is of interest in the struct
+func (record *DataRecord) MarshalJSON() ([]byte, error) {
+	var dataJSON []byte
+	var dataJSONErr error
+	switch record.Data.(type) {
+	case aez.CCDImage:
+		ccd, ok := record.Data.(aez.CCDImage)
+		if ok {
+			dataJSON, dataJSONErr = ccd.MarshalJSON()
+		} else {
+			dataJSON, dataJSONErr = json.Marshal("Could not marshal ccd data into json")
+		}
+	default:
+		dataJSON, dataJSONErr = json.Marshal(record.Data)
+	}
+	buf, err := json.Marshal(&struct {
+		Origin         OriginDescription          `json:"origin"`
+		RamsesHeader   ramses.Ramses              `json:"ramsesHeader"`
+		RamsesTMHeader ramses.TMHeader            `json:"ramsesTMHeader"`
+		SourceHeader   innosat.SourcePacketHeader `json:"sourceHeader"`
+		TMHeader       innosat.TMHeader           `json:"tmHeader"`
+		SID            aez.SID
+		RID            aez.RID
+		Data           string `json:"data"`
+		Error          error  `json:"error,omitempty"`
+		JSONError      error  `json:"errorJSON,omitempty"`
+	}{
+		Origin:         record.Origin,
+		RamsesHeader:   record.RamsesHeader,
+		RamsesTMHeader: record.RamsesTMHeader,
+		SourceHeader:   record.SourceHeader,
+		TMHeader:       record.TMHeader,
+		SID:            record.SID,
+		RID:            record.RID,
+		Data:           "$1",
+		Error:          record.Error,
+		JSONError:      dataJSONErr,
+	})
+
+	//Inject the specially marshalled Data in the right place
+	jsonAsStr := string(buf)
+	pattern := "\"data\":\"$1\""
+	idx := strings.Index(jsonAsStr, pattern)
+	return append(append(buf[0:idx+7], dataJSON...), buf[idx+len(pattern):]...), err
 }
 
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
