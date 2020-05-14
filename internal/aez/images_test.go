@@ -1,4 +1,4 @@
-package exports
+package aez
 
 import (
 	"image"
@@ -7,13 +7,11 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
-
-	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 )
 
 func Test_getGrayscaleImageName(t *testing.T) {
 	want := filepath.Join("test", "MyFile_5000000000.png")
-	got := getGrayscaleImageName("test", "my/path/MyFile.rac", aez.CCDImagePackData{EXPTS: 5})
+	got := getGrayscaleImageName("test", "my/path/MyFile.rac", CCDImagePackData{EXPTS: 5})
 	if got != want {
 		t.Errorf("getGrayscaleImageName() = %v, want %v", got, want)
 	}
@@ -31,7 +29,7 @@ func Test_getImageData(t *testing.T) {
 	// NON-STANDARD test because don't really want to check full image
 	type args struct {
 		buf         []byte
-		packData    aez.CCDImagePackData
+		packData    CCDImagePackData
 		outFileName string
 	}
 	tests := []struct {
@@ -44,7 +42,7 @@ func Test_getImageData(t *testing.T) {
 			"Processes uncompressed directly as pixels",
 			args{
 				buf:         []byte{0xff, 0x00},
-				packData:    aez.CCDImagePackData{JPEGQ: aez.JPEGQUncompressed16bit},
+				packData:    CCDImagePackData{JPEGQ: JPEGQUncompressed16bit},
 				outFileName: "myfile.png",
 			},
 			1,
@@ -54,7 +52,7 @@ func Test_getImageData(t *testing.T) {
 			"Processes compressed jpeg 12bit buffer into pixels",
 			args{
 				buf:         getTestImage(),
-				packData:    aez.CCDImagePackData{JPEGQ: 95},
+				packData:    CCDImagePackData{JPEGQ: 95},
 				outFileName: "myfile.png",
 			},
 			250 * 501,
@@ -74,7 +72,7 @@ func Test_getImageData(t *testing.T) {
 	}
 }
 
-func getTestImagePixels(packData aez.CCDImagePackData) []uint16 {
+func getTestImagePixels(packData CCDImagePackData) []uint16 {
 	buf := getTestImage()
 	return getImageData(buf, packData, "test.png")
 }
@@ -97,7 +95,7 @@ func Test_getGrayscaleImage(t *testing.T) {
 		{
 			"Returns expected image unshifted",
 			args{
-				pixels:   getTestImagePixels(aez.CCDImagePackData{JPEGQ: 95}),
+				pixels:   getTestImagePixels(CCDImagePackData{JPEGQ: 95}),
 				width:    501,
 				height:   250,
 				shift:    0,
@@ -110,7 +108,7 @@ func Test_getGrayscaleImage(t *testing.T) {
 		{
 			"Returns expected image shifted",
 			args{
-				pixels:   getTestImagePixels(aez.CCDImagePackData{JPEGQ: 95}),
+				pixels:   getTestImagePixels(CCDImagePackData{JPEGQ: 95}),
 				width:    501,
 				height:   250,
 				shift:    1,

@@ -18,6 +18,7 @@ var skipImages *bool
 var skipTimeseries *bool
 var outputDirectory *string
 var stdout *bool
+var aws *bool
 
 //myUsage replaces default usage since it doesn't include information on non-flags
 func myUsage() {
@@ -39,23 +40,27 @@ or if you want the Buffer contents which can be rather large if you are unlucky:
 }
 
 func getCallback(
-	stdout bool,
+	toStdout bool,
+	toAws bool,
 	outputDirectory string,
 	skipImages bool,
 	skipTimeseries bool,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown, error) {
-	if outputDirectory == "" && !stdout {
+	if outputDirectory == "" && !toStdout && !toAws {
 		flag.Usage()
 		fmt.Println("\nExpected an output directory")
 		return nil, nil, errors.New("Invalid arguments")
 	}
-	if skipTimeseries && (skipImages || stdout) {
+	if skipTimeseries && (skipImages || toStdout) {
 		fmt.Println("Nothing will be extracted, only validating integrity of rac-file(s)")
 	}
 
-	if stdout {
+	if toStdout {
 		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
+		return callback, teardown, nil
+	} else if toAws {
+		callback, teardown := exports.AWSS3CallbackFactory(!skipImages, !skipTimeseries, wg)
 		return callback, teardown, nil
 	}
 	callback, teardown := exports.DiskCallbackFactory(
@@ -97,6 +102,7 @@ func init() {
 	skipTimeseries = flag.Bool("skip-timeseries", false, "Extract timeseries from rac-files.\n(Default: false)")
 	outputDirectory = flag.String("output", "", "Directory to place images and/or timeseries data")
 	stdout = flag.Bool("stdout", false, "Output to standard out instead of to disk (only timeseries)\n(Default: false)")
+	aws = flag.Bool("aws", false, "Output to aws instead of disk (requires credentials and permissions)")
 	flag.Usage = myUsage
 }
 
@@ -108,7 +114,7 @@ func main() {
 		flag.Usage()
 		log.Fatal("No rac-files supplied")
 	}
-	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries, &wg)
+	callback, teardown, err := getCallback(*stdout, *aws, *outputDirectory, *skipImages, *skipTimeseries, &wg)
 	if err != nil {
 		log.Fatal(err)
 	}

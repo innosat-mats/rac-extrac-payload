@@ -3,6 +3,7 @@ package aez
 import (
 	"encoding/json"
 	"fmt"
+	"image"
 	"time"
 )
 
@@ -10,6 +11,26 @@ import (
 type CCDImage struct {
 	PackData   CCDImagePackData
 	BadColumns []uint16
+}
+
+// Image returns the 16bit gray image and the name of the file/bucket object
+func (ccd *CCDImage) Image(buf []byte, prefix string, originName string) (*image.Gray16, string) {
+	imgFileName := getGrayscaleImageName(prefix, originName, ccd.PackData)
+
+	imgData := getImageData(
+		buf,
+		ccd.PackData,
+		imgFileName,
+	)
+	_, shift, _ := ccd.PackData.WDW.InputDataWindow()
+	return getGrayscaleImage(
+		imgData,
+		int(ccd.PackData.NCOL+NCOLStartOffset),
+		int(ccd.PackData.NROW),
+		shift,
+		imgFileName,
+	), imgFileName
+
 }
 
 // CSVSpecifications returns the specs used in creating the struct
