@@ -18,7 +18,7 @@ type DataRecord struct {
 	TMHeader       innosat.TMHeader           // Data header information
 	SID            aez.SID                    // SID of the Data if any
 	RID            aez.RID                    // RID of Data if any
-	Data           Exportable                 // The data payload itself, HK report, jpeg image etc.
+	Data           Exporter                   // The data payload itself, HK report, jpeg image etc.
 	Error          error                      // First propagated error from the decoding process
 	Buffer         []byte                     // Currently unprocessed data (payload)
 }

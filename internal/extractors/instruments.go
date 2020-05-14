@@ -9,8 +9,8 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
-func instrumentHK(sid aez.SID, buf io.Reader) (common.Exportable, error) {
-	var dataPackage common.Exportable
+func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
+	var dataPackage common.Exporter
 	var err error
 	switch sid {
 	case aez.SIDSTAT:
@@ -39,8 +39,8 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exportable, error) {
 	return dataPackage, err
 }
 
-func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exportable, error) {
-	var dataPackage common.Exportable
+func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exporter, error) {
+	var dataPackage common.Exporter
 	var err error
 	switch rid {
 	case aez.CCD1, aez.CCD2, aez.CCD3, aez.CCD4, aez.CCD5, aez.CCD6, aez.CCD7:
@@ -62,8 +62,8 @@ func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exportable, e
 func instrumentVerification(
 	subtype innosat.SourcePackageServiceSubtype,
 	buf io.Reader,
-) (common.Exportable, error) {
-	var dataPackage common.Exportable
+) (common.Exporter, error) {
+	var dataPackage common.Exporter
 	var err error
 	switch subtype {
 	case innosat.TCAcceptSuccess:
