@@ -19,7 +19,7 @@ func Test_instrumentHK(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    common.Exportable
+		want    common.Exporter
 		wantErr bool
 	}{
 		{
@@ -76,7 +76,7 @@ func Test_instrumentTransparentData(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    common.Exportable
+		want    common.Exporter
 		wantErr bool
 	}{
 		{
@@ -151,7 +151,7 @@ func Test_instrumentVerification(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    common.Exportable
+		want    common.Exporter
 		wantErr bool
 	}{
 		{
