@@ -13,7 +13,7 @@ import (
 // DecodeAEZ parses AEZ packages
 func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord) {
 	defer close(target)
-	var exportable common.Exportable
+	var exportable common.Exporter
 	var err error
 	var buffer *bytes.Buffer
 	for sourcePacket := range source {
