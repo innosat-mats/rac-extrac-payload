@@ -25,7 +25,7 @@ func TestDecodeAEZ(t *testing.T) {
 	tests := []struct {
 		name       string
 		arg        common.DataRecord
-		want       common.Exportable
+		want       common.Exporter
 		wantSID    aez.SID
 		wantRID    aez.RID
 		wantBufLen int

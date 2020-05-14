@@ -20,7 +20,7 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 		TMHeader       innosat.TMHeader
 		SID            aez.SID
 		RID            aez.RID
-		Data           Exportable
+		Data           Exporter
 		Error          error
 		Buffer         []byte
 	}
@@ -80,7 +80,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 		TMHeader       innosat.TMHeader
 		SID            aez.SID
 		RID            aez.RID
-		Data           Exportable
+		Data           Exporter
 		Error          error
 		Buffer         []byte
 	}
@@ -174,7 +174,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 		TMHeader       innosat.TMHeader
 		SID            aez.SID
 		RID            aez.RID
-		Data           Exportable
+		Data           Exporter
 		Error          error
 		Buffer         []byte
 	}
