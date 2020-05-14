@@ -61,9 +61,11 @@ func (record *DataRecord) MarshalJSON() ([]byte, error) {
 		Error:          record.Error,
 		JSONError:      dataJSONErr,
 	})
-	s := string(buf)
+
+	//Inject the specially marshalled Data in the right place
+	jsonAsStr := string(buf)
 	pattern := "\"data\":\"$1\""
-	idx := strings.Index(s, pattern)
+	idx := strings.Index(jsonAsStr, pattern)
 	return append(append(buf[0:idx+7], dataJSON...), buf[idx+len(pattern):]...), err
 }
 

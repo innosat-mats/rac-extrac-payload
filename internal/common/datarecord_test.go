@@ -1,7 +1,9 @@
 package common
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
 	"reflect"
 	"testing"
 	"time"
@@ -286,6 +288,39 @@ func TestDataRecord_CSVRow(t *testing.T) {
 			}
 			if got := record.CSVRow(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DataRecord.CSVRow() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDataRecord_MarshalJSON(t *testing.T) {
+	type fields struct {
+		Data  Exportable
+		Error error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		{"No Data, No Error", fields{}},
+		{"Error", fields{Error: io.EOF}},
+		{"Image Data", fields{Data: aez.CCDImage{}}},
+		{"Non-image Data", fields{Data: aez.STAT{}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			record := &DataRecord{
+				Data:  tt.fields.Data,
+				Error: tt.fields.Error,
+			}
+			got, err := record.MarshalJSON()
+			if err != nil {
+				t.Errorf("DataRecord.MarshalJSON() error = %v", err)
+				return
+			}
+			var js map[string]interface{}
+			if json.Unmarshal(got, &js) != nil {
+				t.Errorf("DataRecord.MarshalJSON() = %v, not a valid json", string(got))
 			}
 		})
 	}
