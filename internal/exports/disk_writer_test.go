@@ -232,6 +232,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 			args{writeImages: true},
 			[]common.DataRecord{
 				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
 					Data: aez.CCDImage{
 						PackData: aez.CCDImagePackData{
 							JPEGQ: aez.JPEGQUncompressed16bit,
@@ -243,6 +244,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
 				{
+					Origin: common.OriginDescription{Name: "File1.rac"},
 					Data: aez.CCDImage{
 						PackData: aez.CCDImagePackData{
 							JPEGQ: aez.JPEGQUncompressed16bit,
@@ -255,10 +257,10 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"5000000000.png", 0, true},
-				{"5000000000.json", 0, true},
-				{"6000000000.png", 0, true},
-				{"6000000000.json", 0, true},
+				{"File1_5000000000.png", 0, true},
+				{"File1_5000000000.json", 0, true},
+				{"File1_6000000000.png", 0, true},
+				{"File1_6000000000.json", 0, true},
 			},
 		},
 		{
