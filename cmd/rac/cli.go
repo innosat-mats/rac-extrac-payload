@@ -16,7 +16,7 @@ import (
 
 var skipImages *bool
 var skipTimeseries *bool
-var outputDirectory *string
+var project *string
 var stdout *bool
 var aws *bool
 
@@ -42,12 +42,12 @@ or if you want the Buffer contents which can be rather large if you are unlucky:
 func getCallback(
 	toStdout bool,
 	toAws bool,
-	outputDirectory string,
+	project string,
 	skipImages bool,
 	skipTimeseries bool,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown, error) {
-	if outputDirectory == "" && !toStdout && !toAws {
+	if project == "" && !toStdout {
 		flag.Usage()
 		fmt.Println("\nExpected an output directory")
 		return nil, nil, errors.New("Invalid arguments")
@@ -60,11 +60,16 @@ func getCallback(
 		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
 		return callback, teardown, nil
 	} else if toAws {
-		callback, teardown := exports.AWSS3CallbackFactory(!skipImages, !skipTimeseries, wg)
+		callback, teardown := exports.AWSS3CallbackFactory(
+			project,
+			!skipImages,
+			!skipTimeseries,
+			wg,
+		)
 		return callback, teardown, nil
 	}
 	callback, teardown := exports.DiskCallbackFactory(
-		outputDirectory,
+		project,
 		!skipImages,
 		!skipTimeseries,
 		wg,
@@ -100,7 +105,7 @@ func processFiles(
 func init() {
 	skipImages = flag.Bool("skip-images", false, "Extract images from rac-files.\n(Default: false)")
 	skipTimeseries = flag.Bool("skip-timeseries", false, "Extract timeseries from rac-files.\n(Default: false)")
-	outputDirectory = flag.String("output", "", "Directory to place images and/or timeseries data")
+	project = flag.String("project", "", "Name for experiments, when outputting to disk a directory will be created with this name, when sending to AWS files will have this as a prefix")
 	stdout = flag.Bool("stdout", false, "Output to standard out instead of to disk (only timeseries)\n(Default: false)")
 	aws = flag.Bool("aws", false, "Output to aws instead of disk (requires credentials and permissions)")
 	flag.Usage = myUsage
@@ -114,7 +119,7 @@ func main() {
 		flag.Usage()
 		log.Fatal("No rac-files supplied")
 	}
-	callback, teardown, err := getCallback(*stdout, *aws, *outputDirectory, *skipImages, *skipTimeseries, &wg)
+	callback, teardown, err := getCallback(*stdout, *aws, *project, *skipImages, *skipTimeseries, &wg)
 	if err != nil {
 		log.Fatal(err)
 	}

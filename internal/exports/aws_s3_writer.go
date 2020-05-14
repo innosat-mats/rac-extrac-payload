@@ -5,6 +5,7 @@ import (
 	"image/png"
 	"io"
 	"log"
+	"strings"
 	"sync"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -20,7 +21,7 @@ const awsS3Region = "eu-north-1"
 func upload(uploader *s3manager.Uploader, key string, pngBuffer io.Reader) {
 	_, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(awsBucket),
-		Key:    aws.String(key),
+		Key:    aws.String(strings.ReplaceAll(key, "\\", "/")),
 		Body:   pngBuffer,
 	})
 	if err != nil {
@@ -31,6 +32,7 @@ func upload(uploader *s3manager.Uploader, key string, pngBuffer io.Reader) {
 
 // AWSS3CallbackFactory generates callbacks for writing to S3 instead of disk
 func AWSS3CallbackFactory(
+	project string,
 	writeImages bool,
 	writeTimeseries bool,
 	wg *sync.WaitGroup,
@@ -53,8 +55,7 @@ func AWSS3CallbackFactory(
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
 				}
-				img, imgFileName := ccdImage.Image(pkg.Buffer, "", pkg.Origin.Name)
-
+				img, imgFileName := ccdImage.Image(pkg.Buffer, project, pkg.Origin.Name)
 				wg.Add(1)
 				go func() {
 					pngBuffer := bytes.NewBuffer([]byte{})
