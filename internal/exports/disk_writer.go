@@ -82,7 +82,7 @@ func DiskCallbackFactory(
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
 				}
-				imgFileName := getGrayscaleImageName(output, ccdImage.PackData)
+				imgFileName := getGrayscaleImageName(output, pkg.Origin.Name, ccdImage.PackData)
 
 				imgData := getImageData(
 					pkg.Buffer,
