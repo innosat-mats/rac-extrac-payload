@@ -41,7 +41,10 @@ jobs:
       run: make build
 
     - name: Lint
-      run: make lint
+      run: |
+        go env
+        go install golang.org/x/lint/golint
+        make lint
 
     - name: Test
       run: make test
@@ -52,7 +55,6 @@ jobs:
 
     - name: Build linux
       run: go build -o rac ./cmd/rac
-
 
     - name: binaries
       uses: actions/upload-artifact@v2
