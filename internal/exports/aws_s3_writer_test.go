@@ -22,15 +22,11 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 		writeImages         bool
 		writeTimeseries     bool
 	}
-	type upload struct {
-		key     string
-		bodyLen int
-	}
 	tests := []struct {
 		name    string
 		args    args
 		record  common.DataRecord
-		uploads []upload
+		uploads map[string]int
 	}{
 		{
 			"Uploads description file",
@@ -40,7 +36,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileBody: []byte("Hello"),
 			},
 			common.DataRecord{},
-			[]upload{{key: filepath.Join("myproj", "ABOUT.txt"), bodyLen: 5}},
+			map[string]int{
+				filepath.Join("myproj", "ABOUT.txt"): 5,
+			},
 		},
 		{
 			"Uploads description file without project",
@@ -50,7 +48,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileBody: []byte("Hello"),
 			},
 			common.DataRecord{},
-			[]upload{{key: "ABOUT.md", bodyLen: 5}},
+			map[string]int{"ABOUT.md": 5},
 		},
 		{
 			"Doesn't upload description file if name empty",
@@ -59,7 +57,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileName: "",
 			},
 			common.DataRecord{},
-			[]upload{},
+			map[string]int{},
 		},
 		{
 			"Uploads image",
@@ -79,15 +77,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			},
-			[]upload{
-				{
-					key:     filepath.Join("myproj", "MyRac_5000000000.png"),
-					bodyLen: 76, // 8 + header
-				},
-				{
-					key:     filepath.Join("myproj", "MyRac_5000000000.json"),
-					bodyLen: 853, // length of the json
-				},
+			map[string]int{
+				filepath.Join("myproj", "MyRac_5000000000.png"):  76,  // 8 + header
+				filepath.Join("myproj", "MyRac_5000000000.json"): 853, // length of the json
 			},
 		},
 		{
@@ -108,7 +100,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			},
-			[]upload{},
+			map[string]int{},
 		},
 		{
 			"Doesn't uploads errors",
@@ -129,7 +121,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				Error:  errors.New("here be dragons"),
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			},
-			[]upload{},
+			map[string]int{},
 		},
 		{
 			"Uploads everything",
@@ -151,19 +143,10 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			},
-			[]upload{
-				{
-					key:     filepath.Join("myproj", "ABOUT.json"),
-					bodyLen: 7,
-				},
-				{
-					key:     filepath.Join("myproj", "MyRac_5000000000.png"),
-					bodyLen: 76, // 8 + header
-				},
-				{
-					key:     filepath.Join("myproj", "MyRac_5000000000.json"),
-					bodyLen: 853, // length of the json
-				},
+			map[string]int{
+				filepath.Join("myproj", "ABOUT.json"):            7,
+				filepath.Join("myproj", "MyRac_5000000000.png"):  76,  // 8 + header
+				filepath.Join("myproj", "MyRac_5000000000.json"): 853, // length of the json
 			},
 		},
 	}
@@ -182,12 +165,11 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 						buf,
 					)
 				} else {
-					upload := tt.uploads[idxUp]
-					if key != upload.key {
-						t.Errorf("Upload %v: key = %v, want %v ", idxUp, key, upload.key)
-					}
-					if upload.bodyLen != len(buf) {
-						t.Errorf("Upload %v: len(buf) = %v, want %v ", idxUp, len(buf), upload.bodyLen)
+					bodyLen, ok := tt.uploads[key]
+					if !ok {
+						t.Errorf("Upload %v: key = %v, key not wanted", idxUp, key)
+					} else if bodyLen != len(buf) {
+						t.Errorf("Upload %v: len(buf) = %v, want %v ", idxUp, len(buf), bodyLen)
 					}
 				}
 
