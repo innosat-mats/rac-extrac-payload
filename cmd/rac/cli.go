@@ -51,7 +51,7 @@ func getCallback(
 ) (common.Callback, common.CallbackTeardown, error) {
 	if project == "" && !toStdout {
 		flag.Usage()
-		fmt.Println("\nExpected an output directory")
+		fmt.Println("\nExpected an project")
 		return nil, nil, errors.New("Invalid arguments")
 	}
 	if skipTimeseries && (skipImages || toStdout) {
@@ -63,6 +63,7 @@ func getCallback(
 		return callback, teardown, nil
 	} else if toAws {
 		callback, teardown := exports.AWSS3CallbackFactory(
+			exports.AWSUpload,
 			project,
 			awsDescription,
 			!skipImages,

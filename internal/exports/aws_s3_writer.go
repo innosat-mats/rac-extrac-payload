@@ -21,11 +21,12 @@ import (
 const awsBucket = "mats-l0-artifacts"
 const awsS3Region = "eu-north-1"
 
-func upload(uploader *s3manager.Uploader, key string, pngBuffer io.Reader) {
+// AWSUpload uploads file content to target bucket
+func AWSUpload(uploader *s3manager.Uploader, key string, body io.Reader) {
 	_, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(awsBucket),
 		Key:    aws.String(strings.ReplaceAll(key, "\\", "/")),
-		Body:   pngBuffer,
+		Body:   body,
 	})
 	if err != nil {
 		log.Printf("Failed to upload file %v, %v", key, err)
@@ -33,8 +34,12 @@ func upload(uploader *s3manager.Uploader, key string, pngBuffer io.Reader) {
 
 }
 
+// AWSUploadFunc is the signature of an AWS upload function
+type AWSUploadFunc func(uploader *s3manager.Uploader, key string, body io.Reader)
+
 // AWSS3CallbackFactory generates callbacks for writing to S3 instead of disk
 func AWSS3CallbackFactory(
+	upload AWSUploadFunc,
 	project string,
 	awsDescriptionPath string,
 	writeImages bool,
@@ -52,7 +57,10 @@ func AWSS3CallbackFactory(
 		}
 		wg.Add(1)
 		go func() {
-			key := fmt.Sprintf("%v/ABOUT%v", project, filepath.Ext(awsDescriptionPath))
+			key := fmt.Sprintf("ABOUT%v", filepath.Ext(awsDescriptionPath))
+			if project != "" {
+				key = fmt.Sprintf("%v/%v", project, key)
+			}
 			upload(uploader, key, awsDescription)
 			wg.Done()
 		}()

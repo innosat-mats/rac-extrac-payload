@@ -10,10 +10,33 @@ import (
 )
 
 func Test_getGrayscaleImageName(t *testing.T) {
-	want := filepath.Join("test", "MyFile_5000000000.png")
-	got := getGrayscaleImageName("test", "my/path/MyFile.rac", CCDImagePackData{EXPTS: 5})
-	if got != want {
-		t.Errorf("getGrayscaleImageName() = %v, want %v", got, want)
+	tests := []struct {
+		name       string
+		project    string
+		originName string
+		expts      uint32
+		want       string
+	}{
+		{
+			"Adds project",
+			"test",
+			"my/path/MyFile.rac",
+			5,
+			filepath.Join("test", "MyFile_5000000000.png"),
+		},
+		{
+			"Omits project if empty",
+			"",
+			"my/path/MyFile.rac",
+			5,
+			"MyFile_5000000000.png",
+		},
+	}
+	for _, tt := range tests {
+		got := getGrayscaleImageName(tt.project, tt.originName, CCDImagePackData{EXPTS: tt.expts})
+		if got != tt.want {
+			t.Errorf("getGrayscaleImageName() = %v, want %v", got, tt.want)
+		}
 	}
 }
 

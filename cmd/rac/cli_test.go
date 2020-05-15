@@ -16,12 +16,12 @@ import (
 
 func Test_getCallback(t *testing.T) {
 	type args struct {
-		toStdout        bool
-		toAws           bool
-		outputDirectory string
-		skipImages      bool
-		skipTimeseries  bool
-		wg              *sync.WaitGroup
+		toStdout       bool
+		toAws          bool
+		project        string
+		skipImages     bool
+		skipTimeseries bool
+		wg             *sync.WaitGroup
 	}
 	tests := []struct {
 		name    string
@@ -29,8 +29,9 @@ func Test_getCallback(t *testing.T) {
 		wantErr bool
 	}{
 		{"Returns stdout callback", args{toStdout: true}, false},
-		{"Returns aws callback", args{toAws: true}, false},
-		{"Returns disk callback", args{outputDirectory: "somewhere"}, false},
+		{"Returns aws callback", args{toAws: true, project: "test"}, false},
+		{"Returns aws callback requires project", args{toAws: true}, true},
+		{"Returns disk callback", args{project: "somewhere"}, false},
 		{"Returns error if no output directory", args{}, true},
 	}
 	for _, tt := range tests {
@@ -38,7 +39,7 @@ func Test_getCallback(t *testing.T) {
 			_, _, err := getCallback(
 				tt.args.toStdout,
 				tt.args.toAws,
-				tt.args.outputDirectory,
+				tt.args.project,
 				tt.args.skipImages,
 				tt.args.skipTimeseries,
 				"",
