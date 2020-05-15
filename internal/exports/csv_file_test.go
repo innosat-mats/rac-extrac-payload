@@ -8,12 +8,12 @@ import (
 	"testing"
 )
 
-func getTestFile() (*csvFile, *os.File, error) {
+func getTestFile() (*CsvFile, *os.File, error) {
 	file, err := ioutil.TempFile("", "innosat-mats-test")
 	if err != nil {
 		return nil, file, err
 	}
-	return &csvFile{File: file, Writer: csv.NewWriter(file)}, file, err
+	return &CsvFile{file: file, writer: csv.NewWriter(file)}, file, err
 
 }
 
@@ -23,11 +23,11 @@ func Test_csvFile_close(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	csvFile.close()
+	csvFile.Close()
 	buf := make([]byte, 10)
 	_, err = file.Read(buf)
 	if err == nil {
-		t.Error("csvFile.close(), didn't close file")
+		t.Error("csvFile.Close(), didn't Close file")
 	}
 }
 
@@ -37,21 +37,21 @@ func Test_csvFile_setSpecifications(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	err = csvFile.setSpecifications([]string{"test", "me"})
+	err = csvFile.SetSpecifications([]string{"test", "me"})
 	if err != nil {
-		t.Errorf("csvFile.setSpecifications() = %v, wanted %v", err, nil)
+		t.Errorf("csvFile.SetSpecifications() = %v, wanted %v", err, nil)
 	}
 	if !csvFile.HasSpec {
-		t.Errorf("csvFile.setSpecifications() resulted in csvFile.HasSpec = %v, wanted %v", csvFile.HasSpec, true)
+		t.Errorf("csvFile.SetSpecifications() resulted in csvFile.HasSpec = %v, wanted %v", csvFile.HasSpec, true)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.setSpecifications() output file could not be located %v", err)
+		t.Errorf("csvFile.SetSpecifications() output file could not be located %v", err)
 	}
 	var want string = "test,me\n"
 	if string(content) != want {
-		t.Errorf("csvFile.setSpecifications() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.SetSpecifications() output file content '%v',' wanted '%v'", string(content), want)
 	}
 }
 
@@ -62,24 +62,24 @@ func Test_csvFile_setSpecifications_no_run_twice(t *testing.T) {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
 	// First write should be OK
-	err = csvFile.setSpecifications([]string{"test", "me"})
+	err = csvFile.SetSpecifications([]string{"test", "me"})
 	if err != nil {
-		t.Errorf("First csvFile.setSpecifications() = %v, wanted %v", err, nil)
+		t.Errorf("First csvFile.SetSpecifications() = %v, wanted %v", err, nil)
 	}
 
 	// Second write should be NOK
-	err = csvFile.setSpecifications([]string{"test", "me"})
+	err = csvFile.SetSpecifications([]string{"test", "me"})
 	if err == nil {
-		t.Errorf("Second csvFile.setSpecifications() = %v, wanted an error", err)
+		t.Errorf("Second csvFile.SetSpecifications() = %v, wanted an error", err)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.setSpecifications() output file could not be located %v", err)
+		t.Errorf("csvFile.SetSpecifications() output file could not be located %v", err)
 	}
 	var want string = "test,me\n"
 	if string(content) != want {
-		t.Errorf("csvFile.setSpecifications() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.SetSpecifications() output file content '%v',' wanted '%v'", string(content), want)
 	}
 }
 
@@ -89,18 +89,18 @@ func Test_csvFile_setHeaderRow_requires_setSpecifications(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	err = csvFile.setHeaderRow([]string{"Hello", "World"})
+	err = csvFile.SetHeaderRow([]string{"Hello", "World"})
 	if err == nil {
-		t.Errorf("csvFile.setHeaderRow() = %v, wanted an error", err)
+		t.Errorf("csvFile.SetHeaderRow() = %v, wanted an error", err)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.setHeaderRow() output file could not be located %v", err)
+		t.Errorf("csvFile.SetHeaderRow() output file could not be located %v", err)
 	}
 	var want string = ""
 	if string(content) != want {
-		t.Errorf("csvFile.setHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.SetHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
 	}
 
 }
@@ -111,19 +111,19 @@ func Test_csvFile_setHeaderRow(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	csvFile.setSpecifications([]string{"test", "me"})
-	err = csvFile.setHeaderRow([]string{"Hello", "World"})
+	csvFile.SetSpecifications([]string{"test", "me"})
+	err = csvFile.SetHeaderRow([]string{"Hello", "World"})
 	if err != nil {
-		t.Errorf("csvFile.setHeaderRow() = %v, wanted %v", err, nil)
+		t.Errorf("csvFile.SetHeaderRow() = %v, wanted %v", err, nil)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.setHeaderRow() output file could not be located %v", err)
+		t.Errorf("csvFile.SetHeaderRow() output file could not be located %v", err)
 	}
 	var want string = "test,me\nHello,World\n"
 	if string(content) != want {
-		t.Errorf("csvFile.setHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.SetHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
 	}
 
 }
@@ -134,25 +134,25 @@ func Test_csvFile_setHeaderRow_only_one_header(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	csvFile.setSpecifications([]string{"test", "me"})
+	csvFile.SetSpecifications([]string{"test", "me"})
 	// First Header
-	err = csvFile.setHeaderRow([]string{"Hello", "World"})
+	err = csvFile.SetHeaderRow([]string{"Hello", "World"})
 	if err != nil {
-		t.Errorf("csvFile.setHeaderRow() = %v, wanted %v", err, nil)
+		t.Errorf("csvFile.SetHeaderRow() = %v, wanted %v", err, nil)
 	}
 	// Second Header
-	err = csvFile.setHeaderRow([]string{"World", "World"})
+	err = csvFile.SetHeaderRow([]string{"World", "World"})
 	if err == nil {
-		t.Errorf("csvFile.setHeaderRow() = %v, wanted an error", err)
+		t.Errorf("csvFile.SetHeaderRow() = %v, wanted an error", err)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.setHeaderRow() output file could not be located %v", err)
+		t.Errorf("csvFile.SetHeaderRow() output file could not be located %v", err)
 	}
 	var want string = "test,me\nHello,World\n"
 	if string(content) != want {
-		t.Errorf("csvFile.setHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.SetHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
 	}
 }
 
@@ -162,20 +162,20 @@ func Test_csvFile_writeData_requires_spec_and_head(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	err = csvFile.writeData([]string{"Test", "1"})
+	err = csvFile.WriteData([]string{"Test", "1"})
 	if err == nil {
-		t.Errorf("csvFile.writeData() = %v, wanted an error", err)
+		t.Errorf("csvFile.WriteData() = %v, wanted an error", err)
 	} else if !strings.HasPrefix(err.Error(), "Specifications and/or") {
-		t.Errorf("csvFile.writeData() = %v, wanted error to start with 'Specifications and/or'", err)
+		t.Errorf("csvFile.WriteData() = %v, wanted error to start with 'Specifications and/or'", err)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.writeData() output file could not be located %v", err)
+		t.Errorf("csvFile.WriteData() output file could not be located %v", err)
 	}
 	var want string = ""
 	if string(content) != want {
-		t.Errorf("csvFile.writeData() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.WriteData() output file content '%v',' wanted '%v'", string(content), want)
 	}
 }
 
@@ -185,20 +185,20 @@ func Test_csvFile_writeData(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	csvFile.setSpecifications([]string{"test", "me"})
-	csvFile.setHeaderRow([]string{"Hello", "World"})
-	err = csvFile.writeData([]string{"Test", "1"})
+	csvFile.SetSpecifications([]string{"test", "me"})
+	csvFile.SetHeaderRow([]string{"Hello", "World"})
+	err = csvFile.WriteData([]string{"Test", "1"})
 	if err != nil {
-		t.Errorf("csvFile.writeData() = %v, wanted %v", err, nil)
+		t.Errorf("csvFile.WriteData() = %v, wanted %v", err, nil)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.writeData() output file could not be located %v", err)
+		t.Errorf("csvFile.WriteData() output file could not be located %v", err)
 	}
 	var want string = "test,me\nHello,World\nTest,1\n"
 	if string(content) != want {
-		t.Errorf("csvFile.writeData() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.WriteData() output file content '%v',' wanted '%v'", string(content), want)
 	}
 }
 
@@ -208,32 +208,32 @@ func Test_csvFile_writeData_rejects_bad_columned_row(t *testing.T) {
 	if err != nil {
 		t.Errorf("csvFile fixture could not setup: %v", err)
 	}
-	csvFile.setSpecifications([]string{"test", "me"})
-	csvFile.setHeaderRow([]string{"Hello", "World"})
+	csvFile.SetSpecifications([]string{"test", "me"})
+	csvFile.SetHeaderRow([]string{"Hello", "World"})
 	// Good
-	err = csvFile.writeData([]string{"Test", "1"})
+	err = csvFile.WriteData([]string{"Test", "1"})
 	if err != nil {
-		t.Errorf("csvFile.writeData() = %v, wanted %v", err, nil)
+		t.Errorf("csvFile.WriteData() = %v, wanted %v", err, nil)
 	}
 	// Bad
-	err = csvFile.writeData([]string{"Test", "1", "2"})
+	err = csvFile.WriteData([]string{"Test", "1", "2"})
 	if err == nil {
-		t.Errorf("csvFile.writeData() = %v, wanted an error", err)
+		t.Errorf("csvFile.WriteData() = %v, wanted an error", err)
 	} else if !strings.HasPrefix(err.Error(), "Irregular column") {
-		t.Errorf("csvFile.writeData() = %v, wanted error starting with 'Irregular column'", err)
+		t.Errorf("csvFile.WriteData() = %v, wanted error starting with 'Irregular column'", err)
 	}
 	// Good again
-	err = csvFile.writeData([]string{"Test", "2"})
+	err = csvFile.WriteData([]string{"Test", "2"})
 	if err != nil {
-		t.Errorf("csvFile.writeData() = %v, wanted %v", err, nil)
+		t.Errorf("csvFile.WriteData() = %v, wanted %v", err, nil)
 	}
-	csvFile.close()
+	csvFile.Close()
 	content, err := ioutil.ReadFile(file.Name())
 	if err != nil {
-		t.Errorf("csvFile.writeData() output file could not be located %v", err)
+		t.Errorf("csvFile.WriteData() output file could not be located %v", err)
 	}
 	var want string = "test,me\nHello,World\nTest,1\nTest,2\n"
 	if string(content) != want {
-		t.Errorf("csvFile.writeData() output file content '%v',' wanted '%v'", string(content), want)
+		t.Errorf("csvFile.WriteData() output file content '%v',' wanted '%v'", string(content), want)
 	}
 }
