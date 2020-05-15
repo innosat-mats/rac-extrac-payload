@@ -9,7 +9,7 @@ import (
 // ExtractFunction is the type of the ExtractData function
 type ExtractFunction func(callback common.Callback, streamBatch ...StreamBatch)
 
-const channelBufferSize int = 1000
+const channelBufferSize int = 1024
 
 // ExtractData reads Ramses data packages and extract the instrument data.
 func ExtractData(callback common.Callback, streamBatch ...StreamBatch) {
