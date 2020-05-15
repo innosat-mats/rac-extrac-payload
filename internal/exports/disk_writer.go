@@ -83,6 +83,7 @@ func DiskCallbackFactory(
 					break
 				}
 				imgFileName := getGrayscaleImageName(output, pkg.Origin.Name, ccdImage.PackData)
+
 				imgData := getImageData(
 					pkg.Buffer,
 					ccdImage.PackData,
