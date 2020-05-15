@@ -83,23 +83,22 @@ func DiskCallbackFactory(
 					break
 				}
 				imgFileName := getGrayscaleImageName(output, pkg.Origin.Name, ccdImage.PackData)
-
-				imgData := getImageData(
-					pkg.Buffer,
-					ccdImage.PackData,
-					imgFileName,
-				)
-				_, shift, _ := ccdImage.PackData.WDW.InputDataWindow()
-				img := getGrayscaleImage(
-					imgData,
-					int(ccdImage.PackData.NCOL+aez.NCOLStartOffset),
-					int(ccdImage.PackData.NROW),
-					shift,
-					imgFileName,
-				)
-
 				wg.Add(1)
 				go func() {
+					imgData := getImageData(
+						pkg.Buffer,
+						ccdImage.PackData,
+						imgFileName,
+					)
+					_, shift, _ := ccdImage.PackData.WDW.InputDataWindow()
+					img := getGrayscaleImage(
+						imgData,
+						int(ccdImage.PackData.NCOL+aez.NCOLStartOffset),
+						int(ccdImage.PackData.NROW),
+						shift,
+						imgFileName,
+					)
+
 					defer wg.Done()
 					imgFile, err := os.Create(imgFileName)
 					if err != nil {
