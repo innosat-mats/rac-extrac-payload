@@ -12,27 +12,10 @@ import (
 )
 
 func Test_getGrayscaleImageName(t *testing.T) {
-	type args struct {
-		dir         string
-		imgPackData aez.CCDImagePackData
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			"Uses nanos in filename",
-			args{"test", aez.CCDImagePackData{EXPTS: 5}},
-			filepath.Join("test", "5000000000.png"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getGrayscaleImageName(tt.args.dir, tt.args.imgPackData); got != tt.want {
-				t.Errorf("getGrayscaleImageName() = %v, want %v", got, tt.want)
-			}
-		})
+	want := filepath.Join("test", "MyFile_5000000000.png")
+	got := getGrayscaleImageName("test", "my/path/MyFile.rac", aez.CCDImagePackData{EXPTS: 5})
+	if got != want {
+		t.Errorf("getGrayscaleImageName() = %v, want %v", got, want)
 	}
 }
 

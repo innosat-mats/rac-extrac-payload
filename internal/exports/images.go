@@ -7,6 +7,7 @@ import (
 	"image"
 	"log"
 	"path/filepath"
+	"strings"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/decodejpeg"
@@ -49,10 +50,11 @@ func getGrayscaleImage(
 	return img
 }
 
-func getGrayscaleImageName(dir string, imgPackData aez.CCDImagePackData) string {
+func getGrayscaleImageName(dir string, originName string, imgPackData aez.CCDImagePackData) string {
+	racName := strings.TrimSuffix(filepath.Base(originName), filepath.Ext(originName))
 	return filepath.Join(
 		dir,
-		fmt.Sprintf("%v.png", imgPackData.Nanoseconds()),
+		fmt.Sprintf("%v_%v.png", racName, imgPackData.Nanoseconds()),
 	)
 }
 
