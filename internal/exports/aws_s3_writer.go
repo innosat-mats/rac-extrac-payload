@@ -80,6 +80,7 @@ func AWSS3CallbackFactory(
 					break
 				}
 				img, imgFileName := ccdImage.Image(pkg.Buffer, project, pkg.Origin.Name)
+
 				wg.Add(1)
 				go func() {
 					pngBuffer := bytes.NewBuffer([]byte{})

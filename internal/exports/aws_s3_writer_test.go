@@ -1,11 +1,11 @@
 package exports
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"reflect"
 	"sync"
 	"testing"
 
@@ -24,7 +24,6 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 	}
 	type upload struct {
 		key     string
-		body    []byte
 		bodyLen int
 	}
 	tests := []struct {
@@ -41,7 +40,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileBody: []byte("Hello"),
 			},
 			common.DataRecord{},
-			[]upload{{key: filepath.Join("myproj", "ABOUT.txt"), body: []byte("Hello")}},
+			[]upload{{key: filepath.Join("myproj", "ABOUT.txt"), bodyLen: 5}},
 		},
 		{
 			"Uploads description file without project",
@@ -51,7 +50,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileBody: []byte("Hello"),
 			},
 			common.DataRecord{},
-			[]upload{{key: "ABOUT.md", body: []byte("Hello")}},
+			[]upload{{key: "ABOUT.md", bodyLen: 5}},
 		},
 		{
 			"Doesn't upload description file if name empty",
@@ -83,11 +82,87 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			[]upload{
 				{
 					key:     filepath.Join("myproj", "MyRac_5000000000.png"),
-					bodyLen: 8,
+					bodyLen: 76, // 8 + header
 				},
 				{
 					key:     filepath.Join("myproj", "MyRac_5000000000.json"),
-					bodyLen: 8,
+					bodyLen: 853, // length of the json
+				},
+			},
+		},
+		{
+			"Doesn't uploads image when told not to",
+			args{
+				project:     "myproj",
+				writeImages: false,
+			},
+			common.DataRecord{
+				Origin: common.OriginDescription{Name: "MyRac.rac"},
+				Data: aez.CCDImage{
+					PackData: aez.CCDImagePackData{
+						EXPTS: 5,
+						JPEGQ: aez.JPEGQUncompressed16bit,
+						NCOL:  1,
+						NROW:  2,
+					},
+				},
+				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
+			},
+			[]upload{},
+		},
+		{
+			"Doesn't uploads errors",
+			args{
+				project:     "myproj",
+				writeImages: true,
+			},
+			common.DataRecord{
+				Origin: common.OriginDescription{Name: "MyRac.rac"},
+				Data: aez.CCDImage{
+					PackData: aez.CCDImagePackData{
+						EXPTS: 5,
+						JPEGQ: aez.JPEGQUncompressed16bit,
+						NCOL:  1,
+						NROW:  2,
+					},
+				},
+				Error:  errors.New("here be dragons"),
+				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
+			},
+			[]upload{},
+		},
+		{
+			"Uploads everything",
+			args{
+				project:             "myproj",
+				descriptionFileName: "info.json",
+				descriptionFileBody: []byte("[42,42]"),
+				writeImages:         true,
+			},
+			common.DataRecord{
+				Origin: common.OriginDescription{Name: "MyRac.rac"},
+				Data: aez.CCDImage{
+					PackData: aez.CCDImagePackData{
+						EXPTS: 5,
+						JPEGQ: aez.JPEGQUncompressed16bit,
+						NCOL:  1,
+						NROW:  2,
+					},
+				},
+				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
+			},
+			[]upload{
+				{
+					key:     filepath.Join("myproj", "ABOUT.json"),
+					bodyLen: 7,
+				},
+				{
+					key:     filepath.Join("myproj", "MyRac_5000000000.png"),
+					bodyLen: 76, // 8 + header
+				},
+				{
+					key:     filepath.Join("myproj", "MyRac_5000000000.json"),
+					bodyLen: 853, // length of the json
 				},
 			},
 		},
@@ -98,8 +173,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			var idxUp = 0
 
 			var uploader = func(uploader *s3manager.Uploader, key string, bodyBuffer io.Reader) {
-				var buf []byte
-				bodyBuffer.Read(buf)
+				buf, _ := ioutil.ReadAll(bodyBuffer)
 				if idxUp >= len(tt.uploads) {
 					t.Errorf(
 						"Got unexpected upload #%v, key '%v', body %v",
@@ -112,12 +186,8 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					if key != upload.key {
 						t.Errorf("Upload %v: key = %v, want %v ", idxUp, key, upload.key)
 					}
-					if upload.bodyLen > 0 {
-						if upload.bodyLen != len(buf) {
-							t.Errorf("Upload %v: len(buf) = %v, want %v ", idxUp, len(buf), upload.bodyLen)
-						}
-					} else if reflect.DeepEqual(buf, upload.body) {
-						t.Errorf("Upload %v: buf = %v, want %v ", idxUp, buf, upload.body)
+					if upload.bodyLen != len(buf) {
+						t.Errorf("Upload %v: len(buf) = %v, want %v ", idxUp, len(buf), upload.bodyLen)
 					}
 				}
 
