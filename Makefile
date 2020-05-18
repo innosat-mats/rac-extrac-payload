@@ -4,12 +4,16 @@ GOCMD := go
 GOBUILD := $(GOCMD) build
 GOCLEAN := $(GOCMD) clean
 GOTEST := $(GOCMD) test
-GOGET := $(GOCMD) get
+GOVET := ${GOCMD} vet
+GOLINT := golint
 GOINSTALL := $(GOCMD) install
 
-all: build test install
+all: build lint test install
 build:
 	$(GOBUILD) -ldflags='-extldflags=-static' ./...
+lint:
+		${GOVET} ./...
+		${GOLINT} ./...
 test:
 	$(GOTEST) -ldflags='-extldflags=-static' ./...
 install:
