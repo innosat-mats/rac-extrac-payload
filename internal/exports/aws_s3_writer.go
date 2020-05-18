@@ -79,10 +79,12 @@ func AWSS3CallbackFactory(
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
 				}
-				img, imgFileName := ccdImage.Image(pkg.Buffer, project, pkg.Origin.Name)
 
 				wg.Add(1)
 				go func() {
+					defer wg.Done()
+
+					img, imgFileName := ccdImage.Image(pkg.Buffer, project, pkg.Origin.Name)
 					pngBuffer := bytes.NewBuffer([]byte{})
 					png.Encode(pngBuffer, img)
 					upload(uploader, imgFileName, pngBuffer)
@@ -91,8 +93,6 @@ func AWSS3CallbackFactory(
 					jsonBuffer := bytes.NewBuffer([]byte{})
 					WriteJSON(jsonBuffer, &pkg, jsonFileName)
 					upload(uploader, jsonFileName, jsonBuffer)
-
-					wg.Done()
 				}()
 			}
 		}
