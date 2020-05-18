@@ -1,9 +1,13 @@
 package decodejpeg
 
-// #cgo windows CFLAGS: -I${SRCDIR}/windows/include
-// #cgo windows LDFLAGS: ${SRCDIR}/windows/lib/libjpeg.a
-// #cgo linux CFLAGS: -I${SRCDIR}/linux/include
-// #cgo linux LDFLAGS: ${SRCDIR}/linux/lib/libjpeg.a
+//-L/opt/local/SDK/MacOSX10.15.sdk/usr/lib/ -Wl,-rpath,$ORIGIN/lib
+
+// #cgo windows CFLAGS: -I${SRCDIR}/../../third-party/windows/include
+// #cgo windows LDFLAGS: -L${SRCDIR}/../../third-party/windows/lib -Wl,-rpath,$ORIGIN/../lib -ljpeg
+// #cgo linux CFLAGS: -I${SRCDIR}/../../third-party/linux/include
+// #cgo linux LDFLAGS: -L${SRCDIR}/../../third-party/linux/lib -Wl,-rpath,$ORIGIN/../lib -ljpeg
+// #cgo darwin CFLAGS: -I${SRCDIR}/../../third-party/darwin/include
+// #cgo darwin LDFLAGS: -L/${SRCDIR}/../../third-party/darwin/lib -Wl,-rpath,$ORIGIN/../lib -ljpeg
 // #include <stdlib.h>
 // #include "decode.h"
 import "C"

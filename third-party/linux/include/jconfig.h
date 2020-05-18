@@ -47,7 +47,7 @@ typedef unsigned char boolean;
 #undef BMP_SUPPORTED		/* BMP image file format */
 #define GIF_SUPPORTED		/* GIF image file format */
 #define PPM_SUPPORTED		/* PBMPLUS PPM/PGM image file format */
-#undef RLE_SUPPORTED 
+#undef RLE_SUPPORTED
 #undef TARGA_SUPPORTED		/* Targa image file format */
 
 /* #undef TWO_FILE_COMMANDLINE */
