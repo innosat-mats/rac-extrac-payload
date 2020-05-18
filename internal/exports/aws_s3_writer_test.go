@@ -81,7 +81,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 		},
 		{
-			"Doesn't uploads image when told not to",
+			"Doesn't upload image when told not to",
 			args{
 				project:     "myproj",
 				writeImages: false,
@@ -101,7 +101,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			map[string]int{},
 		},
 		{
-			"Doesn't uploads errors",
+			"Doesn't upload errors",
 			args{
 				project:     "myproj",
 				writeImages: true,

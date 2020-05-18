@@ -51,7 +51,7 @@ func getCallback(
 ) (common.Callback, common.CallbackTeardown, error) {
 	if project == "" && !toStdout {
 		flag.Usage()
-		fmt.Println("\nExpected an project")
+		fmt.Println("\nExpected a project")
 		return nil, nil, errors.New("Invalid arguments")
 	}
 	if skipTimeseries && (skipImages || toStdout) {
