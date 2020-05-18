@@ -1,7 +1,5 @@
 package decodejpeg
 
-//-L/opt/local/SDK/MacOSX10.15.sdk/usr/lib/ -Wl,-rpath,$ORIGIN/lib
-
 // #cgo windows CFLAGS: -I${SRCDIR}/../../third-party/windows/include
 // #cgo windows LDFLAGS: -L${SRCDIR}/../../third-party/windows/lib -Wl,-rpath,$ORIGIN/../lib -ljpeg
 // #cgo linux CFLAGS: -I${SRCDIR}/../../third-party/linux/include
