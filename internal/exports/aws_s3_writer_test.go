@@ -36,9 +36,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileBody: []byte("Hello"),
 			},
 			common.DataRecord{},
-			map[string]int{
-				filepath.Join("myproj", "ABOUT.txt"): 5,
-			},
+			map[string]int{"myproj/ABOUT.txt": 5},
 		},
 		{
 			"Uploads description file without project",
@@ -78,12 +76,12 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			},
 			map[string]int{
-				filepath.Join("myproj", "MyRac_5000000000.png"):  76,  // 8 + header
-				filepath.Join("myproj", "MyRac_5000000000.json"): 853, // length of the json
+				"myproj/MyRac_5000000000.png":  76,  // 8 + header
+				"myproj/MyRac_5000000000.json": 853, // length of the json
 			},
 		},
 		{
-			"Doesn't uploads image when told not to",
+			"Doesn't upload image when told not to",
 			args{
 				project:     "myproj",
 				writeImages: false,
@@ -103,7 +101,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			map[string]int{},
 		},
 		{
-			"Doesn't uploads errors",
+			"Doesn't upload errors",
 			args{
 				project:     "myproj",
 				writeImages: true,
@@ -144,9 +142,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			},
 			map[string]int{
-				filepath.Join("myproj", "ABOUT.json"):            7,
-				filepath.Join("myproj", "MyRac_5000000000.png"):  76,  // 8 + header
-				filepath.Join("myproj", "MyRac_5000000000.json"): 853, // length of the json
+				"myproj/ABOUT.json":            7,
+				"myproj/MyRac_5000000000.png":  76,  // 8 + header
+				"myproj/MyRac_5000000000.json": 853, // length of the json
 			},
 		},
 	}

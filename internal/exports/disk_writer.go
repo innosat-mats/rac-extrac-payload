@@ -85,11 +85,12 @@ func DiskCallbackFactory(
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
 				}
-				img, imgFileName := ccdImage.Image(pkg.Buffer, output, pkg.Origin.Name)
 
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
+
+					img, imgFileName := ccdImage.Image(pkg.Buffer, output, pkg.Origin.Name)
 					imgFile, err := os.Create(imgFileName)
 					if err != nil {
 						log.Printf("failed creating %s: %s", imgFileName, err)
@@ -97,16 +98,17 @@ func DiskCallbackFactory(
 					}
 					defer imgFile.Close()
 					png.Encode(imgFile, img)
+
+					jsonFileName := GetJSONFilename(imgFileName)
+					jsonFile, err := os.Create(jsonFileName)
+					defer jsonFile.Close()
+					if err != nil {
+						log.Printf("failed creating %s: %s", jsonFileName, err)
+						panic(err.Error())
+					}
+					WriteJSON(jsonFile, &pkg, jsonFileName)
 				}()
 
-				jsonFileName := GetJSONFilename(imgFileName)
-				jsonFile, err := os.Create(jsonFileName)
-				defer jsonFile.Close()
-				if err != nil {
-					log.Printf("failed creating %s: %s", jsonFileName, err)
-					panic(err.Error())
-				}
-				WriteJSON(jsonFile, &pkg, jsonFileName)
 			}
 		}
 
