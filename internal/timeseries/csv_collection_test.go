@@ -35,7 +35,7 @@ func TestCSVCollection_Write(t *testing.T) {
 			[]common.DataRecord{{}},
 			false,
 			0,
-			[]OutStream{Unknown},
+			[]OutStream{},
 		},
 		{
 			"CCDImage -> CCD",
@@ -79,13 +79,16 @@ func TestCSVCollection_Write(t *testing.T) {
 			}
 			for _, stream := range tt.openStreams {
 				_, ok := col.streams[stream]
-				if !ok && stream != Unknown {
+				if !ok {
 					t.Errorf(
 						"CSVCollection.Write() caused %v streams, expected %v open",
 						openStreams,
 						stream.String(),
 					)
 				}
+			}
+			if len(openStreams) != len(tt.openStreams) {
+				t.Errorf("CSVCollection has %v streams open, want %v", openStreams, tt.openStreams)
 			}
 			col.CloseAll()
 			if lines := strings.Count(string(buf.Bytes()), "\n"); lines != tt.wantLines {
