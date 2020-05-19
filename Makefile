@@ -1,11 +1,12 @@
 # Go parameters
 GOPATH ?= $(HOME)/go
+GOBIN ?= $(GOPATH)/bin
 GOCMD := go
 GOBUILD := $(GOCMD) build
 GOCLEAN := $(GOCMD) clean
 GOTEST := $(GOCMD) test
 GOVET := ${GOCMD} vet
-GOLINT := golint
+GOLINT := $(GOBIN)/golint
 GOINSTALL := $(GOCMD) install
 
 all: build lint test install
