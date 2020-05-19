@@ -143,23 +143,29 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages:         true,
 				writeTimeseries:     true,
 			},
-			[]common.DataRecord{{
-				Origin: common.OriginDescription{Name: "MyRac.rac"},
-				Data: aez.CCDImage{
-					PackData: aez.CCDImagePackData{
-						EXPTS: 5,
-						JPEGQ: aez.JPEGQUncompressed16bit,
-						NCOL:  1,
-						NROW:  2,
+			[]common.DataRecord{
+				{
+					Origin: common.OriginDescription{Name: "MyRac.rac"},
+					Data: aez.CCDImage{
+						PackData: aez.CCDImagePackData{
+							EXPTS: 5,
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  1,
+							NROW:  2,
+						},
 					},
+					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 				},
-				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
-			}},
+				{
+					Data: aez.HTR{},
+				},
+			},
 			map[string]int{
 				"myproj/ABOUT.json":            7,
 				"myproj/MyRac_5000000000.png":  76,  // 8 + header
 				"myproj/MyRac_5000000000.json": 853, // length of the json
 				"myproj/CCD.csv":               649, // length of the first three lines csv (specs, header, datarow)
+				"myproj/HTR.csv":               975,
 			},
 		},
 	}
