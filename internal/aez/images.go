@@ -1,4 +1,4 @@
-package exports
+package aez
 
 import (
 	"bytes"
@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/decodejpeg"
 )
 
@@ -50,22 +49,23 @@ func getGrayscaleImage(
 	return img
 }
 
-func getGrayscaleImageName(dir string, originName string, imgPackData aez.CCDImagePackData) string {
+func getGrayscaleImageName(dir string, originName string, imgPackData CCDImagePackData) string {
 	racName := strings.TrimSuffix(filepath.Base(originName), filepath.Ext(originName))
-	return filepath.Join(
-		dir,
-		fmt.Sprintf("%v_%v.png", racName, imgPackData.Nanoseconds()),
-	)
+	fileName := fmt.Sprintf("%v_%v.png", racName, imgPackData.Nanoseconds())
+	if dir == "" {
+		return fileName
+	}
+	return filepath.Join(dir, fileName)
 }
 
 func getImageData(
 	buf []byte,
-	packData aez.CCDImagePackData,
+	packData CCDImagePackData,
 	outFileName string,
 ) []uint16 {
 	var imgData []uint16
 	var err error
-	if packData.JPEGQ != aez.JPEGQUncompressed16bit {
+	if packData.JPEGQ != JPEGQUncompressed16bit {
 		var height int
 		var width int
 		imgData, height, width, err = decodejpeg.JpegImageData(buf)
@@ -73,12 +73,12 @@ func getImageData(
 			log.Print(err)
 			return imgData
 		}
-		if uint16(height) != packData.NROW || uint16(width) != packData.NCOL+aez.NCOLStartOffset {
+		if uint16(height) != packData.NROW || uint16(width) != packData.NCOL+NCOLStartOffset {
 			log.Printf(
 				"Compressed CCDImage %v has either width %v != %v and/or height %v != %v\n",
 				outFileName,
 				width,
-				packData.NCOL+aez.NCOLStartOffset,
+				packData.NCOL+NCOLStartOffset,
 				height,
 				packData.NROW,
 			)
@@ -86,7 +86,7 @@ func getImageData(
 	} else {
 		reader := bytes.NewReader(buf)
 		imgData = make([]uint16, reader.Len()/2)
-		width, height := int(packData.NCOL+aez.NCOLStartOffset), int(packData.NROW)
+		width, height := int(packData.NCOL+NCOLStartOffset), int(packData.NROW)
 		if len(imgData) != width*height {
 			log.Printf(
 				"Raw CCDImage %v has %v pixels, but dimensions %v x %v\n",
