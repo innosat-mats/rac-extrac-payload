@@ -2,7 +2,6 @@ package exports
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"image/png"
 	"log"
@@ -82,25 +81,12 @@ func DiskCallbackFactory(
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
 				}
-				imgFileName := getGrayscaleImageName(output, pkg.Origin.Name, ccdImage.PackData)
-
-				imgData := getImageData(
-					pkg.Buffer,
-					ccdImage.PackData,
-					imgFileName,
-				)
-				_, shift, _ := ccdImage.PackData.WDW.InputDataWindow()
-				img := getGrayscaleImage(
-					imgData,
-					int(ccdImage.PackData.NCOL+aez.NCOLStartOffset),
-					int(ccdImage.PackData.NROW),
-					shift,
-					imgFileName,
-				)
 
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
+
+					img, imgFileName := ccdImage.Image(pkg.Buffer, output, pkg.Origin.Name)
 					imgFile, err := os.Create(imgFileName)
 					if err != nil {
 						log.Printf("failed creating %s: %s", imgFileName, err)
@@ -108,23 +94,17 @@ func DiskCallbackFactory(
 					}
 					defer imgFile.Close()
 					png.Encode(imgFile, img)
+
+					jsonFileName := GetJSONFilename(imgFileName)
+					jsonFile, err := os.Create(jsonFileName)
+					defer jsonFile.Close()
+					if err != nil {
+						log.Printf("failed creating %s: %s", jsonFileName, err)
+						panic(err.Error())
+					}
+					WriteJSON(jsonFile, &pkg, jsonFileName)
 				}()
 
-				ext := filepath.Ext(imgFileName)
-				jsonFileName := fmt.Sprintf(
-					"%v.json",
-					imgFileName[0:len(imgFileName)-len(ext)],
-				)
-				jsonFile, err := os.Create(jsonFileName)
-				defer jsonFile.Close()
-				if err != nil {
-					log.Printf("failed creating %s: %s", jsonFileName, err)
-					panic(err.Error())
-				}
-				err = json.NewEncoder(jsonFile).Encode(&pkg)
-				if err != nil {
-					log.Printf("failed to encode json into %s", jsonFileName)
-				}
 			}
 		}
 

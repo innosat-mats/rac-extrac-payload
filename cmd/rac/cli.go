@@ -16,8 +16,10 @@ import (
 
 var skipImages *bool
 var skipTimeseries *bool
-var outputDirectory *string
+var project *string
 var stdout *bool
+var aws *bool
+var awsDescription *string
 
 //myUsage replaces default usage since it doesn't include information on non-flags
 func myUsage() {
@@ -39,27 +41,39 @@ or if you want the Buffer contents which can be rather large if you are unlucky:
 }
 
 func getCallback(
-	stdout bool,
-	outputDirectory string,
+	toStdout bool,
+	toAws bool,
+	project string,
 	skipImages bool,
 	skipTimeseries bool,
+	awsDescription string,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown, error) {
-	if outputDirectory == "" && !stdout {
+	if project == "" && !toStdout {
 		flag.Usage()
-		fmt.Println("\nExpected an output directory")
+		fmt.Println("\nExpected a project")
 		return nil, nil, errors.New("Invalid arguments")
 	}
-	if skipTimeseries && (skipImages || stdout) {
+	if skipTimeseries && (skipImages || toStdout) {
 		fmt.Println("Nothing will be extracted, only validating integrity of rac-file(s)")
 	}
 
-	if stdout {
+	if toStdout {
 		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
+		return callback, teardown, nil
+	} else if toAws {
+		callback, teardown := exports.AWSS3CallbackFactory(
+			exports.AWSUpload,
+			project,
+			awsDescription,
+			!skipImages,
+			!skipTimeseries,
+			wg,
+		)
 		return callback, teardown, nil
 	}
 	callback, teardown := exports.DiskCallbackFactory(
-		outputDirectory,
+		project,
 		!skipImages,
 		!skipTimeseries,
 		wg,
@@ -95,8 +109,10 @@ func processFiles(
 func init() {
 	skipImages = flag.Bool("skip-images", false, "Extract images from rac-files.\n(Default: false)")
 	skipTimeseries = flag.Bool("skip-timeseries", false, "Extract timeseries from rac-files.\n(Default: false)")
-	outputDirectory = flag.String("output", "", "Directory to place images and/or timeseries data")
+	project = flag.String("project", "", "Name for experiments, when outputting to disk a directory will be created with this name, when sending to AWS files will have this as a prefix")
 	stdout = flag.Bool("stdout", false, "Output to standard out instead of to disk (only timeseries)\n(Default: false)")
+	aws = flag.Bool("aws", false, "Output to aws instead of disk (requires credentials and permissions)")
+	awsDescription = flag.String("description", "", "Path to a file containing a project description to be uploaded to AWS")
 	flag.Usage = myUsage
 }
 
@@ -108,7 +124,15 @@ func main() {
 		flag.Usage()
 		log.Fatal("No rac-files supplied")
 	}
-	callback, teardown, err := getCallback(*stdout, *outputDirectory, *skipImages, *skipTimeseries, &wg)
+	callback, teardown, err := getCallback(
+		*stdout,
+		*aws,
+		*project,
+		*skipImages,
+		*skipTimeseries,
+		*awsDescription,
+		&wg,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
