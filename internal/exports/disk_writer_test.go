@@ -73,11 +73,11 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_STAT.csv", 4, false},
+				{"STAT.csv", 4, false},
 			},
 		},
 		{
-			"Swaps file if different origin",
+			"Adds from all racs into same file",
 			args{writeTimeseries: true},
 			[]common.DataRecord{
 				{
@@ -90,8 +90,7 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_STAT.csv", 3, false},
-				{"File2_STAT.csv", 3, false},
+				{"STAT.csv", 4, false},
 			},
 		},
 		{
@@ -152,78 +151,12 @@ func TestDiskCallbackFactory(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_STAT.csv", 3, false},
-				{"File1_CPRU.csv", 4, false},
-				{"File1_HTR.csv", 4, false},
-				{"File1_PWR.csv", 4, false},
-				{"File1_PM.csv", 4, false},
-				{"File1_TCV.csv", 6, false},
-			},
-		},
-		{
-			"Swaps out the other files",
-			args{writeTimeseries: true},
-			[]common.DataRecord{
-				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.CPRU{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.CPRU{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.HTR{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.HTR{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.PWR{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.PWR{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.PMData{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.PMData{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptSuccessData{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.TCExecSuccessData{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptFailureData{},
-				},
-				{
-					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.TCExecFailureData{},
-				},
-			},
-			[]wantFile{
-				{"File1_CPRU.csv", 3, false},
-				{"File1_HTR.csv", 3, false},
-				{"File1_PWR.csv", 3, false},
-				{"File1_PM.csv", 3, false},
-				{"File1_TCV.csv", 3, false},
-				{"File2_CPRU.csv", 3, false},
-				{"File2_HTR.csv", 3, false},
-				{"File2_PWR.csv", 3, false},
-				{"File2_PM.csv", 3, false},
-				{"File2_TCV.csv", 3, false},
+				{"STAT.csv", 3, false},
+				{"CPRU.csv", 4, false},
+				{"HTR.csv", 4, false},
+				{"PWR.csv", 4, false},
+				{"PM.csv", 4, false},
+				{"TCV.csv", 6, false},
 			},
 		},
 		{

@@ -6,6 +6,7 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 )
 
+// CSVFactory is a function that creates CSVWriters
 type CSVFactory func(pkg *common.DataRecord, stream OutStream) (CSVWriter, error)
 
 // CSVCollection hold all active csv writers
@@ -14,6 +15,7 @@ type CSVCollection struct {
 	factory CSVFactory
 }
 
+// NewCollection returns a novel ready to use CSVCollection
 func NewCollection(factory CSVFactory) CSVCollection {
 	return CSVCollection{factory: factory, streams: make(map[OutStream]CSVWriter)}
 }
@@ -44,7 +46,6 @@ func (collection *CSVCollection) Write(pkg *common.DataRecord) error {
 			if err != nil {
 				return err
 			}
-
 		}
 		collection.streams[stream] = writer
 	}
