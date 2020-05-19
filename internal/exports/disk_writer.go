@@ -18,7 +18,7 @@ func csvName(dir string, packetType string) string {
 	return filepath.Join(dir, name)
 }
 
-func csvFileWriterFactoryFactory(
+func csvFileWriterFactoryCreator(
 	dir string,
 ) timeseries.CSVFactory {
 	return func(pkg *common.DataRecord, stream timeseries.OutStream) (timeseries.CSVWriter, error) {
@@ -40,7 +40,7 @@ func DiskCallbackFactory(
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown) {
 	var err error
-	timeseriesCollection := timeseries.NewCollection(csvFileWriterFactoryFactory(output))
+	timeseriesCollection := timeseries.NewCollection(csvFileWriterFactoryCreator(output))
 
 	if writeImages || writeTimeseries {
 		// Create Directory and File

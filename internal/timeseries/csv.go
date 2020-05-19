@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 )
 
 //CSV gives easy access for csv writing
@@ -38,6 +40,11 @@ func (csv *CSV) Close() {
 		f, ok := csv.writer.(*os.File)
 		if ok {
 			f.Close()
+		}
+	case *awstools.Timeseries:
+		writer, ok := csv.writer.(*awstools.Timeseries)
+		if ok {
+			writer.Close()
 		}
 	}
 }

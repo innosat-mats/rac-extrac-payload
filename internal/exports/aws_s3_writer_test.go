@@ -9,9 +9,12 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/timeseries"
 )
 
 func TestAWSS3CallbackFactory(t *testing.T) {
@@ -25,7 +28,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		record  common.DataRecord
+		records []common.DataRecord
 		uploads map[string]int
 	}{
 		{
@@ -35,7 +38,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileName: "myfile.txt",
 				descriptionFileBody: []byte("Hello"),
 			},
-			common.DataRecord{},
+			[]common.DataRecord{{}},
 			map[string]int{"myproj/ABOUT.txt": 5},
 		},
 		{
@@ -45,7 +48,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileName: "myfile.md",
 				descriptionFileBody: []byte("Hello"),
 			},
-			common.DataRecord{},
+			[]common.DataRecord{{}},
 			map[string]int{"ABOUT.md": 5},
 		},
 		{
@@ -54,7 +57,17 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				project:             "myproj",
 				descriptionFileName: "",
 			},
-			common.DataRecord{},
+			[]common.DataRecord{{}},
+			map[string]int{},
+		},
+		{
+			"Doesn't upload timeseries for no data",
+			args{
+				project:             "myproj",
+				descriptionFileName: "",
+				writeTimeseries:     true,
+			},
+			[]common.DataRecord{{}},
 			map[string]int{},
 		},
 		{
@@ -63,7 +76,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				project:     "myproj",
 				writeImages: true,
 			},
-			common.DataRecord{
+			[]common.DataRecord{{
 				Origin: common.OriginDescription{Name: "MyRac.rac"},
 				Data: aez.CCDImage{
 					PackData: aez.CCDImagePackData{
@@ -74,7 +87,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					},
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
-			},
+			}},
 			map[string]int{
 				"myproj/MyRac_5000000000.png":  76,  // 8 + header
 				"myproj/MyRac_5000000000.json": 853, // length of the json
@@ -86,7 +99,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				project:     "myproj",
 				writeImages: false,
 			},
-			common.DataRecord{
+			[]common.DataRecord{{
 				Origin: common.OriginDescription{Name: "MyRac.rac"},
 				Data: aez.CCDImage{
 					PackData: aez.CCDImagePackData{
@@ -97,7 +110,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					},
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
-			},
+			}},
 			map[string]int{},
 		},
 		{
@@ -106,7 +119,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				project:     "myproj",
 				writeImages: true,
 			},
-			common.DataRecord{
+			[]common.DataRecord{{
 				Origin: common.OriginDescription{Name: "MyRac.rac"},
 				Data: aez.CCDImage{
 					PackData: aez.CCDImagePackData{
@@ -118,7 +131,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				},
 				Error:  errors.New("here be dragons"),
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
-			},
+			}},
 			map[string]int{},
 		},
 		{
@@ -128,8 +141,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				descriptionFileName: "info.json",
 				descriptionFileBody: []byte("[42,42]"),
 				writeImages:         true,
+				writeTimeseries:     true,
 			},
-			common.DataRecord{
+			[]common.DataRecord{{
 				Origin: common.OriginDescription{Name: "MyRac.rac"},
 				Data: aez.CCDImage{
 					PackData: aez.CCDImagePackData{
@@ -140,11 +154,12 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					},
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
-			},
+			}},
 			map[string]int{
 				"myproj/ABOUT.json":            7,
 				"myproj/MyRac_5000000000.png":  76,  // 8 + header
 				"myproj/MyRac_5000000000.json": 853, // length of the json
+				"myproj/CCD.csv":               649, // length of the first three lines csv (specs, header, datarow)
 			},
 		},
 	}
@@ -214,12 +229,36 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				&wg,
 			)
 
-			callback(tt.record)
+			for _, record := range tt.records {
+				callback(record)
+			}
 			teardown()
 
 			if idxUp < len(tt.uploads) {
 				t.Errorf("Recorded %v uploads, want %v", idxUp, len(tt.uploads))
 			}
 		})
+	}
+}
+
+func Test_csvAWSWriterFactoryCreator(t *testing.T) {
+	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("localhost")}))
+	upload := s3manager.NewUploader(sess)
+	uploads := make(map[string]int)
+
+	var uploader = func(uploader *s3manager.Uploader, key string, bodyBuffer io.Reader) {
+		buf, _ := ioutil.ReadAll(bodyBuffer)
+		uploads[key] = len(buf)
+	}
+	factory := csvAWSWriterFactoryCreator(uploader, upload, "myproject")
+	writer, err := factory(&common.DataRecord{Data: aez.HTR{}}, timeseries.HTR)
+	if err != nil {
+		t.Errorf("csvAWSWriterFactoryCreator()'s factory returned error %v", err)
+	}
+	writer.Close()
+	want := "myproject/HTR.csv"
+	_, ok := uploads[want]
+	if !ok {
+		t.Errorf("csvAWSWriterFactoryCreator()'s factory produced uploads %v, want key %v", uploads, want)
 	}
 }

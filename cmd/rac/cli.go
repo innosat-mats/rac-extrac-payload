@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 	"github.com/innosat-mats/rac-extract-payload/internal/extractors"
@@ -63,7 +64,7 @@ func getCallback(
 		return callback, teardown, nil
 	} else if toAws {
 		callback, teardown := exports.AWSS3CallbackFactory(
-			exports.AWSUpload,
+			awstools.AWSUpload,
 			project,
 			awsDescription,
 			!skipImages,

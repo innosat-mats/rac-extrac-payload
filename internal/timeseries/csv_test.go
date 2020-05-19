@@ -2,10 +2,16 @@ package timeseries
 
 import (
 	"encoding/csv"
+	"io"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 )
 
 func getTestFile() (*CSV, *os.File, error) {
@@ -17,7 +23,7 @@ func getTestFile() (*CSV, *os.File, error) {
 
 }
 
-func Test_CSV_Close(t *testing.T) {
+func Test_CSV_Close_WithFile(t *testing.T) {
 	csv, file, err := getTestFile()
 	defer os.Remove(file.Name())
 	if err != nil {
@@ -28,6 +34,24 @@ func Test_CSV_Close(t *testing.T) {
 	_, err = file.Read(buf)
 	if err == nil {
 		t.Error("CSV.Close(), didn't Close file")
+	}
+}
+func Test_CSV_Close_Timeseries(t *testing.T) {
+	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("localhost")}))
+	upload := s3manager.NewUploader(sess)
+	var idxUp = 0
+	var uploader = func(uploader *s3manager.Uploader, key string, bodyBuffer io.Reader) {
+		idxUp++
+	}
+	key := "test"
+	ts := awstools.NewTimeseries(uploader, upload, key)
+	csv := NewCSV(ts, key)
+	if idxUp != 0 {
+		t.Errorf("Expected 0 uploads before CSV.Close(), found %v", idxUp)
+	}
+	csv.Close()
+	if idxUp != 1 {
+		t.Errorf("Expected 1 upload after CSV.Close(), found %v", idxUp)
 	}
 }
 
