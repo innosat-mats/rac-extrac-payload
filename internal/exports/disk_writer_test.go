@@ -15,7 +15,6 @@ import (
 func Test_csvName(t *testing.T) {
 	type args struct {
 		dir        string
-		originName string
 		packetType string
 	}
 	tests := []struct {
@@ -23,12 +22,12 @@ func Test_csvName(t *testing.T) {
 		args args
 		want string
 	}{
-		{"Case 1", args{".", "somefile.rac", "TEST"}, "somefile_TEST.csv"},
-		{"Case 2", args{"my/dir", "somefile", "TEST"}, filepath.FromSlash("my/dir/somefile_TEST.csv")},
+		{"Case 1", args{".", "TEST"}, "TEST.csv"},
+		{"Case 2", args{"my/dir", "TEST"}, filepath.FromSlash("my/dir/TEST.csv")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := csvName(tt.args.dir, tt.args.originName, tt.args.packetType); got != tt.want {
+			if got := csvName(tt.args.dir, tt.args.packetType); got != tt.want {
 				t.Errorf("csvName() = %v, want %v", got, tt.want)
 			}
 		})
