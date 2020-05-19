@@ -1,0 +1,32 @@
+diff --git a/jconfig.h b/jconfig.h
+index 2d05a3b..f4e5c17 100644
+--- a/jconfig.h
++++ b/jconfig.h
+@@ -44,11 +44,11 @@ typedef unsigned char boolean;
+ 
+ #ifdef JPEG_CJPEG_DJPEG
+ 
+-#define BMP_SUPPORTED		/* BMP image file format */
++#undef BMP_SUPPORTED		/* BMP image file format */
+ #define GIF_SUPPORTED		/* GIF image file format */
+ #define PPM_SUPPORTED		/* PBMPLUS PPM/PGM image file format */
+-/* #undef RLE_SUPPORTED */
+-#define TARGA_SUPPORTED		/* Targa image file format */
++#undef RLE_SUPPORTED
++#undef TARGA_SUPPORTED		/* Targa image file format */
+ 
+ /* #undef TWO_FILE_COMMANDLINE */
+ /* #undef NEED_SIGNAL_CATCHER */
+diff --git a/jmorecfg.h b/jmorecfg.h
+index 679d68b..c8a7874 100644
+--- a/jmorecfg.h
++++ b/jmorecfg.h
+@@ -30,7 +30,7 @@
+  * in all cases (see below).
+  */
+ 
+-#define BITS_IN_JSAMPLE  8	/* use 8, 9, 10, 11, or 12 */
++#define BITS_IN_JSAMPLE  12	/* use 8, 9, 10, 11, or 12 */
+ 
+ 
+ /*

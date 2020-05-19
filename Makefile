@@ -1,18 +1,24 @@
 # Go parameters
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
-GOINSTALL=$(GOCMD) install
+GOPATH ?= $(HOME)/go
+GOBIN ?= $(GOPATH)/bin
+GOCMD := go
+GOBUILD := $(GOCMD) build
+GOCLEAN := $(GOCMD) clean
+GOTEST := $(GOCMD) test
+GOVET := ${GOCMD} vet
+GOLINT := $(GOBIN)/golint
+GOINSTALL := $(GOCMD) install
 
-
-all: build test install
+all: build lint test install
 build:
-		$(GOBUILD) ./...
+	$(GOBUILD) -ldflags='-extldflags=-static' ./...
+lint:
+	${GOVET} ./...
+	${GOLINT} ./...
 test:
-		$(GOTEST) ./...
+	$(GOTEST) -ldflags='-extldflags=-static' ./...
 install:
-		$(GOINSTALL) -i ./...
+	$(GOINSTALL) -i -ldflags='-extldflags=-static' ./...
 clean:
-		$(GOCLEAN) -i -cache ./...
+	$(GOCLEAN) -i -cache ./...
+
