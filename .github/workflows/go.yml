@@ -16,12 +16,6 @@ jobs:
         go-version: 1.14
       id: go
 
-    - name: setup env
-      run: |
-        echo "::set-env name=GOPATH::$(go env GOPATH)"
-        echo "::add-path::$(go env GOPATH)/bin"
-        go env
-
     - name: install mingw
       run : sudo apt-get install -y gcc-mingw-w64
 
@@ -42,10 +36,7 @@ jobs:
       run: make build
 
     - name: Lint
-      run: |
-        go install golang.org/x/lint/golint
-        go vet ./...
-        golint ./...
+      run: make lint
 
     - name: Test
       run: make test
