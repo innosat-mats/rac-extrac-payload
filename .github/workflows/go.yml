@@ -15,14 +15,20 @@ jobs:
       with:
         go-version: 1.14
       id: go
-      
+
+    - name: setup env
+      run: |
+        echo "::set-env name=GOPATH::$(go env GOPATH)"
+        echo "::add-path::$(go env GOPATH)/bin"
+        go env
+
     - name: install mingw
       run : sudo apt-get install -y gcc-mingw-w64
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
       with:
-        ref: ${{ github.head_ref }} 
+        ref: ${{ github.head_ref }}
 
     - name: Get dependencies
       run: |
@@ -35,16 +41,21 @@ jobs:
     - name: Build
       run: make build
 
+    - name: Lint
+      run: |
+        go install golang.org/x/lint/golint
+        go vet ./...
+        golint ./...
+
     - name: Test
       run: make test
 
     # # TODO: wait for #https://github.com/actions/virtual-environments/issues/228
     # - name: Build windows
-    #   run: CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o rac.exe ./cmd/rac  
+    #   run: CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o rac.exe ./cmd/rac
 
-    - name: Build linux 
-      run: go build -o rac ./cmd/rac 
-
+    - name: Build linux
+      run: go build -o rac ./cmd/rac
 
     - name: binaries
       uses: actions/upload-artifact@v2
