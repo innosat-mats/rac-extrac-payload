@@ -4,42 +4,36 @@ import (
 	"bytes"
 	"fmt"
 	"image/png"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
+	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/timeseries"
 )
 
-const awsBucket = "mats-l0-artifacts"
 const awsS3Region = "eu-north-1"
 
-// AWSUpload uploads file content to target bucket
-func AWSUpload(uploader *s3manager.Uploader, key string, body io.Reader) {
-	_, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(awsBucket),
-		Key:    aws.String(strings.ReplaceAll(key, "\\", "/")),
-		Body:   body,
-	})
-	if err != nil {
-		log.Printf("Failed to upload file %v, %v", key, err)
+func csvAWSWriterFactoryCreator(
+	upload awstools.AWSUploadFunc,
+	uploader *s3manager.Uploader,
+	project string,
+) timeseries.CSVFactory {
+	return func(pkg *common.DataRecord, stream timeseries.OutStream) (timeseries.CSVWriter, error) {
+		key := fmt.Sprintf("%v/%v.csv", project, stream.String())
+		return timeseries.NewCSV(awstools.NewTimeseries(upload, uploader, key), key), nil
 	}
-
 }
-
-// AWSUploadFunc is the signature of an AWS upload function
-type AWSUploadFunc func(uploader *s3manager.Uploader, key string, body io.Reader)
 
 // AWSS3CallbackFactory generates callbacks for writing to S3 instead of disk
 func AWSS3CallbackFactory(
-	upload AWSUploadFunc,
+	upload awstools.AWSUploadFunc,
 	project string,
 	awsDescriptionPath string,
 	writeImages bool,
@@ -49,6 +43,9 @@ func AWSS3CallbackFactory(
 
 	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String(awsS3Region)}))
 	uploader := s3manager.NewUploader(sess)
+	timeseriesCollection := timeseries.NewCollection(
+		csvAWSWriterFactoryCreator(upload, uploader, project),
+	)
 
 	if awsDescriptionPath != "" {
 		awsDescription, err := os.Open(awsDescriptionPath)
@@ -96,9 +93,18 @@ func AWSS3CallbackFactory(
 				}()
 			}
 		}
+
+		if writeTimeseries && pkg.Data != nil {
+			// Write to the dedicated target stream
+			err := timeseriesCollection.Write(&pkg)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 	}
 
 	teardown := func() {
+		timeseriesCollection.CloseAll()
 		wg.Wait()
 	}
 

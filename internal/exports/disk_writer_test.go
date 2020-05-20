@@ -34,7 +34,7 @@ func Test_csvName(t *testing.T) {
 	}
 }
 
-func TestDiskCallbackFactory(t *testing.T) {
+func TestDiskCallbackFactoryCreator(t *testing.T) {
 	type args struct {
 		writeImages     bool
 		writeTimeseries bool
