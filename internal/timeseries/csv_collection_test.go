@@ -8,6 +8,7 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
 func TestNewCollection_IsReadyToUse(t *testing.T) {
@@ -19,9 +20,11 @@ func TestNewCollection_IsReadyToUse(t *testing.T) {
 	got := NewCollection(factory)
 	err := got.Write(
 		&common.DataRecord{
-			SourceHeader: &innosat.SourcePacketHeader{},
-			TMHeader:     &innosat.TMHeader{},
-			Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+			RamsesHeader:   &ramses.Ramses{},
+			RamsesTMHeader: &ramses.TMHeader{},
+			SourceHeader:   &innosat.SourcePacketHeader{},
+			TMHeader:       &innosat.TMHeader{},
+			Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
 		},
 	)
 	if err != nil {
@@ -48,9 +51,11 @@ func TestCSVCollection_Write(t *testing.T) {
 			"CCDImage -> CCD",
 			[]common.DataRecord{
 				{
-					SourceHeader: &innosat.SourcePacketHeader{},
-					TMHeader:     &innosat.TMHeader{},
-					Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
 				},
 			},
 			false,
@@ -61,14 +66,18 @@ func TestCSVCollection_Write(t *testing.T) {
 			"Writing twice adds just one more line",
 			[]common.DataRecord{
 				{
-					SourceHeader: &innosat.SourcePacketHeader{},
-					TMHeader:     &innosat.TMHeader{},
-					Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
 				},
 				{
-					SourceHeader: &innosat.SourcePacketHeader{},
-					TMHeader:     &innosat.TMHeader{},
-					Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
 				},
 			},
 			false,
@@ -79,14 +88,18 @@ func TestCSVCollection_Write(t *testing.T) {
 			"Two different streams",
 			[]common.DataRecord{
 				{
-					SourceHeader: &innosat.SourcePacketHeader{},
-					TMHeader:     &innosat.TMHeader{},
-					Data:         &aez.HTR{},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.HTR{},
 				},
 				{
-					SourceHeader: &innosat.SourcePacketHeader{},
-					TMHeader:     &innosat.TMHeader{},
-					Data:         &aez.STAT{},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.STAT{},
 				},
 			},
 			false,
