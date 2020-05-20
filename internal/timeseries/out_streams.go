@@ -55,7 +55,7 @@ func OutStreamFromDataRecord(pkg *common.DataRecord) OutStream {
 		return CCD
 	case aez.PMData:
 		return PM
-	case aez.HTR:
+	case *aez.HTR:
 		return HTR
 	case aez.PWR:
 		return PWR

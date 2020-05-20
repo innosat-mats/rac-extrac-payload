@@ -41,7 +41,7 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 			fields{
 				RamsesHeader: ramses.Ramses{Type: 4},
 				SourceHeader: innosat.SourcePacketHeader{PacketLength: 42},
-				Data:         aez.HTR{},
+				Data:         &aez.HTR{},
 			},
 			[]string{
 				"RAMSES", ramses.Specification,

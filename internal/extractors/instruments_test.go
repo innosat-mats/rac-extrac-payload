@@ -31,7 +31,7 @@ func Test_instrumentHK(t *testing.T) {
 		{
 			"HTR",
 			args{sid: aez.SIDHTR, buf: bytes.NewReader(make([]byte, 100))},
-			aez.HTR{},
+			&aez.HTR{},
 			false,
 		},
 		{

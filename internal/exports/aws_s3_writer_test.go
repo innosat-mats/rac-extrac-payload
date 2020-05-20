@@ -157,7 +157,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 				},
 				{
-					Data: aez.HTR{},
+					Data: &aez.HTR{},
 				},
 			},
 			map[string]int{
@@ -257,7 +257,7 @@ func Test_csvAWSWriterFactoryCreator(t *testing.T) {
 		uploads[key] = len(buf)
 	}
 	factory := csvAWSWriterFactoryCreator(uploader, upload, "myproject")
-	writer, err := factory(&common.DataRecord{Data: aez.HTR{}}, timeseries.HTR)
+	writer, err := factory(&common.DataRecord{Data: &aez.HTR{}}, timeseries.HTR)
 	if err != nil {
 		t.Errorf("csvAWSWriterFactoryCreator()'s factory returned error %v", err)
 	}

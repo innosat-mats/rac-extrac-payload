@@ -78,9 +78,11 @@ type HTRReport struct {
 	WARNINGS []error
 }
 
-// Read HTR
-func (htr *HTR) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, htr)
+// NewHTR reads an HTR from buffer
+func NewHTR(buf io.Reader) (*HTR, error) {
+	htr := HTR{}
+	err := binary.Read(buf, binary.LittleEndian, &htr)
+	return &htr, err
 }
 
 // Report returns a HTRReport with useful units
@@ -144,12 +146,12 @@ func (htr *HTR) Report() HTRReport {
 }
 
 //CSVHeaders returns the field names
-func (htr HTR) CSVHeaders() []string {
+func (htr *HTR) CSVHeaders() []string {
 	return csvHeader(htr.Report())
 }
 
 //CSVRow returns the field values
-func (htr HTR) CSVRow() []string {
+func (htr *HTR) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(htr.Report()))
 	values := make([]string, val.NumField())
 	t := val.Type()
@@ -174,6 +176,6 @@ func (htr HTR) CSVRow() []string {
 }
 
 //CSVSpecifications returns the specs used in creating the struct
-func (htr HTR) CSVSpecifications() []string {
+func (htr *HTR) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }

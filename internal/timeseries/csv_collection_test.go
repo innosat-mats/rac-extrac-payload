@@ -58,7 +58,7 @@ func TestCSVCollection_Write(t *testing.T) {
 		},
 		{
 			"Two different streams",
-			[]common.DataRecord{{Data: aez.HTR{}}, {Data: aez.STAT{}}},
+			[]common.DataRecord{{Data: &aez.HTR{}}, {Data: aez.STAT{}}},
 			false,
 			6, //Our simple factory puts everything in same buffer
 			[]OutStream{HTR, STAT},

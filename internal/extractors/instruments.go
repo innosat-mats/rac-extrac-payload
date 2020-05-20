@@ -18,9 +18,7 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
 		err = stat.Read(buf)
 		dataPackage = stat
 	case aez.SIDHTR:
-		htr := aez.HTR{}
-		err = htr.Read(buf)
-		dataPackage = htr
+		dataPackage, err = aez.NewHTR(buf)
 	case aez.SIDPWR:
 		pwr := aez.PWR{}
 		err = pwr.Read(buf)
