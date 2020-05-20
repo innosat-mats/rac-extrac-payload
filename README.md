@@ -1,5 +1,8 @@
 # RAC Extract Payload
 
+Download releases from:
+https://github.com/innosat-mats/rac-extract-payload/releases
+
 # How to use
 ## Writing to disk
 
@@ -13,7 +16,7 @@ The `-description` just copies the file into the output directory and renames it
 
 For more information run `rac --help`
 
-## Sending to AWS
+## Sending to AWS (avialable from v0.2.0)
 
 ### Obtaining and configuring credentials
 
