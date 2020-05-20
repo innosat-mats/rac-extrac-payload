@@ -56,8 +56,8 @@ func DiskCallbackFactory(
 		}
 		if writeImages {
 			switch pkg.Data.(type) {
-			case aez.CCDImage:
-				ccdImage, ok := pkg.Data.(aez.CCDImage)
+			case *aez.CCDImage:
+				ccdImage, ok := pkg.Data.(*aez.CCDImage)
 				if !ok {
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break

@@ -40,7 +40,7 @@ func TestOutStreamFromDataRecord(t *testing.T) {
 		args args
 		want OutStream
 	}{
-		{"CCD", args{&common.DataRecord{Data: aez.CCDImage{}}}, CCD},
+		{"CCD", args{&common.DataRecord{Data: &aez.CCDImage{}}}, CCD},
 		{"PM", args{&common.DataRecord{Data: aez.PMData{}}}, PM},
 		{"HTR", args{&common.DataRecord{Data: aez.HTR{}}}, HTR},
 		{"PWR", args{&common.DataRecord{Data: aez.PWR{}}}, PWR},

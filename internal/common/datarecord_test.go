@@ -304,7 +304,7 @@ func TestDataRecord_MarshalJSON(t *testing.T) {
 	}{
 		{"No Data, No Error", fields{}},
 		{"Error", fields{Error: io.EOF}},
-		{"Image Data", fields{Data: aez.CCDImage{}}},
+		{"Image Data", fields{Data: &aez.CCDImage{}}},
 		{"Non-image Data", fields{Data: aez.STAT{}}},
 	}
 	for _, tt := range tests {

@@ -185,14 +185,20 @@ type CCDImagePackData struct {
 	NBC     uint16  // Number of bad columns set
 }
 
-// Read CCDImagePackData from the buffer
-//
-// returns the BC (bad columns) array and the error status.
-func (ccd *CCDImagePackData) Read(buf io.Reader) ([]uint16, error) {
+// NewCCDImagePackData reads buf into CCDImagePackData
+func NewCCDImagePackData(buf io.Reader) (*CCDImagePackData, error) {
+	ccd := CCDImagePackData{}
 	err := binary.Read(buf, binary.LittleEndian, ccd)
 	if err != nil {
 		return nil, err
 	}
+	return &ccd, nil
+}
+
+// Read CCDImagePackData from the buffer
+//
+// returns the BC (bad columns) array and the error status.
+func (ccd *CCDImagePackData) Read(buf io.Reader) ([]uint16, error) {
 	badColumns := make([]uint16, ccd.NBC)
 	return badColumns, binary.Read(buf, binary.LittleEndian, &badColumns)
 }
@@ -208,7 +214,7 @@ func (ccd *CCDImagePackData) Nanoseconds() int64 {
 }
 
 // CSVHeaders returns the exportable field names
-func (ccd CCDImagePackData) CSVHeaders() []string {
+func (ccd *CCDImagePackData) CSVHeaders() []string {
 	return []string{
 		"CCDSEL",
 		"EXP Nanoseconds",
@@ -243,7 +249,7 @@ func (ccd CCDImagePackData) CSVHeaders() []string {
 }
 
 // CSVRow returns the exportable field values
-func (ccd CCDImagePackData) CSVRow() []string {
+func (ccd *CCDImagePackData) CSVRow() []string {
 	wdwhigh, wdwlow, _ := ccd.WDW.InputDataWindow()
 	return []string{
 		strconv.Itoa(int(ccd.CCDSEL)),

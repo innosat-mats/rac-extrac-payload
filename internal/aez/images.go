@@ -49,7 +49,7 @@ func getGrayscaleImage(
 	return img
 }
 
-func getGrayscaleImageName(dir string, originName string, imgPackData CCDImagePackData) string {
+func getGrayscaleImageName(dir string, originName string, imgPackData *CCDImagePackData) string {
 	racName := strings.TrimSuffix(filepath.Base(originName), filepath.Ext(originName))
 	fileName := fmt.Sprintf("%v_%v.png", racName, imgPackData.Nanoseconds())
 	if dir == "" {
@@ -60,7 +60,7 @@ func getGrayscaleImageName(dir string, originName string, imgPackData CCDImagePa
 
 func getImageData(
 	buf []byte,
-	packData CCDImagePackData,
+	packData *CCDImagePackData,
 	outFileName string,
 ) []uint16 {
 	var imgData []uint16

@@ -51,7 +51,7 @@ func (stream OutStream) String() string {
 // OutStreamFromDataRecord infers stream based on data
 func OutStreamFromDataRecord(pkg *common.DataRecord) OutStream {
 	switch pkg.Data.(type) {
-	case aez.CCDImage:
+	case *aez.CCDImage:
 		return CCD
 	case aez.PMData:
 		return PM

@@ -4,13 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"image"
+	"io"
 	"time"
 )
 
 // CCDImage is a container for the invariant CCDImagePackData header and the variable BadColumns that follow
 type CCDImage struct {
-	PackData   CCDImagePackData
+	PackData   *CCDImagePackData
 	BadColumns []uint16
+}
+
+// NewCCDImage reads buf into a complete CCDImage
+func NewCCDImage(buf io.Reader) (*CCDImage, error) {
+	packData, err := NewCCDImagePackData(buf)
+	if err != nil {
+		return nil, err
+	}
+	badColumns := make([]uint16, packData.NBC)
+	return &CCDImage{packData, badColumns}, nil
 }
 
 // Image returns the 16bit gray image and the name of the file/bucket object
@@ -34,17 +45,17 @@ func (ccd *CCDImage) Image(buf []byte, prefix string, originName string) (*image
 }
 
 // CSVSpecifications returns the specs used in creating the struct
-func (ccd CCDImage) CSVSpecifications() []string {
+func (ccd *CCDImage) CSVSpecifications() []string {
 	return []string{"Specification", Specification}
 }
 
 // CSVHeaders returns the exportable field names
-func (ccd CCDImage) CSVHeaders() []string {
+func (ccd *CCDImage) CSVHeaders() []string {
 	return append(ccd.PackData.CSVHeaders(), "BC")
 }
 
 // CSVRow returns the exportable field values
-func (ccd CCDImage) CSVRow() []string {
+func (ccd *CCDImage) CSVRow() []string {
 	row := ccd.PackData.CSVRow()
 	return append(row, fmt.Sprintf("%v", ccd.BadColumns))
 }

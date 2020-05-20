@@ -78,8 +78,8 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 			[]common.DataRecord{{
 				Origin: common.OriginDescription{Name: "MyRac.rac"},
-				Data: aez.CCDImage{
-					PackData: aez.CCDImagePackData{
+				Data: &aez.CCDImage{
+					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
 						JPEGQ: aez.JPEGQUncompressed16bit,
 						NCOL:  1,
@@ -101,8 +101,8 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 			[]common.DataRecord{{
 				Origin: common.OriginDescription{Name: "MyRac.rac"},
-				Data: aez.CCDImage{
-					PackData: aez.CCDImagePackData{
+				Data: &aez.CCDImage{
+					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
 						JPEGQ: aez.JPEGQUncompressed16bit,
 						NCOL:  1,
@@ -121,8 +121,8 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 			[]common.DataRecord{{
 				Origin: common.OriginDescription{Name: "MyRac.rac"},
-				Data: aez.CCDImage{
-					PackData: aez.CCDImagePackData{
+				Data: &aez.CCDImage{
+					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
 						JPEGQ: aez.JPEGQUncompressed16bit,
 						NCOL:  1,
@@ -146,8 +146,8 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			[]common.DataRecord{
 				{
 					Origin: common.OriginDescription{Name: "MyRac.rac"},
-					Data: aez.CCDImage{
-						PackData: aez.CCDImagePackData{
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
 							EXPTS: 5,
 							JPEGQ: aez.JPEGQUncompressed16bit,
 							NCOL:  1,

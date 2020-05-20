@@ -28,8 +28,8 @@ func (record *DataRecord) MarshalJSON() ([]byte, error) {
 	var dataJSON []byte
 	var dataJSONErr error
 	switch record.Data.(type) {
-	case aez.CCDImage:
-		ccd, ok := record.Data.(aez.CCDImage)
+	case *aez.CCDImage:
+		ccd, ok := record.Data.(*aez.CCDImage)
 		if ok {
 			dataJSON, dataJSONErr = ccd.MarshalJSON()
 		} else {

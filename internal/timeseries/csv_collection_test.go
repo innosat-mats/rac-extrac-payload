@@ -16,7 +16,7 @@ func TestNewCollection_IsReadyToUse(t *testing.T) {
 		return csv, nil
 	}
 	got := NewCollection(factory)
-	err := got.Write(&common.DataRecord{Data: aez.CCDImage{}})
+	err := got.Write(&common.DataRecord{Data: &aez.CCDImage{}})
 	if err != nil {
 		t.Errorf("NewCollection() returned collection that couldn't write, %v", err)
 	}
@@ -39,21 +39,21 @@ func TestCSVCollection_Write(t *testing.T) {
 		},
 		{
 			"CCDImage -> CCD",
-			[]common.DataRecord{{Data: aez.CCDImage{}}},
+			[]common.DataRecord{{Data: &aez.CCDImage{}}},
 			false,
 			3,
 			[]OutStream{CCD},
 		},
 		{
 			"Writing twice adds just one more line",
-			[]common.DataRecord{{Data: aez.CCDImage{}}, {Data: aez.CCDImage{}}},
+			[]common.DataRecord{{Data: &aez.CCDImage{}}, {Data: &aez.CCDImage{}}},
 			false,
 			4,
 			[]OutStream{CCD},
 		},
 		{
 			"Two different streams",
-			[]common.DataRecord{{Data: aez.HTR{}}, {Data: aez.STAT{}}},
+			[]common.DataRecord{{Data: &aez.HTR{}}, {Data: &aez.STAT{}}},
 			false,
 			6, //Our simple factory puts everything in same buffer
 			[]OutStream{HTR, STAT},

@@ -44,11 +44,7 @@ func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exporter, err
 	var err error
 	switch rid {
 	case aez.CCD1, aez.CCD2, aez.CCD3, aez.CCD4, aez.CCD5, aez.CCD6, aez.CCD7:
-		ccdIPD := aez.CCDImagePackData{}
-		var badColumns []uint16
-		badColumns, err = ccdIPD.Read(buf)
-		ccdImg := aez.CCDImage{PackData: ccdIPD, BadColumns: badColumns}
-		dataPackage = ccdImg
+		dataPackage, err = aez.NewCCDImage(buf)
 	case aez.PM:
 		pmData := aez.PMData{}
 		err = pmData.Read(buf)

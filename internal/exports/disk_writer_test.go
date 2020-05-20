@@ -165,8 +165,8 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			[]common.DataRecord{
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data: aez.CCDImage{
-						PackData: aez.CCDImagePackData{
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
 							JPEGQ: aez.JPEGQUncompressed16bit,
 							NCOL:  1,
 							NROW:  2,
@@ -177,8 +177,8 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data: aez.CCDImage{
-						PackData: aez.CCDImagePackData{
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
 							JPEGQ: aez.JPEGQUncompressed16bit,
 							NCOL:  1,
 							NROW:  2,
@@ -200,8 +200,8 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeImages: false},
 			[]common.DataRecord{
 				{
-					Data: aez.CCDImage{
-						PackData: aez.CCDImagePackData{
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
 							JPEGQ: aez.JPEGQUncompressed16bit,
 							NCOL:  1,
 							NROW:  2,
