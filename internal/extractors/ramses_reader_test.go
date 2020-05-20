@@ -331,3 +331,22 @@ func TestDecodeRamses(t *testing.T) {
 		})
 	}
 }
+
+func TestStreamBatch_OriginName(t *testing.T) {
+	tests := []struct {
+		name   string
+		origin *common.OriginDescription
+		want   string
+	}{
+		{"Default empty", nil, ""},
+		{"Returns name", &common.OriginDescription{Name: "Test"}, "Test"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stream := &StreamBatch{Origin: tt.origin}
+			if got := stream.OriginName(); got != tt.want {
+				t.Errorf("StreamBatch.OriginName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

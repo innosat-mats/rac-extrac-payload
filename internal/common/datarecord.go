@@ -72,14 +72,28 @@ func (record *DataRecord) MarshalJSON() ([]byte, error) {
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
 func (record *DataRecord) CSVSpecifications() []string {
 	var specifications []string
-	specifications = append(
-		specifications,
-		record.RamsesHeader.CSVSpecifications()...,
-	)
-	specifications = append(
-		specifications,
-		record.SourceHeader.CSVSpecifications()...,
-	)
+	if record.RamsesHeader != nil {
+		specifications = append(
+			specifications,
+			record.RamsesHeader.CSVSpecifications()...,
+		)
+	} else {
+		specifications = append(
+			specifications,
+			(&ramses.Ramses{}).CSVSpecifications()...,
+		)
+	}
+	if record.SourceHeader != nil {
+		specifications = append(
+			specifications,
+			record.SourceHeader.CSVSpecifications()...,
+		)
+	} else {
+		specifications = append(
+			specifications,
+			(&innosat.SourcePacketHeader{}).CSVSpecifications()...,
+		)
+	}
 
 	if record.Data != nil {
 		specifications = append(
@@ -93,11 +107,31 @@ func (record *DataRecord) CSVSpecifications() []string {
 // CSVHeaders returns a header row for the data record
 func (record *DataRecord) CSVHeaders() []string {
 	var headers []string
-	headers = append(headers, record.Origin.CSVHeaders()...)
-	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
-	headers = append(headers, record.RamsesTMHeader.CSVHeaders()...)
-	headers = append(headers, record.SourceHeader.CSVHeaders()...)
-	headers = append(headers, record.TMHeader.CSVHeaders()...)
+	if record.Origin != nil {
+		headers = append(headers, record.Origin.CSVHeaders()...)
+	} else {
+		headers = append(headers, (&OriginDescription{}).CSVHeaders()...)
+	}
+	if record.RamsesHeader != nil {
+		headers = append(headers, record.RamsesHeader.CSVHeaders()...)
+	} else {
+		headers = append(headers, (&ramses.Ramses{}).CSVHeaders()...)
+	}
+	if record.RamsesTMHeader != nil {
+		headers = append(headers, record.RamsesTMHeader.CSVHeaders()...)
+	} else {
+		headers = append(headers, (&ramses.TMHeader{}).CSVHeaders()...)
+	}
+	if record.SourceHeader != nil {
+		headers = append(headers, record.SourceHeader.CSVHeaders()...)
+	} else {
+		headers = append(headers, (&innosat.SourcePacketHeader{}).CSVHeaders()...)
+	}
+	if record.TMHeader != nil {
+		headers = append(headers, record.TMHeader.CSVHeaders()...)
+	} else {
+		headers = append(headers, (&innosat.TMHeader{}).CSVHeaders()...)
+	}
 	headers = append(headers, "SID", "RID")
 	if record.Data != nil {
 		headers = append(headers, record.Data.CSVHeaders()...)
@@ -109,11 +143,31 @@ func (record *DataRecord) CSVHeaders() []string {
 // CSVRow returns a data row for the record
 func (record *DataRecord) CSVRow() []string {
 	var row []string
-	row = append(row, record.Origin.CSVRow()...)
-	row = append(row, record.RamsesHeader.CSVRow()...)
-	row = append(row, record.RamsesTMHeader.CSVRow()...)
-	row = append(row, record.SourceHeader.CSVRow()...)
-	row = append(row, record.TMHeader.CSVRow()...)
+	if record.Origin != nil {
+		row = append(row, record.Origin.CSVRow()...)
+	} else {
+		row = append(row, make([]string, len((&OriginDescription{}).CSVRow()))...)
+	}
+	if record.RamsesHeader != nil {
+		row = append(row, record.RamsesHeader.CSVRow()...)
+	} else {
+		row = append(row, make([]string, len((&ramses.Ramses{}).CSVRow()))...)
+	}
+	if record.RamsesTMHeader != nil {
+		row = append(row, record.RamsesTMHeader.CSVRow()...)
+	} else {
+		row = append(row, make([]string, len((&ramses.TMHeader{}).CSVRow()))...)
+	}
+	if record.SourceHeader != nil {
+		row = append(row, record.SourceHeader.CSVRow()...)
+	} else {
+		row = append(row, make([]string, len((&innosat.SourcePacketHeader{}).CSVRow()))...)
+	}
+	if record.TMHeader != nil {
+		row = append(row, record.TMHeader.CSVRow()...)
+	} else {
+		row = append(row, make([]string, len((&innosat.TMHeader{}).CSVRow()))...)
+	}
 	row = append(row, record.SID.String(), record.RID.String())
 	if record.Data != nil {
 		row = append(row, record.Data.CSVRow()...)
@@ -124,4 +178,12 @@ func (record *DataRecord) CSVRow() []string {
 		row = append(row, "")
 	}
 	return row
+}
+
+// OriginName returns the origin name or empty string if unknown
+func (record *DataRecord) OriginName() string {
+	if record.Origin != nil {
+		return record.Origin.Name
+	}
+	return ""
 }

@@ -23,6 +23,14 @@ type StreamBatch struct {
 	Origin *common.OriginDescription
 }
 
+// OriginName returns the origin name or empty string if unknown
+func (stream *StreamBatch) OriginName() string {
+	if stream.Origin != nil {
+		return stream.Origin.Name
+	}
+	return ""
+}
+
 //DecodeRamses reads Ramses packages from buffer
 func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamBatch) {
 	defer close(recordChannel)
@@ -50,7 +58,7 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 	for _, firstRecord := range records {
 		recordChannel <- firstRecord
 		for _, stream := range streamBatch {
-			if stream.Origin.Name != firstRecord.Origin.Name {
+			if stream.OriginName() != firstRecord.OriginName() {
 				continue
 			}
 			for {
