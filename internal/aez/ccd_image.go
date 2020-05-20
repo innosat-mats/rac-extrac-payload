@@ -1,6 +1,7 @@
 package aez
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"image"
@@ -21,6 +22,10 @@ func NewCCDImage(buf io.Reader) (*CCDImage, error) {
 		return nil, err
 	}
 	badColumns := make([]uint16, packData.NBC)
+	err = binary.Read(buf, binary.LittleEndian, &badColumns)
+	if err != nil {
+		return nil, err
+	}
 	return &CCDImage{packData, badColumns}, nil
 }
 

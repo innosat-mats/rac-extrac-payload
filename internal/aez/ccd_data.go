@@ -188,19 +188,11 @@ type CCDImagePackData struct {
 // NewCCDImagePackData reads buf into CCDImagePackData
 func NewCCDImagePackData(buf io.Reader) (*CCDImagePackData, error) {
 	ccd := CCDImagePackData{}
-	err := binary.Read(buf, binary.LittleEndian, ccd)
+	err := binary.Read(buf, binary.LittleEndian, &ccd)
 	if err != nil {
 		return nil, err
 	}
 	return &ccd, nil
-}
-
-// Read CCDImagePackData from the buffer
-//
-// returns the BC (bad columns) array and the error status.
-func (ccd *CCDImagePackData) Read(buf io.Reader) ([]uint16, error) {
-	badColumns := make([]uint16, ccd.NBC)
-	return badColumns, binary.Read(buf, binary.LittleEndian, &badColumns)
 }
 
 // Time returns the measurement time in UTC

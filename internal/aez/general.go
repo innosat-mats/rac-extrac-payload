@@ -73,6 +73,11 @@ const (
 	PM RID = 30
 )
 
+// IsCCD returns if the RID is for a CCD
+func (rid RID) IsCCD() bool {
+	return rid == CCD1 || rid == CCD2 || rid == CCD3 || rid == CCD4 || rid == CCD5 || rid == CCD6 || rid == CCD7
+}
+
 func (rid RID) String() string {
 	switch rid {
 	case 0:

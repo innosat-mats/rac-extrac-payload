@@ -154,32 +154,8 @@ func TestCCDGain_Truncation(t *testing.T) {
 
 func TestCCDImagePackData_Time(t *testing.T) {
 	type fields struct {
-		CCDSEL  uint8
-		EXPTS   uint32
-		EXPTSS  uint16
-		WDW     Wdw
-		WDWOV   uint16
-		JPEGQ   uint8
-		FRAME   uint16
-		NROW    uint16
-		NRBIN   uint16
-		NRSKIP  uint16
-		NCOL    uint16
-		NCBIN   NCBin
-		NCSKIP  uint16
-		NFLUSH  uint16
-		TEXPMS  uint32
-		GAIN    CCDGain
-		TEMP    uint16
-		FBINOV  uint16
-		LBLNK   uint16
-		TBLNK   uint16
-		ZERO    uint16
-		TIMING1 uint16
-		TIMING2 uint16
-		VERSION uint16
-		TIMING3 uint16
-		NBC     uint16
+		EXPTS  uint32
+		EXPTSS uint16
 	}
 	type args struct {
 		epoch time.Time
@@ -200,32 +176,8 @@ func TestCCDImagePackData_Time(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ccdImagePackData := &CCDImagePackData{
-				CCDSEL:  tt.fields.CCDSEL,
-				EXPTS:   tt.fields.EXPTS,
-				EXPTSS:  tt.fields.EXPTSS,
-				WDW:     tt.fields.WDW,
-				WDWOV:   tt.fields.WDWOV,
-				JPEGQ:   tt.fields.JPEGQ,
-				FRAME:   tt.fields.FRAME,
-				NROW:    tt.fields.NROW,
-				NRBIN:   tt.fields.NRBIN,
-				NRSKIP:  tt.fields.NRSKIP,
-				NCOL:    tt.fields.NCOL,
-				NCBIN:   tt.fields.NCBIN,
-				NCSKIP:  tt.fields.NCSKIP,
-				NFLUSH:  tt.fields.NFLUSH,
-				TEXPMS:  tt.fields.TEXPMS,
-				GAIN:    tt.fields.GAIN,
-				TEMP:    tt.fields.TEMP,
-				FBINOV:  tt.fields.FBINOV,
-				LBLNK:   tt.fields.LBLNK,
-				TBLNK:   tt.fields.TBLNK,
-				ZERO:    tt.fields.ZERO,
-				TIMING1: tt.fields.TIMING1,
-				TIMING2: tt.fields.TIMING2,
-				VERSION: tt.fields.VERSION,
-				TIMING3: tt.fields.TIMING3,
-				NBC:     tt.fields.NBC,
+				EXPTS:  tt.fields.EXPTS,
+				EXPTSS: tt.fields.EXPTSS,
 			}
 			if got := ccdImagePackData.Time(tt.args.epoch); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CCDImagePackData.Time() = %v, want %v", got, tt.want)
@@ -236,32 +188,8 @@ func TestCCDImagePackData_Time(t *testing.T) {
 
 func TestCCDImagePackData_Nanoseconds(t *testing.T) {
 	type fields struct {
-		CCDSEL  uint8
-		EXPTS   uint32
-		EXPTSS  uint16
-		WDW     Wdw
-		WDWOV   uint16
-		JPEGQ   uint8
-		FRAME   uint16
-		NROW    uint16
-		NRBIN   uint16
-		NRSKIP  uint16
-		NCOL    uint16
-		NCBIN   NCBin
-		NCSKIP  uint16
-		NFLUSH  uint16
-		TEXPMS  uint32
-		GAIN    CCDGain
-		TEMP    uint16
-		FBINOV  uint16
-		LBLNK   uint16
-		TBLNK   uint16
-		ZERO    uint16
-		TIMING1 uint16
-		TIMING2 uint16
-		VERSION uint16
-		TIMING3 uint16
-		NBC     uint16
+		EXPTS  uint32
+		EXPTSS uint16
 	}
 	tests := []struct {
 		name   string
@@ -277,32 +205,8 @@ func TestCCDImagePackData_Nanoseconds(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ccdImagePackData := &CCDImagePackData{
-				CCDSEL:  tt.fields.CCDSEL,
-				EXPTS:   tt.fields.EXPTS,
-				EXPTSS:  tt.fields.EXPTSS,
-				WDW:     tt.fields.WDW,
-				WDWOV:   tt.fields.WDWOV,
-				JPEGQ:   tt.fields.JPEGQ,
-				FRAME:   tt.fields.FRAME,
-				NROW:    tt.fields.NROW,
-				NRBIN:   tt.fields.NRBIN,
-				NRSKIP:  tt.fields.NRSKIP,
-				NCOL:    tt.fields.NCOL,
-				NCBIN:   tt.fields.NCBIN,
-				NCSKIP:  tt.fields.NCSKIP,
-				NFLUSH:  tt.fields.NFLUSH,
-				TEXPMS:  tt.fields.TEXPMS,
-				GAIN:    tt.fields.GAIN,
-				TEMP:    tt.fields.TEMP,
-				FBINOV:  tt.fields.FBINOV,
-				LBLNK:   tt.fields.LBLNK,
-				TBLNK:   tt.fields.TBLNK,
-				ZERO:    tt.fields.ZERO,
-				TIMING1: tt.fields.TIMING1,
-				TIMING2: tt.fields.TIMING2,
-				VERSION: tt.fields.VERSION,
-				TIMING3: tt.fields.TIMING3,
-				NBC:     tt.fields.NBC,
+				EXPTS:  tt.fields.EXPTS,
+				EXPTSS: tt.fields.EXPTSS,
 			}
 			if got := ccdImagePackData.Nanoseconds(); got != tt.want {
 				t.Errorf("CCDImagePackData.Nanoseconds() = %v, want %v", got, tt.want)

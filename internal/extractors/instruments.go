@@ -42,10 +42,10 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
 func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exporter, error) {
 	var dataPackage common.Exporter
 	var err error
-	switch rid {
-	case aez.CCD1, aez.CCD2, aez.CCD3, aez.CCD4, aez.CCD5, aez.CCD6, aez.CCD7:
+	switch {
+	case rid.IsCCD():
 		dataPackage, err = aez.NewCCDImage(buf)
-	case aez.PM:
+	case rid == aez.PM:
 		pmData := aez.PMData{}
 		err = pmData.Read(buf)
 		dataPackage = pmData
