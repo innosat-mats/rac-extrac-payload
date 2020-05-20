@@ -45,7 +45,7 @@ func TestOutStreamFromDataRecord(t *testing.T) {
 		{"HTR", args{&common.DataRecord{Data: &aez.HTR{}}}, HTR},
 		{"PWR", args{&common.DataRecord{Data: &aez.PWR{}}}, PWR},
 		{"CPRU", args{&common.DataRecord{Data: &aez.CPRU{}}}, CPRU},
-		{"STAT", args{&common.DataRecord{Data: aez.STAT{}}}, STAT},
+		{"STAT", args{&common.DataRecord{Data: &aez.STAT{}}}, STAT},
 		{"TCV, accept success", args{&common.DataRecord{Data: aez.TCAcceptSuccessData{}}}, TCV},
 		{"TCV, accept fail", args{&common.DataRecord{Data: aez.TCAcceptFailureData{}}}, TCV},
 		{"TCV, exec success", args{&common.DataRecord{Data: aez.TCExecSuccessData{}}}, TCV},

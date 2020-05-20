@@ -30,9 +30,11 @@ type STAT struct { //(34 octets)
 	ANOMALY uint8  // Anomalyflag (0==0 ? OK: payload power off)
 }
 
-// Read STAT
-func (stat *STAT) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, stat)
+// NewSTAT reads a STAT from buffer
+func NewSTAT(buf io.Reader) (*STAT, error) {
+	stat := STAT{}
+	err := binary.Read(buf, binary.LittleEndian, &stat)
+	return &stat, err
 }
 
 // Time returns the measurement time in UTC
@@ -51,7 +53,7 @@ func (stat STAT) CSVSpecifications() []string {
 }
 
 // CSVHeaders returns the header row
-func (stat STAT) CSVHeaders() []string {
+func (stat *STAT) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, "STATTIME", "STATNANO")
 	// We don't need the raw CUC Time fields, instead the iso date and nanoseconds are included above.
@@ -59,7 +61,7 @@ func (stat STAT) CSVHeaders() []string {
 }
 
 // CSVRow returns the data row
-func (stat STAT) CSVRow() []string {
+func (stat *STAT) CSVRow() []string {
 	var row []string
 	statTime := stat.Time(gpsTime)
 	row = append(row, statTime.Format(time.RFC3339Nano), fmt.Sprintf("%v", stat.Nanoseconds()))

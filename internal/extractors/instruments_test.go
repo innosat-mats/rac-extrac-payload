@@ -25,7 +25,7 @@ func Test_instrumentHK(t *testing.T) {
 		{
 			"STAT",
 			args{sid: aez.SIDSTAT, buf: bytes.NewReader(make([]byte, 100))},
-			aez.STAT{},
+			&aez.STAT{},
 			false,
 		},
 		{

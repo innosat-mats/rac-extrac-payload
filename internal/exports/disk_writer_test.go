@@ -55,7 +55,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			"Doesn't create files if no writeTimeseries",
 			args{writeTimeseries: false},
 			[]common.DataRecord{
-				{Data: aez.STAT{}},
+				{Data: &aez.STAT{}},
 			},
 			[]wantFile{},
 		},
@@ -65,11 +65,11 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			[]common.DataRecord{
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.STAT{},
+					Data:   &aez.STAT{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.STAT{},
+					Data:   &aez.STAT{},
 				},
 			},
 			[]wantFile{
@@ -82,11 +82,11 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			[]common.DataRecord{
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.STAT{},
+					Data:   &aez.STAT{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   aez.STAT{},
+					Data:   &aez.STAT{},
 				},
 			},
 			[]wantFile{
@@ -99,7 +99,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			[]common.DataRecord{
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.STAT{},
+					Data:   &aez.STAT{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},

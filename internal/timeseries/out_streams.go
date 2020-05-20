@@ -61,7 +61,7 @@ func OutStreamFromDataRecord(pkg *common.DataRecord) OutStream {
 		return PWR
 	case *aez.CPRU:
 		return CPRU
-	case aez.STAT:
+	case *aez.STAT:
 		return STAT
 	case aez.TCAcceptSuccessData, aez.TCAcceptFailureData, aez.TCExecSuccessData, aez.TCExecFailureData:
 		return TCV

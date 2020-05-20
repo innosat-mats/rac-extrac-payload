@@ -111,7 +111,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 		},
 		{
 			"Returns expected headers",
-			fields{Data: aez.STAT{}},
+			fields{Data: &aez.STAT{}},
 			[]string{
 				"File",
 				"ProcessingDate",
@@ -221,7 +221,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 				SourceHeader:   innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
 				TMHeader:       innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
 				SID:            aez.SIDSTAT,
-				Data: aez.STAT{
+				Data: &aez.STAT{
 					SPID:    1,
 					SPREV:   2,
 					FPID:    3,
@@ -305,7 +305,7 @@ func TestDataRecord_MarshalJSON(t *testing.T) {
 		{"No Data, No Error", fields{}},
 		{"Error", fields{Error: io.EOF}},
 		{"Image Data", fields{Data: &aez.CCDImage{PackData: &aez.CCDImagePackData{}}}},
-		{"Non-image Data", fields{Data: aez.STAT{}}},
+		{"Non-image Data", fields{Data: &aez.STAT{}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

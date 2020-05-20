@@ -14,9 +14,7 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
 	var err error
 	switch sid {
 	case aez.SIDSTAT:
-		stat := aez.STAT{}
-		err = stat.Read(buf)
-		dataPackage = stat
+		dataPackage, err = aez.NewSTAT(buf)
 	case aez.SIDHTR:
 		dataPackage, err = aez.NewHTR(buf)
 	case aez.SIDPWR:
