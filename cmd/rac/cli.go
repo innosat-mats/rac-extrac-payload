@@ -96,7 +96,7 @@ func processFiles(
 		}
 		batch[n] = extractors.StreamBatch{
 			Buf: f,
-			Origin: common.OriginDescription{
+			Origin: &common.OriginDescription{
 				Name:           filename,
 				ProcessingDate: time.Now(),
 			},

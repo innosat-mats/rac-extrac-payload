@@ -79,7 +79,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: true,
 			},
 			[]common.DataRecord{{
-				Origin:         common.OriginDescription{Name: "MyRac.rac"},
+				Origin:         &common.OriginDescription{Name: "MyRac.rac"},
 				RamsesHeader:   &ramses.Ramses{},
 				RamsesTMHeader: &ramses.TMHeader{},
 				SourceHeader:   &innosat.SourcePacketHeader{},
@@ -106,7 +106,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: false,
 			},
 			[]common.DataRecord{{
-				Origin:         common.OriginDescription{Name: "MyRac.rac"},
+				Origin:         &common.OriginDescription{Name: "MyRac.rac"},
 				RamsesHeader:   &ramses.Ramses{},
 				RamsesTMHeader: &ramses.TMHeader{},
 				SourceHeader:   &innosat.SourcePacketHeader{},
@@ -130,7 +130,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: true,
 			},
 			[]common.DataRecord{{
-				Origin:         common.OriginDescription{Name: "MyRac.rac"},
+				Origin:         &common.OriginDescription{Name: "MyRac.rac"},
 				RamsesHeader:   &ramses.Ramses{},
 				RamsesTMHeader: &ramses.TMHeader{},
 				SourceHeader:   &innosat.SourcePacketHeader{},
@@ -159,7 +159,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 			[]common.DataRecord{
 				{
-					Origin:         common.OriginDescription{Name: "MyRac.rac"},
+					Origin:         &common.OriginDescription{Name: "MyRac.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -175,6 +175,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 				},
 				{
+					Origin:         &common.OriginDescription{Name: "MyOtherRac.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -187,7 +188,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				"myproj/MyRac_5000000000.png":  76,  // 8 + header
 				"myproj/MyRac_5000000000.json": 853, // length of the json
 				"myproj/CCD.csv":               649, // length of the first three lines csv (specs, header, datarow)
-				"myproj/HTR.csv":               975,
+				"myproj/HTR.csv":               989,
 			},
 		},
 	}
@@ -210,7 +211,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					if !ok {
 						t.Errorf("Upload %v: key = %v, key not wanted", idxUp, key)
 					} else if bodyLen != len(buf) {
-						t.Errorf("Upload %v: len(buf) = %v, want %v ", idxUp, len(buf), bodyLen)
+						t.Errorf("Upload %v/%v: len(buf) = %v, want %v ", idxUp, key, len(buf), bodyLen)
 					}
 				}
 

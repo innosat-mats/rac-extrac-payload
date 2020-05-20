@@ -11,7 +11,7 @@ import (
 
 // DataRecord holds the full decode from one or many Ramses packages
 type DataRecord struct {
-	Origin         OriginDescription           // Describes the origin of the data like filename or data batch name
+	Origin         *OriginDescription          // Describes the origin of the data like filename or data batch name
 	RamsesHeader   *ramses.Ramses              // Ramses header information
 	RamsesTMHeader *ramses.TMHeader            // The CCSDS compliant OHBSE TM Packet header
 	SourceHeader   *innosat.SourcePacketHeader // Source header from the innosat platform
@@ -39,7 +39,7 @@ func (record *DataRecord) MarshalJSON() ([]byte, error) {
 		dataJSON, dataJSONErr = json.Marshal(record.Data)
 	}
 	buf, err := json.Marshal(&struct {
-		Origin         OriginDescription           `json:"origin"`
+		Origin         *OriginDescription          `json:"origin"`
 		RamsesHeader   *ramses.Ramses              `json:"ramsesHeader"`
 		RamsesTMHeader *ramses.TMHeader            `json:"ramsesTMHeader"`
 		SourceHeader   *innosat.SourcePacketHeader `json:"sourceHeader"`

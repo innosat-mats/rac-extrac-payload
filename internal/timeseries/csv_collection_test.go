@@ -20,6 +20,7 @@ func TestNewCollection_IsReadyToUse(t *testing.T) {
 	got := NewCollection(factory)
 	err := got.Write(
 		&common.DataRecord{
+			Origin:         &common.OriginDescription{},
 			RamsesHeader:   &ramses.Ramses{},
 			RamsesTMHeader: &ramses.TMHeader{},
 			SourceHeader:   &innosat.SourcePacketHeader{},
@@ -51,6 +52,7 @@ func TestCSVCollection_Write(t *testing.T) {
 			"CCDImage -> CCD",
 			[]common.DataRecord{
 				{
+					Origin:         &common.OriginDescription{},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -66,6 +68,7 @@ func TestCSVCollection_Write(t *testing.T) {
 			"Writing twice adds just one more line",
 			[]common.DataRecord{
 				{
+					Origin:         &common.OriginDescription{},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -73,6 +76,7 @@ func TestCSVCollection_Write(t *testing.T) {
 					Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
 				},
 				{
+					Origin:         &common.OriginDescription{},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -88,6 +92,7 @@ func TestCSVCollection_Write(t *testing.T) {
 			"Two different streams",
 			[]common.DataRecord{
 				{
+					Origin:         &common.OriginDescription{},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -95,6 +100,7 @@ func TestCSVCollection_Write(t *testing.T) {
 					Data:           &aez.HTR{},
 				},
 				{
+					Origin:         &common.OriginDescription{},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},

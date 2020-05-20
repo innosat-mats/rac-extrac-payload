@@ -53,7 +53,7 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:         tt.fields.Origin,
+				Origin:         &tt.fields.Origin,
 				RamsesHeader:   &tt.fields.RamsesHeader,
 				RamsesTMHeader: &tt.fields.RamsesTMHeader,
 				SourceHeader:   &tt.fields.SourceHeader,
@@ -147,7 +147,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:         tt.fields.Origin,
+				Origin:         &tt.fields.Origin,
 				RamsesHeader:   &tt.fields.RamsesHeader,
 				RamsesTMHeader: &tt.fields.RamsesTMHeader,
 				SourceHeader:   &tt.fields.SourceHeader,
@@ -275,7 +275,7 @@ func TestDataRecord_CSVRow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			record := DataRecord{
-				Origin:         tt.fields.Origin,
+				Origin:         &tt.fields.Origin,
 				RamsesHeader:   &tt.fields.RamsesHeader,
 				RamsesTMHeader: &tt.fields.RamsesTMHeader,
 				SourceHeader:   &tt.fields.SourceHeader,

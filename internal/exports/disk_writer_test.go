@@ -69,7 +69,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeTimeseries: true},
 			[]common.DataRecord{
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -77,7 +77,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.STAT{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -94,7 +94,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeTimeseries: true},
 			[]common.DataRecord{
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -102,7 +102,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.STAT{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File2.rac"},
+					Origin:         &common.OriginDescription{Name: "File2.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -119,7 +119,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeTimeseries: true},
 			[]common.DataRecord{
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -127,7 +127,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.STAT{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -135,7 +135,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.CPRU{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -143,7 +143,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.CPRU{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -151,7 +151,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.HTR{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -159,7 +159,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.HTR{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -167,7 +167,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.PWR{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -175,7 +175,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.PWR{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -183,7 +183,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.PMData{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -191,7 +191,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.PMData{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -199,7 +199,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.TCAcceptSuccessData{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -207,7 +207,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.TCExecSuccessData{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -215,7 +215,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Data:           &aez.TCAcceptFailureData{},
 				},
 				{
-					Origin:         common.OriginDescription{Name: "File1.rac"},
+					Origin:         &common.OriginDescription{Name: "File1.rac"},
 					RamsesHeader:   &ramses.Ramses{},
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
@@ -237,7 +237,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeImages: true},
 			[]common.DataRecord{
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
+					Origin: &common.OriginDescription{Name: "File1.rac"},
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
 							JPEGQ: aez.JPEGQUncompressed16bit,
@@ -249,7 +249,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
+					Origin: &common.OriginDescription{Name: "File1.rac"},
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
 							JPEGQ: aez.JPEGQUncompressed16bit,

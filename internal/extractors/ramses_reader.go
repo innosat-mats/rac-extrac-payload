@@ -20,7 +20,7 @@ type Packet struct {
 // StreamBatch tells origin of batch
 type StreamBatch struct {
 	Buf    io.Reader
-	Origin common.OriginDescription
+	Origin *common.OriginDescription
 }
 
 //DecodeRamses reads Ramses packages from buffer
