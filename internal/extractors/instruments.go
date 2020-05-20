@@ -34,9 +34,7 @@ func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exporter, err
 	case rid.IsCCD():
 		dataPackage, err = aez.NewCCDImage(buf)
 	case rid == aez.PM:
-		pmData := aez.PMData{}
-		err = pmData.Read(buf)
-		dataPackage = pmData
+		dataPackage, err = aez.NewPMData(buf)
 	default:
 		err = fmt.Errorf("unhandled RID %v", rid)
 	}
@@ -51,21 +49,13 @@ func instrumentVerification(
 	var err error
 	switch subtype {
 	case innosat.TCAcceptSuccess:
-		tcv := aez.TCAcceptSuccessData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCAcceptSuccessData(buf)
 	case innosat.TCAcceptFailure:
-		tcv := aez.TCAcceptFailureData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCAcceptFailureData(buf)
 	case innosat.TCExecSuccess:
-		tcv := aez.TCExecSuccessData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCExecSuccessData(buf)
 	case innosat.TCExecFailure:
-		tcv := aez.TCExecFailureData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCExecFailureData(buf)
 	default:
 		err = fmt.Errorf("unhandled TC Verification subtype %v", subtype)
 	}

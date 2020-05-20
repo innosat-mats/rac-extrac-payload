@@ -28,9 +28,11 @@ type PMData struct {
 	PM2SCNTR uint32 // Photometer 2, photo diode input SIG counter
 }
 
-// Read PM
-func (pm *PMData) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, pm)
+// NewPMData reads a PMData from reader
+func NewPMData(buf io.Reader) (*PMData, error) {
+	pm := PMData{}
+	err := binary.Read(buf, binary.LittleEndian, &pm)
+	return &pm, err
 }
 
 // Time returns the measurement time in UTC
@@ -44,12 +46,12 @@ func (pm *PMData) Nanoseconds() int64 {
 }
 
 // CSVSpecifications returns the version of the spec used
-func (pm PMData) CSVSpecifications() []string {
+func (pm *PMData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (pm PMData) CSVHeaders() []string {
+func (pm *PMData) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, "PMTIME", "PMNANO")
 	// We don't need the raw CUC Time fields, instead the iso date and
@@ -58,7 +60,7 @@ func (pm PMData) CSVHeaders() []string {
 }
 
 // CSVRow returns the data row
-func (pm PMData) CSVRow() []string {
+func (pm *PMData) CSVRow() []string {
 	var row []string
 	gpsTime := time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
 	pmTime := pm.Time(gpsTime)

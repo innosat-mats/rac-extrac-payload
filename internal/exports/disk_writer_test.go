@@ -127,27 +127,27 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.PMData{},
+					Data:   &aez.PMData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.PMData{},
+					Data:   &aez.PMData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptSuccessData{},
+					Data:   &aez.TCAcceptSuccessData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCExecSuccessData{},
+					Data:   &aez.TCExecSuccessData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCAcceptFailureData{},
+					Data:   &aez.TCAcceptFailureData{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.TCExecFailureData{},
+					Data:   &aez.TCExecFailureData{},
 				},
 			},
 			[]wantFile{

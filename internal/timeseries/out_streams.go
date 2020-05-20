@@ -53,7 +53,7 @@ func OutStreamFromDataRecord(pkg *common.DataRecord) OutStream {
 	switch pkg.Data.(type) {
 	case *aez.CCDImage:
 		return CCD
-	case aez.PMData:
+	case *aez.PMData:
 		return PM
 	case *aez.HTR:
 		return HTR
@@ -63,7 +63,7 @@ func OutStreamFromDataRecord(pkg *common.DataRecord) OutStream {
 		return CPRU
 	case *aez.STAT:
 		return STAT
-	case aez.TCAcceptSuccessData, aez.TCAcceptFailureData, aez.TCExecSuccessData, aez.TCExecFailureData:
+	case *aez.TCAcceptSuccessData, *aez.TCAcceptFailureData, *aez.TCExecSuccessData, *aez.TCExecFailureData:
 		return TCV
 	default:
 		return Unknown

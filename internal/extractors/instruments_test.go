@@ -132,7 +132,7 @@ func Test_instrumentTransparentData(t *testing.T) {
 				if !tt.args.rid.IsCCD() {
 					t.Errorf("instrumentTransparentData() = %+v, want a CCD", got)
 				}
-			case aez.PMData:
+			case *aez.PMData:
 				if tt.args.rid != aez.PM {
 					t.Errorf("instrumentTransparentData() = %+v, want a PM", got)
 				}
@@ -155,25 +155,25 @@ func Test_instrumentVerification(t *testing.T) {
 		{
 			"TC Acceptance - Success",
 			args{subtype: 1, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCAcceptSuccessData{},
+			&aez.TCAcceptSuccessData{},
 			false,
 		},
 		{
 			"TC Acceptance - Failure",
 			args{subtype: 2, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCAcceptFailureData{},
+			&aez.TCAcceptFailureData{},
 			false,
 		},
 		{
 			"TC Execution - Success",
 			args{subtype: 7, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCExecSuccessData{},
+			&aez.TCExecSuccessData{},
 			false,
 		},
 		{
 			"TC Execution - Failure",
 			args{subtype: 8, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCExecFailureData{},
+			&aez.TCExecFailureData{},
 			false,
 		},
 		{
