@@ -25,14 +25,8 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
 		pwr := aez.PWR{}
 		err = pwr.Read(buf)
 		dataPackage = pwr
-	case aez.SIDCPRUA:
-		cpru := aez.CPRU{}
-		err = cpru.Read(buf)
-		dataPackage = cpru
-	case aez.SIDCPRUB:
-		cpru := aez.CPRU{}
-		err = cpru.Read(buf)
-		dataPackage = cpru
+	case aez.SIDCPRUA, aez.SIDCPRUB:
+		dataPackage, err = aez.NewCPRU(buf)
 	default:
 		err = fmt.Errorf("unhandled SID %v", sid)
 	}

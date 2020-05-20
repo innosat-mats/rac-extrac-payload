@@ -43,13 +43,13 @@ func Test_instrumentHK(t *testing.T) {
 		{
 			"CPRUA",
 			args{sid: aez.SIDCPRUA, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CPRU{},
+			&aez.CPRU{},
 			false,
 		},
 		{
 			"CPRUB",
 			args{sid: aez.SIDCPRUB, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CPRU{},
+			&aez.CPRU{},
 			false,
 		},
 		{"Unknown", args{sid: aez.SID(0)}, nil, true},

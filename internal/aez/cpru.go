@@ -105,9 +105,11 @@ type CPRUReport struct {
 
 }
 
-// Read CRPU
-func (cpru *CPRU) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, cpru)
+// NewCPRU reads buffer into a new CPRU
+func NewCPRU(buf io.Reader) (*CPRU, error) {
+	cpru := CPRU{}
+	err := binary.Read(buf, binary.LittleEndian, &cpru)
+	return &cpru, err
 }
 
 // Report transforms CPRU data to useful units
@@ -141,17 +143,17 @@ func (cpru *CPRU) Report() CPRUReport {
 }
 
 //CSVSpecifications returns the specs used in creating the struct
-func (cpru CPRU) CSVSpecifications() []string {
+func (cpru *CPRU) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 //CSVHeaders returns the field names
-func (cpru CPRU) CSVHeaders() []string {
+func (cpru *CPRU) CSVHeaders() []string {
 	return csvHeader(cpru.Report())
 }
 
 //CSVRow returns the field values
-func (cpru CPRU) CSVRow() []string {
+func (cpru *CPRU) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(cpru.Report()))
 	values := make([]string, val.NumField())
 	for i := range values {
