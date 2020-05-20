@@ -57,7 +57,7 @@ func OutStreamFromDataRecord(pkg *common.DataRecord) OutStream {
 		return PM
 	case *aez.HTR:
 		return HTR
-	case aez.PWR:
+	case *aez.PWR:
 		return PWR
 	case *aez.CPRU:
 		return CPRU

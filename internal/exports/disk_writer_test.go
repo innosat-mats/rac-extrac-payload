@@ -119,11 +119,11 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.PWR{},
+					Data:   &aez.PWR{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   aez.PWR{},
+					Data:   &aez.PWR{},
 				},
 				{
 					Origin: common.OriginDescription{Name: "File1.rac"},

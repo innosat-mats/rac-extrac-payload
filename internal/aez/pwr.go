@@ -132,9 +132,11 @@ type PWRReport struct {
 	WARNINGS []error
 }
 
-// Read PWR
-func (pwr *PWR) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, pwr)
+// NewPWR reads a PWR from buffer
+func NewPWR(buf io.Reader) (*PWR, error) {
+	pwr := PWR{}
+	err := binary.Read(buf, binary.LittleEndian, &pwr)
+	return &pwr, err
 }
 
 func pwrVoltageADC(data uint16) float64 {
@@ -164,17 +166,17 @@ func (pwr *PWR) Report() PWRReport {
 }
 
 //CSVSpecifications returns the specs used in creating the struct
-func (pwr PWR) CSVSpecifications() []string {
+func (pwr *PWR) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 //CSVHeaders returns the field names
-func (pwr PWR) CSVHeaders() []string {
+func (pwr *PWR) CSVHeaders() []string {
 	return csvHeader(pwr.Report())
 }
 
 //CSVRow returns the field values
-func (pwr PWR) CSVRow() []string {
+func (pwr *PWR) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(pwr.Report()))
 	values := make([]string, val.NumField())
 	t := val.Type()

@@ -37,7 +37,7 @@ func Test_instrumentHK(t *testing.T) {
 		{
 			"PWR",
 			args{sid: aez.SIDPWR, buf: bytes.NewReader(make([]byte, 100))},
-			aez.PWR{},
+			&aez.PWR{},
 			false,
 		},
 		{
