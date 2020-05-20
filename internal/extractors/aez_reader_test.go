@@ -44,8 +44,8 @@ func TestDecodeAEZ(t *testing.T) {
 		{
 			"STAT package",
 			common.DataRecord{
-				SourceHeader: innosat.SourcePacketHeader{PacketID: 0x0864, PacketSequenceControl: 0xc89a, PacketLength: 0x31},
-				TMHeader:     innosat.TMHeader{PUS: 16, ServiceType: 3, ServiceSubType: 0x19, CUCTimeSeconds: 0, CUCTimeFraction: 0},
+				SourceHeader: &innosat.SourcePacketHeader{PacketID: 0x0864, PacketSequenceControl: 0xc89a, PacketLength: 0x31},
+				TMHeader:     &innosat.TMHeader{PUS: 16, ServiceType: 3, ServiceSubType: 0x19, CUCTimeSeconds: 0, CUCTimeFraction: 0},
 				Buffer: []byte{0x00, 0x01, 0x7f, 0x04, 0x02, 0x82,
 					0x04, 0x02, 0x02, 0x06, 0x01, 0x1b, 0x12, 0x00, 0x00, 0xef, 0xa0, 0x02, 0x00, 0x00, 0x00, 0x00,
 					0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -61,8 +61,8 @@ func TestDecodeAEZ(t *testing.T) {
 		{
 			"Bad package",
 			common.DataRecord{
-				SourceHeader: innosat.SourcePacketHeader{PacketID: 0x0864, PacketSequenceControl: 0xc89a, PacketLength: 0x31},
-				TMHeader:     innosat.TMHeader{PUS: 16, ServiceType: 3, ServiceSubType: 0x19, CUCTimeSeconds: 0, CUCTimeFraction: 0},
+				SourceHeader: &innosat.SourcePacketHeader{PacketID: 0x0864, PacketSequenceControl: 0xc89a, PacketLength: 0x31},
+				TMHeader:     &innosat.TMHeader{PUS: 16, ServiceType: 3, ServiceSubType: 0x19, CUCTimeSeconds: 0, CUCTimeFraction: 0},
 				Buffer: []byte{0x00, 0x01, 0x7f, 0x04, 0x02, 0x82,
 					0x04, 0x02, 0x02, 0x06, 0x01, 0x1b, 0x12, 0x00, 0x00, 0xef, 0xa0, 0x02, 0x00, 0x00, 0x00, 0x00,
 					0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -77,7 +77,7 @@ func TestDecodeAEZ(t *testing.T) {
 		{
 			"Transparent Data package",
 			common.DataRecord{
-				TMHeader: innosat.TMHeader{ServiceType: 128, ServiceSubType: 25},
+				TMHeader: &innosat.TMHeader{ServiceType: 128, ServiceSubType: 25},
 				Buffer: makeInstrumentData(
 					uint16(aez.CCD2),
 					aez.CCDImagePackData{NBC: 2},

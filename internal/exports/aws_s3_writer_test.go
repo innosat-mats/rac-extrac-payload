@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 	"github.com/innosat-mats/rac-extract-payload/internal/timeseries"
 )
 
@@ -77,7 +78,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: true,
 			},
 			[]common.DataRecord{{
-				Origin: common.OriginDescription{Name: "MyRac.rac"},
+				Origin:       common.OriginDescription{Name: "MyRac.rac"},
+				SourceHeader: &innosat.SourcePacketHeader{},
+				TMHeader:     &innosat.TMHeader{},
 				Data: &aez.CCDImage{
 					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
@@ -100,7 +103,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: false,
 			},
 			[]common.DataRecord{{
-				Origin: common.OriginDescription{Name: "MyRac.rac"},
+				Origin:       common.OriginDescription{Name: "MyRac.rac"},
+				SourceHeader: &innosat.SourcePacketHeader{},
+				TMHeader:     &innosat.TMHeader{},
 				Data: &aez.CCDImage{
 					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
@@ -120,7 +125,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: true,
 			},
 			[]common.DataRecord{{
-				Origin: common.OriginDescription{Name: "MyRac.rac"},
+				Origin:       common.OriginDescription{Name: "MyRac.rac"},
+				SourceHeader: &innosat.SourcePacketHeader{},
+				TMHeader:     &innosat.TMHeader{},
 				Data: &aez.CCDImage{
 					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
@@ -145,7 +152,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 			[]common.DataRecord{
 				{
-					Origin: common.OriginDescription{Name: "MyRac.rac"},
+					Origin:       common.OriginDescription{Name: "MyRac.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
 							EXPTS: 5,
@@ -157,7 +166,9 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 				},
 				{
-					Data: &aez.HTR{},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.HTR{},
 				},
 			},
 			map[string]int{

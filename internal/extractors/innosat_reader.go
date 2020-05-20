@@ -11,8 +11,8 @@ import (
 
 // SourcePackage ...
 type SourcePackage struct {
-	Header             innosat.SourcePacketHeader
-	Payload            innosat.TMHeader
+	Header             *innosat.SourcePacketHeader
+	Payload            *innosat.TMHeader
 	ApplicationPayload []byte
 }
 
@@ -23,8 +23,7 @@ const pusLengthOffset int = 1
 func DecodeSource(data []byte) (SourcePackage, error) {
 	var err error
 	buf := bytes.NewReader(data)
-	header := innosat.SourcePacketHeader{}
-	err = header.Read(buf)
+	header, err := innosat.NewSourcePacketHeader(buf)
 	if err != nil {
 		return SourcePackage{}, err
 	}
@@ -35,17 +34,16 @@ func DecodeSource(data []byte) (SourcePackage, error) {
 		)
 	}
 
-	tmHeaader := innosat.TMHeader{}
-	err = tmHeaader.Read(buf)
+	tmHeader, err := innosat.NewTMHeader(buf)
 	if err != nil {
 		return SourcePackage{}, err
 	}
 
-	sliceStart := binary.Size(header) + binary.Size(tmHeaader)
-	sliceEnd := sliceStart + int(header.PacketLength) - binary.Size(tmHeaader) - crcChecksumLength + pusLengthOffset
+	sliceStart := binary.Size(header) + binary.Size(tmHeader)
+	sliceEnd := sliceStart + int(header.PacketLength) - binary.Size(tmHeader) - crcChecksumLength + pusLengthOffset
 	return SourcePackage{
 		header,
-		tmHeaader,
+		tmHeader,
 		data[sliceStart:sliceEnd],
 	}, nil
 }

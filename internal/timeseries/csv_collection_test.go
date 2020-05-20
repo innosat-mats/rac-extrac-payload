@@ -7,6 +7,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 func TestNewCollection_IsReadyToUse(t *testing.T) {
@@ -17,7 +18,11 @@ func TestNewCollection_IsReadyToUse(t *testing.T) {
 	}
 	got := NewCollection(factory)
 	err := got.Write(
-		&common.DataRecord{Data: &aez.CCDImage{PackData: &aez.CCDImagePackData{}}},
+		&common.DataRecord{
+			SourceHeader: &innosat.SourcePacketHeader{},
+			TMHeader:     &innosat.TMHeader{},
+			Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+		},
 	)
 	if err != nil {
 		t.Errorf("NewCollection() returned collection that couldn't write, %v", err)
@@ -41,7 +46,13 @@ func TestCSVCollection_Write(t *testing.T) {
 		},
 		{
 			"CCDImage -> CCD",
-			[]common.DataRecord{{Data: &aez.CCDImage{PackData: &aez.CCDImagePackData{}}}},
+			[]common.DataRecord{
+				{
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+				},
+			},
 			false,
 			3,
 			[]OutStream{CCD},
@@ -49,8 +60,16 @@ func TestCSVCollection_Write(t *testing.T) {
 		{
 			"Writing twice adds just one more line",
 			[]common.DataRecord{
-				{Data: &aez.CCDImage{PackData: &aez.CCDImagePackData{}}},
-				{Data: &aez.CCDImage{PackData: &aez.CCDImagePackData{}}},
+				{
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+				},
+				{
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+				},
 			},
 			false,
 			4,
@@ -58,7 +77,18 @@ func TestCSVCollection_Write(t *testing.T) {
 		},
 		{
 			"Two different streams",
-			[]common.DataRecord{{Data: &aez.HTR{}}, {Data: &aez.STAT{}}},
+			[]common.DataRecord{
+				{
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.HTR{},
+				},
+				{
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.STAT{},
+				},
+			},
 			false,
 			6, //Our simple factory puts everything in same buffer
 			[]OutStream{HTR, STAT},

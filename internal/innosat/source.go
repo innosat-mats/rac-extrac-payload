@@ -99,25 +99,27 @@ type SourcePacketHeader struct {
 	PacketLength          uint16
 }
 
-//Read SourcePacketHeader
-func (sph *SourcePacketHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, sph)
+// NewSourcePacketHeader reads a SourcePacketHeader from buffer
+func NewSourcePacketHeader(buf io.Reader) (*SourcePacketHeader, error) {
+	sph := SourcePacketHeader{}
+	err := binary.Read(buf, binary.BigEndian, &sph)
+	return &sph, err
 }
 
 // CSVSpecifications returns the version of the spec used
-func (sph SourcePacketHeader) CSVSpecifications() []string {
+func (sph *SourcePacketHeader) CSVSpecifications() []string {
 	return []string{"INNOSAT", Specification}
 }
 
 // CSVHeaders returns the header row
-func (sph SourcePacketHeader) CSVHeaders() []string {
+func (sph *SourcePacketHeader) CSVHeaders() []string {
 	return []string{
 		"SPSequenceCount",
 	}
 }
 
 // CSVRow returns the data row
-func (sph SourcePacketHeader) CSVRow() []string {
+func (sph *SourcePacketHeader) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", sph.PacketSequenceControl.SequenceCount()),
 	}

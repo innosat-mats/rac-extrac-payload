@@ -73,7 +73,20 @@ func TestAggregator(t *testing.T) {
 		},
 		{
 			"Three continuation packages makes one error for lacking end",
-			[]common.DataRecord{{Buffer: []byte("42")}, {Buffer: []byte("42")}, {Buffer: []byte("42")}},
+			[]common.DataRecord{
+				{
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Buffer:       []byte("42"),
+				},
+				{
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Buffer:       []byte("42"),
+				},
+				{
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Buffer:       []byte("42"),
+				},
+			},
 			[]outcome{
 				// For the unexpected start error we don't care about removing SID/RID
 				{wantErr: true, partialErrMsg: "dangling final multipacket"},
@@ -82,7 +95,7 @@ func TestAggregator(t *testing.T) {
 		{
 			"Returns standalone as it is",
 			[]common.DataRecord{{
-				SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
+				SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
 				Buffer:       []byte("Hello"),
 			}},
 			[]outcome{{wantErr: false, bufferLength: 5}},
@@ -91,19 +104,19 @@ func TestAggregator(t *testing.T) {
 			"Returns aggregated",
 			[]common.DataRecord{
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
 					Buffer:       []byte("42 "),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
 					Buffer:       []byte("42World"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
 					Buffer:       []byte("42!"),
 				},
 			},
@@ -113,15 +126,15 @@ func TestAggregator(t *testing.T) {
 			"Errors if already started then continues multi",
 			[]common.DataRecord{
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
 					Buffer:       []byte("42World!"),
 				},
 			},
@@ -134,11 +147,11 @@ func TestAggregator(t *testing.T) {
 			"Errors if already started then reports standalone",
 			[]common.DataRecord{
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
 					Buffer:       []byte("World!"),
 				},
 			},

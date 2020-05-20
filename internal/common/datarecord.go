@@ -11,16 +11,16 @@ import (
 
 // DataRecord holds the full decode from one or many Ramses packages
 type DataRecord struct {
-	Origin         OriginDescription          // Describes the origin of the data like filename or data batch name
-	RamsesHeader   ramses.Ramses              // Ramses header information
-	RamsesTMHeader ramses.TMHeader            // The CCSDS compliant OHBSE TM Packet header
-	SourceHeader   innosat.SourcePacketHeader // Source header from the innosat platform
-	TMHeader       innosat.TMHeader           // Data header information
-	SID            aez.SID                    // SID of the Data if any
-	RID            aez.RID                    // RID of Data if any
-	Data           Exporter                   // The data payload itself, HK report, jpeg image etc.
-	Error          error                      // First propagated error from the decoding process
-	Buffer         []byte                     // Currently unprocessed data (payload)
+	Origin         OriginDescription           // Describes the origin of the data like filename or data batch name
+	RamsesHeader   ramses.Ramses               // Ramses header information
+	RamsesTMHeader ramses.TMHeader             // The CCSDS compliant OHBSE TM Packet header
+	SourceHeader   *innosat.SourcePacketHeader // Source header from the innosat platform
+	TMHeader       *innosat.TMHeader           // Data header information
+	SID            aez.SID                     // SID of the Data if any
+	RID            aez.RID                     // RID of Data if any
+	Data           Exporter                    // The data payload itself, HK report, jpeg image etc.
+	Error          error                       // First propagated error from the decoding process
+	Buffer         []byte                      // Currently unprocessed data (payload)
 }
 
 // MarshalJSON makes a custom json of what is of interest in the struct
@@ -39,11 +39,11 @@ func (record *DataRecord) MarshalJSON() ([]byte, error) {
 		dataJSON, dataJSONErr = json.Marshal(record.Data)
 	}
 	buf, err := json.Marshal(&struct {
-		Origin         OriginDescription          `json:"origin"`
-		RamsesHeader   ramses.Ramses              `json:"ramsesHeader"`
-		RamsesTMHeader ramses.TMHeader            `json:"ramsesTMHeader"`
-		SourceHeader   innosat.SourcePacketHeader `json:"sourceHeader"`
-		TMHeader       innosat.TMHeader           `json:"tmHeader"`
+		Origin         OriginDescription           `json:"origin"`
+		RamsesHeader   ramses.Ramses               `json:"ramsesHeader"`
+		RamsesTMHeader ramses.TMHeader             `json:"ramsesTMHeader"`
+		SourceHeader   *innosat.SourcePacketHeader `json:"sourceHeader"`
+		TMHeader       *innosat.TMHeader           `json:"tmHeader"`
 		SID            aez.SID
 		RID            aez.RID
 		Data           string `json:"data"`

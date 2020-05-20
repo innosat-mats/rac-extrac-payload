@@ -10,6 +10,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 func Test_csvName(t *testing.T) {
@@ -55,7 +56,10 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			"Doesn't create files if no writeTimeseries",
 			args{writeTimeseries: false},
 			[]common.DataRecord{
-				{Data: &aez.STAT{}},
+				{
+					SourceHeader: &innosat.SourcePacketHeader{},
+					Data:         &aez.STAT{},
+				},
 			},
 			[]wantFile{},
 		},
@@ -64,12 +68,16 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeTimeseries: true},
 			[]common.DataRecord{
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.STAT{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.STAT{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.STAT{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.STAT{},
 				},
 			},
 			[]wantFile{
@@ -81,12 +89,16 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeTimeseries: true},
 			[]common.DataRecord{
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.STAT{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.STAT{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File2.rac"},
-					Data:   &aez.STAT{},
+					Origin:       common.OriginDescription{Name: "File2.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.STAT{},
 				},
 			},
 			[]wantFile{
@@ -98,56 +110,82 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeTimeseries: true},
 			[]common.DataRecord{
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.STAT{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.STAT{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.CPRU{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.CPRU{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.CPRU{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.CPRU{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.HTR{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.HTR{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.HTR{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.HTR{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.PWR{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.PWR{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.PWR{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.PWR{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.PMData{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.PMData{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.PMData{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.PMData{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.TCAcceptSuccessData{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.TCAcceptSuccessData{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.TCExecSuccessData{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.TCExecSuccessData{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.TCAcceptFailureData{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.TCAcceptFailureData{},
 				},
 				{
-					Origin: common.OriginDescription{Name: "File1.rac"},
-					Data:   &aez.TCExecFailureData{},
+					Origin:       common.OriginDescription{Name: "File1.rac"},
+					SourceHeader: &innosat.SourcePacketHeader{},
+					TMHeader:     &innosat.TMHeader{},
+					Data:         &aez.TCExecFailureData{},
 				},
 			},
 			[]wantFile{
