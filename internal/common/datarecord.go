@@ -70,7 +70,7 @@ func (record *DataRecord) MarshalJSON() ([]byte, error) {
 }
 
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
-func (record DataRecord) CSVSpecifications() []string {
+func (record *DataRecord) CSVSpecifications() []string {
 	var specifications []string
 	specifications = append(
 		specifications,
@@ -91,7 +91,7 @@ func (record DataRecord) CSVSpecifications() []string {
 }
 
 // CSVHeaders returns a header row for the data record
-func (record DataRecord) CSVHeaders() []string {
+func (record *DataRecord) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, record.Origin.CSVHeaders()...)
 	headers = append(headers, record.RamsesHeader.CSVHeaders()...)
@@ -107,7 +107,7 @@ func (record DataRecord) CSVHeaders() []string {
 }
 
 // CSVRow returns a data row for the record
-func (record DataRecord) CSVRow() []string {
+func (record *DataRecord) CSVRow() []string {
 	var row []string
 	row = append(row, record.Origin.CSVRow()...)
 	row = append(row, record.RamsesHeader.CSVRow()...)
