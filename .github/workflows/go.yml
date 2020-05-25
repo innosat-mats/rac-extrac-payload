@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
 
     - name: Set up Go 1.14
@@ -19,7 +19,7 @@ jobs:
         go-version: 1.14
       id: go
 
-    - name: Install mingw Linux
+    - name: --Linux-- Install mingw
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get install -y gcc-mingw-w64
 
@@ -49,22 +49,30 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Build linux
-      if: ${{ runner.os == 'Linux' }}
+    - name: --Linux/macOS-- Build
+      if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       run: go build -o rac ./cmd/rac
 
-    - name: Build windows
+    - name: --Windows-- Build
       if: ${{ runner.os == 'Windows' }}
       run: go build -o rac.exe ./cmd/rac
+      shell: bash
 
-    - name: binaries linux
+    - name: --Linux--- Upload binaries
       if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac
         path: ./rac
 
-    - name: binaries windows
+    - name: --macOS--- Upload binaries
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: rac-mac
+        path: ./rac
+
+    - name: --Windows-- Upload binaries
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
