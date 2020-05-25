@@ -1,7 +1,9 @@
 GOPATH ?= $(HOME)/go
 GOBIN ?= $(GOPATH)/bin
 GOCMD := go
-
+ifeq ($(OS),Windows_NT)
+SHELL := git-bash.exe
+endif
 # Fetch build info
 HEAD := $(shell git rev-parse --short HEAD)
 BUILDTIME := $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
