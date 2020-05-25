@@ -20,11 +20,11 @@ jobs:
       id: go
 
     - name: install mingw Linux
-      if: ${{ runner.os == "Linux" }}
+      if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get install -y gcc-mingw-w64
 
     - name: isntall mingw Windows
-      if: ${{ runner.os == "Windows" }}
+      if: ${{ runner.os == 'Windows' }}
       run:  pacman -S mingw-w64-x86_64-clang
 
     - name: Check out code into the Go module directory
