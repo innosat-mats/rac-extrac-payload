@@ -54,19 +54,19 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
-        name: Rac_for_Linux
+        name: Rac for Linux
         path: /home/runner/go/bin/rac
 
     - name: --macOS--- Upload binaries
       if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v2
       with:
-        name: Rac_for_macOS
+        name: Rac for macOS
         path: /Users/runner/go/bin/rac
 
     - name: --Windows-- Upload binaries
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
-        name: Rac_for_Windows
+        name: Rac for Windows
         path: C:\Users\runneradmin\go\bin\rac.exe
