@@ -52,29 +52,23 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Whatsmyenv
-      run: |
-        echo $GOBIN
-        echo $GOPATH
-        echo $HOME
-
     - name: --Linux--- Upload binaries
       if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-linux
-        path: ${{ env.HOME }}/go/bin/rac
+        path: /home/runner/go/bin/rac
 
     - name: --macOS--- Upload binaries
       if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-mac
-        path: ${{ env.HOME }}/go/bin/rac
+        path: /Users/runner/go/bin/rac
 
     - name: --Windows-- Upload binaries
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-win.exe
-        path: ${{ env.HOME }}/go/bin/rac.exe
+        path: C:\Users\runneradmin\go\bin\rac.exe

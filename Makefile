@@ -32,9 +32,6 @@ lint: tools
 test:
 	$(GOTEST) ./...
 install:
-	$(info GOBIN is $(GOBIN))
-	$(info GOPATH is $(GOPATH))
-	$(info HOME is $(HOME))
 	$(GOINSTALL) -i ./...
 clean:
 	$(GOCLEAN) -i -cache ./...
