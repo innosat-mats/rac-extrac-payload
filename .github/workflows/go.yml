@@ -54,6 +54,10 @@ jobs:
 
     - name: --Linux--- Upload binaries
       if: ${{ runner.os == 'Linux' }}
+      run: |
+        echo $GOBIN
+        echo $GOPATH
+        echo $HOME
       uses: actions/upload-artifact@v2
       with:
         name: rac-linux
@@ -61,6 +65,10 @@ jobs:
 
     - name: --macOS--- Upload binaries
       if: ${{ runner.os == 'macOS' }}
+      run: |
+        echo $GOBIN
+        echo $GOPATH
+        echo $HOME
       uses: actions/upload-artifact@v2
       with:
         name: rac-mac
