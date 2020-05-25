@@ -25,31 +25,31 @@ func Test_instrumentHK(t *testing.T) {
 		{
 			"STAT",
 			args{sid: aez.SIDSTAT, buf: bytes.NewReader(make([]byte, 100))},
-			aez.STAT{},
+			&aez.STAT{},
 			false,
 		},
 		{
 			"HTR",
 			args{sid: aez.SIDHTR, buf: bytes.NewReader(make([]byte, 100))},
-			aez.HTR{},
+			&aez.HTR{},
 			false,
 		},
 		{
 			"PWR",
 			args{sid: aez.SIDPWR, buf: bytes.NewReader(make([]byte, 100))},
-			aez.PWR{},
+			&aez.PWR{},
 			false,
 		},
 		{
 			"CPRUA",
 			args{sid: aez.SIDCPRUA, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CPRU{},
+			&aez.CPRU{},
 			false,
 		},
 		{
 			"CPRUB",
 			args{sid: aez.SIDCPRUB, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CPRU{},
+			&aez.CPRU{},
 			false,
 		},
 		{"Unknown", args{sid: aez.SID(0)}, nil, true},
@@ -76,58 +76,49 @@ func Test_instrumentTransparentData(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    common.Exporter
 		wantErr bool
 	}{
 		{
 			"CCD1",
 			args{rid: aez.CCD1, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CCDImage{BadColumns: []uint16{}},
 			false,
 		},
 		{
 			"CCD2",
 			args{rid: aez.CCD2, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CCDImage{BadColumns: []uint16{}},
 			false,
 		},
 		{
 			"CCD3",
 			args{rid: aez.CCD3, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CCDImage{BadColumns: []uint16{}},
 			false,
 		},
 		{
 			"CCD4",
 			args{rid: aez.CCD4, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CCDImage{BadColumns: []uint16{}},
 			false,
 		},
 		{
 			"CCD5",
 			args{rid: aez.CCD5, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CCDImage{BadColumns: []uint16{}},
 			false,
 		},
 		{
 			"CCD6",
 			args{rid: aez.CCD6, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CCDImage{BadColumns: []uint16{}},
 			false,
 		},
 		{
 			"CCD7",
 			args{rid: aez.CCD7, buf: bytes.NewReader(make([]byte, 100))},
-			aez.CCDImage{BadColumns: []uint16{}},
 			false,
 		},
 		{
 			"PM",
 			args{rid: aez.PM, buf: bytes.NewReader(make([]byte, 100))},
-			aez.PMData{},
 			false,
 		},
-		{"Unknown", args{rid: aez.RID(0)}, nil, true},
+		{"Unknown", args{rid: aez.RID(0)}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -136,8 +127,15 @@ func Test_instrumentTransparentData(t *testing.T) {
 				t.Errorf("instrumentTransparentData() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("instrumentTransparentData() = %v, want %v", got, tt.want)
+			switch got.(type) {
+			case *aez.CCDImage:
+				if !tt.args.rid.IsCCD() {
+					t.Errorf("instrumentTransparentData() = %+v, want a CCD", got)
+				}
+			case *aez.PMData:
+				if tt.args.rid != aez.PM {
+					t.Errorf("instrumentTransparentData() = %+v, want a PM", got)
+				}
 			}
 		})
 	}
@@ -157,25 +155,25 @@ func Test_instrumentVerification(t *testing.T) {
 		{
 			"TC Acceptance - Success",
 			args{subtype: 1, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCAcceptSuccessData{},
+			&aez.TCAcceptSuccessData{},
 			false,
 		},
 		{
 			"TC Acceptance - Failure",
 			args{subtype: 2, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCAcceptFailureData{},
+			&aez.TCAcceptFailureData{},
 			false,
 		},
 		{
 			"TC Execution - Success",
 			args{subtype: 7, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCExecSuccessData{},
+			&aez.TCExecSuccessData{},
 			false,
 		},
 		{
 			"TC Execution - Failure",
 			args{subtype: 8, buf: bytes.NewReader(make([]byte, 100))},
-			aez.TCExecFailureData{},
+			&aez.TCExecFailureData{},
 			false,
 		},
 		{

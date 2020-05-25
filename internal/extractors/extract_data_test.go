@@ -99,8 +99,8 @@ func Example() {
 	reader2 := bytes.NewReader(data)
 	ExtractData(
 		simpleOutput,
-		StreamBatch{reader1, common.OriginDescription{Name: "Set1", ProcessingDate: innosat.Epoch}},
-		StreamBatch{reader2, common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}},
+		StreamBatch{reader1, &common.OriginDescription{Name: "Set1", ProcessingDate: innosat.Epoch}},
+		StreamBatch{reader2, &common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}},
 	)
 
 	// Output:
@@ -117,5 +117,5 @@ func Example() {
 }
 
 func simpleOutput(pkg common.DataRecord) {
-	fmt.Println(pkg.RID, pkg.SID, pkg.Error)
+	fmt.Println(pkg.RID.String(), pkg.SID.String(), pkg.Error)
 }

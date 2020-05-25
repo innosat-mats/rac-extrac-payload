@@ -86,3 +86,28 @@ func TestSID_MarshalJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestRID_IsCCD(t *testing.T) {
+	tests := []struct {
+		name string
+		rid  RID
+		want bool
+	}{
+		{"CCD1", CCD1, true},
+		{"CCD2", CCD2, true},
+		{"CCD3", CCD3, true},
+		{"CCD4", CCD4, true},
+		{"CCD5", CCD5, true},
+		{"CCD6", CCD6, true},
+		{"CCD7", CCD7, true},
+		{"PM", PM, false},
+		{"Unkown", RID(100), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.rid.IsCCD(); got != tt.want {
+				t.Errorf("RID.IsCCD() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

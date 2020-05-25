@@ -51,19 +51,19 @@ func (stream OutStream) String() string {
 // OutStreamFromDataRecord infers stream based on data
 func OutStreamFromDataRecord(pkg *common.DataRecord) OutStream {
 	switch pkg.Data.(type) {
-	case aez.CCDImage:
+	case *aez.CCDImage:
 		return CCD
-	case aez.PMData:
+	case *aez.PMData:
 		return PM
-	case aez.HTR:
+	case *aez.HTR:
 		return HTR
-	case aez.PWR:
+	case *aez.PWR:
 		return PWR
-	case aez.CPRU:
+	case *aez.CPRU:
 		return CPRU
-	case aez.STAT:
+	case *aez.STAT:
 		return STAT
-	case aez.TCAcceptSuccessData, aez.TCAcceptFailureData, aez.TCExecSuccessData, aez.TCExecFailureData:
+	case *aez.TCAcceptSuccessData, *aez.TCAcceptFailureData, *aez.TCExecSuccessData, *aez.TCExecFailureData:
 		return TCV
 	default:
 		return Unknown

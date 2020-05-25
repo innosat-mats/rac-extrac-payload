@@ -40,16 +40,16 @@ func TestOutStreamFromDataRecord(t *testing.T) {
 		args args
 		want OutStream
 	}{
-		{"CCD", args{&common.DataRecord{Data: aez.CCDImage{}}}, CCD},
-		{"PM", args{&common.DataRecord{Data: aez.PMData{}}}, PM},
-		{"HTR", args{&common.DataRecord{Data: aez.HTR{}}}, HTR},
-		{"PWR", args{&common.DataRecord{Data: aez.PWR{}}}, PWR},
-		{"CPRU", args{&common.DataRecord{Data: aez.CPRU{}}}, CPRU},
-		{"STAT", args{&common.DataRecord{Data: aez.STAT{}}}, STAT},
-		{"TCV, accept success", args{&common.DataRecord{Data: aez.TCAcceptSuccessData{}}}, TCV},
-		{"TCV, accept fail", args{&common.DataRecord{Data: aez.TCAcceptFailureData{}}}, TCV},
-		{"TCV, exec success", args{&common.DataRecord{Data: aez.TCExecSuccessData{}}}, TCV},
-		{"TCV, exec fail", args{&common.DataRecord{Data: aez.TCExecFailureData{}}}, TCV},
+		{"CCD", args{&common.DataRecord{Data: &aez.CCDImage{}}}, CCD},
+		{"PM", args{&common.DataRecord{Data: &aez.PMData{}}}, PM},
+		{"HTR", args{&common.DataRecord{Data: &aez.HTR{}}}, HTR},
+		{"PWR", args{&common.DataRecord{Data: &aez.PWR{}}}, PWR},
+		{"CPRU", args{&common.DataRecord{Data: &aez.CPRU{}}}, CPRU},
+		{"STAT", args{&common.DataRecord{Data: &aez.STAT{}}}, STAT},
+		{"TCV, accept success", args{&common.DataRecord{Data: &aez.TCAcceptSuccessData{}}}, TCV},
+		{"TCV, accept fail", args{&common.DataRecord{Data: &aez.TCAcceptFailureData{}}}, TCV},
+		{"TCV, exec success", args{&common.DataRecord{Data: &aez.TCExecSuccessData{}}}, TCV},
+		{"TCV, exec fail", args{&common.DataRecord{Data: &aez.TCExecFailureData{}}}, TCV},
 		{"Unknown", args{&common.DataRecord{}}, Unknown},
 	}
 	for _, tt := range tests {

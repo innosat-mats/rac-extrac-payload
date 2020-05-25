@@ -20,7 +20,15 @@ type Packet struct {
 // StreamBatch tells origin of batch
 type StreamBatch struct {
 	Buf    io.Reader
-	Origin common.OriginDescription
+	Origin *common.OriginDescription
+}
+
+// OriginName returns the origin name or empty string if unknown
+func (stream *StreamBatch) OriginName() string {
+	if stream.Origin != nil {
+		return stream.Origin.Name
+	}
+	return ""
 }
 
 //DecodeRamses reads Ramses packages from buffer
@@ -50,7 +58,7 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 	for _, firstRecord := range records {
 		recordChannel <- firstRecord
 		for _, stream := range streamBatch {
-			if stream.Origin.Name != firstRecord.Origin.Name {
+			if stream.OriginName() != firstRecord.OriginName() {
 				continue
 			}
 			for {
@@ -69,8 +77,7 @@ func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamB
 
 // getRecord returns next record and a flag if stream was actually done prior to this record
 func getRecord(stream StreamBatch) (common.DataRecord, bool) {
-	header := ramses.Ramses{}
-	err := header.Read(stream.Buf)
+	header, err := ramses.NewRamses(stream.Buf)
 	if err != nil {
 		// EOF for reading Ramses just means we have no more records so not really an error
 		if err == io.EOF {
@@ -88,8 +95,7 @@ func getRecord(stream StreamBatch) (common.DataRecord, bool) {
 		return common.DataRecord{Origin: stream.Origin, Error: err, Buffer: []byte{}}, false
 	}
 
-	tmHeader := ramses.TMHeader{}
-	err = tmHeader.Read(stream.Buf)
+	tmHeader, err := ramses.NewTMHeader(stream.Buf)
 	if err != nil && err != io.EOF {
 		return common.DataRecord{
 			Origin:       stream.Origin,
