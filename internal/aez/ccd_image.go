@@ -68,6 +68,9 @@ func (ccd *CCDImage) CSVRow() []string {
 // MarshalJSON jsonifies content
 func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 	wdwhigh, wdwlow, _ := ccd.PackData.WDW.InputDataWindow()
+	wdwMode := ccd.PackData.WDW.Mode()
+	gainMode := ccd.PackData.GAIN.Mode()
+	gainTiming := ccd.PackData.GAIN.Timing()
 	return json.Marshal(&struct {
 		Specification      string `json:"specification"`
 		CCDSEL             uint8
@@ -105,7 +108,7 @@ func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 		ccd.PackData.CCDSEL,
 		ccd.PackData.Nanoseconds(),
 		ccd.PackData.Time(gpsTime).Format(time.RFC3339Nano),
-		ccd.PackData.WDW.Mode().String(),
+		(&wdwMode).String(),
 		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
 		ccd.PackData.WDWOV,
 		ccd.PackData.JPEGQ,
@@ -119,8 +122,8 @@ func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 		ccd.PackData.NCSKIP,
 		ccd.PackData.NFLUSH,
 		ccd.PackData.TEXPMS,
-		ccd.PackData.GAIN.Mode().String(),
-		ccd.PackData.GAIN.Timing().String(),
+		(&gainMode).String(),
+		(&gainTiming).String(),
 		ccd.PackData.TEMP,
 		ccd.PackData.FBINOV,
 		ccd.PackData.LBLNK,

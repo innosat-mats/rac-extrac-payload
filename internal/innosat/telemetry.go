@@ -13,8 +13,8 @@ import (
 type pus uint8
 
 // Version ...
-func (pus pus) Version() uint8 {
-	return uint8((pus << 1) >> 5)
+func (pus *pus) Version() uint8 {
+	return uint8((*pus << 1) >> 5)
 }
 
 //TMHeader (9 octets)

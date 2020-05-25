@@ -13,44 +13,44 @@ type gate uint16
 
 var voltageConstant float64 = 2.5 / (math.Pow(2, 12) - 1)
 
-func (data gate) voltage() float64 {
-	return voltageConstant * float64(data) * 10
+func (data *gate) voltage() float64 {
+	return voltageConstant * float64(*data) * 10
 }
 
 type subs uint16
 
-func (data subs) voltage() float64 {
-	return voltageConstant * float64(data) * 11 / 1.5
+func (data *subs) voltage() float64 {
+	return voltageConstant * float64(*data) * 11 / 1.5
 }
 
 type rd uint16
 
-func (data rd) voltage() float64 {
-	return voltageConstant * float64(data) * 17 / 1.5
+func (data *rd) voltage() float64 {
+	return voltageConstant * float64(*data) * 17 / 1.5
 }
 
 type od uint16
 
-func (data od) voltage() float64 {
-	return voltageConstant * float64(data) * 32 / 1.5
+func (data *od) voltage() float64 {
+	return voltageConstant * float64(*data) * 32 / 1.5
 }
 
 type cpruStat uint8
 
-func (stat cpruStat) overvoltageFault(ccd uint8) bool {
+func (stat *cpruStat) overvoltageFault(ccd uint8) bool {
 	if ccd > 3 {
 		log.Fatalf("overvoltageFault got illegal ccd %v", ccd)
 	}
 	var mask uint8 = 0x80 >> ccd
-	return uint8(stat)&mask != 0
+	return uint8(*stat)&mask != 0
 }
 
-func (stat cpruStat) powerEnabled(ccd uint8) bool {
+func (stat *cpruStat) powerEnabled(ccd uint8) bool {
 	if ccd > 3 {
 		log.Fatalf("powerEnabled got illegal ccd %v", ccd)
 	}
 	var mask uint8 = 0x08 >> ccd
-	return uint8(stat)&mask != 0
+	return uint8(*stat)&mask != 0
 }
 
 //CPRU structure

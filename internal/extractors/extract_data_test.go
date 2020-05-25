@@ -117,5 +117,5 @@ func Example() {
 }
 
 func simpleOutput(pkg common.DataRecord) {
-	fmt.Println(pkg.RID, pkg.SID, pkg.Error)
+	fmt.Println(pkg.RID.String(), pkg.SID.String(), pkg.Error)
 }

@@ -27,8 +27,8 @@ const (
 	SIDCPRUB SID = 31
 )
 
-func (sid SID) String() string {
-	switch sid {
+func (sid *SID) String() string {
+	switch *sid {
 	case 0:
 		return ""
 	case SIDSTAT:
@@ -42,7 +42,7 @@ func (sid SID) String() string {
 	case SIDCPRUB:
 		return "CPRUB"
 	default:
-		return fmt.Sprintf("Unknown SID: %v", int(sid))
+		return fmt.Sprintf("Unknown SID: %v", int(*sid))
 	}
 }
 
@@ -74,12 +74,12 @@ const (
 )
 
 // IsCCD returns if the RID is for a CCD
-func (rid RID) IsCCD() bool {
-	return rid == CCD1 || rid == CCD2 || rid == CCD3 || rid == CCD4 || rid == CCD5 || rid == CCD6 || rid == CCD7
+func (rid *RID) IsCCD() bool {
+	return *rid == CCD1 || *rid == CCD2 || *rid == CCD3 || *rid == CCD4 || *rid == CCD5 || *rid == CCD6 || *rid == CCD7
 }
 
-func (rid RID) String() string {
-	switch rid {
+func (rid *RID) String() string {
+	switch *rid {
 	case 0:
 		return ""
 	case CCD1:
@@ -99,7 +99,7 @@ func (rid RID) String() string {
 	case PM:
 		return "PM"
 	default:
-		return fmt.Sprintf("Unknown RID: %v", int(rid))
+		return fmt.Sprintf("Unknown RID: %v", int(*rid))
 	}
 }
 

@@ -35,69 +35,78 @@ var pwrResistances = [...]float64{
 	1.08974e+01, 1.01410e+01,
 } // Ohm
 
-func (data pwr) voltageADC() float64 {
-	return voltageConstant * float64(data)
+func (data *pwr) voltageADC() float64 {
+	return voltageConstant * float64(*data)
 }
 
 type pwrt pwr
 
-func (data pwrt) voltage() float64 {
-	return pwr(data).voltageADC()
+func (data *pwrt) voltage() float64 {
+	pwr := pwr(*data)
+	return pwr.voltageADC()
 }
 
-func (data pwrt) resistance() float64 {
+func (data *pwrt) resistance() float64 {
 	return 3.3*1000/data.voltage() - 1000
 }
 
 type pwrp32v pwr
 
-func (data pwrp32v) voltage() float64 {
-	return 21 * pwr(data).voltageADC()
+func (data *pwrp32v) voltage() float64 {
+	pwr := pwr(*data)
+	return 21 * pwr.voltageADC()
 }
 
 type pwrp32c pwr
 
-func (data pwrp32c) current() float64 {
-	return 10.1 / 100 * pwr(data).voltageADC()
+func (data *pwrp32c) current() float64 {
+	pwr := pwr(*data)
+	return 10.1 / 100 * pwr.voltageADC()
 }
 
 type pwrp16v pwr
 
-func (data pwrp16v) voltage() float64 {
-	return 11 * pwr(data).voltageADC()
+func (data *pwrp16v) voltage() float64 {
+	pwr := pwr(*data)
+	return 11 * pwr.voltageADC()
 }
 
 type pwrp16c pwr
 
-func (data pwrp16c) current() float64 {
-	return 10.1 / 5 * pwr(data).voltageADC()
+func (data *pwrp16c) current() float64 {
+	pwr := pwr(*data)
+	return 10.1 / 5 * pwr.voltageADC()
 }
 
 type pwrm16v pwr
 
-func (data pwrm16v) voltage() float64 {
-	return -10 * pwr(data).voltageADC()
+func (data *pwrm16v) voltage() float64 {
+	pwr := pwr(*data)
+	return -10 * pwr.voltageADC()
 }
 
 type pwrm16c pwr
 
-func (data pwrm16c) current() float64 {
-	return 10.1 / 100 * pwr(data).voltageADC()
+func (data *pwrm16c) current() float64 {
+	pwr := pwr(*data)
+	return 10.1 / 100 * pwr.voltageADC()
 }
 
 type pwrp3v3 pwr
 
-func (data pwrp3v3) voltage() float64 {
-	return 4 * pwr(data).voltageADC()
+func (data *pwrp3v3) voltage() float64 {
+	pwr := pwr(*data)
+	return 4 * pwr.voltageADC()
 }
 
 type pwrp3c3 pwr
 
-func (data pwrp3c3) current() float64 {
-	return 10.1 / 20 * pwr(data).voltageADC()
+func (data *pwrp3c3) current() float64 {
+	pwr := pwr(*data)
+	return 10.1 / 20 * pwr.voltageADC()
 }
 
-func (data pwrt) temperature() (float64, error) {
+func (data *pwrt) temperature() (float64, error) {
 	return Interpolate(
 		data.resistance(),
 		pwrResistances[:],

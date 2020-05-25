@@ -20,14 +20,14 @@ const (
 	WDWModeAutomatic WDWMode = 1
 )
 
-func (mode WDWMode) String() string {
-	switch mode {
+func (mode *WDWMode) String() string {
+	switch *mode {
 	case WDWModeManual:
 		return "Manual"
 	case WDWModeAutomatic:
 		return "Automatic"
 	default:
-		return fmt.Sprintf("Unrecognized WDWMode: %v", int(mode))
+		return fmt.Sprintf("Unrecognized WDWMode: %v", int(*mode))
 	}
 }
 
@@ -35,8 +35,8 @@ func (mode WDWMode) String() string {
 type Wdw uint8
 
 // Mode returns the WDWMode type used encoded in Bit[7]
-func (wdw Wdw) Mode() WDWMode {
-	if (wdw & 0x80) == 0 {
+func (wdw *Wdw) Mode() WDWMode {
+	if (*wdw & 0x80) == 0 {
 		return WDWModeManual
 	}
 	return WDWModeAutomatic
@@ -50,8 +50,8 @@ func (wdw Wdw) Mode() WDWMode {
 // if encoding not covered by specification.
 //
 // If full range of Bit[15..0] is used the JPEGQ should be 0xFF
-func (wdw Wdw) InputDataWindow() (int, int, error) {
-	switch wdw & 0b111 {
+func (wdw *Wdw) InputDataWindow() (int, int, error) {
+	switch *wdw & 0b111 {
 	case 0x0:
 		return 11, 0, nil
 	case 0x1:
@@ -66,7 +66,7 @@ func (wdw Wdw) InputDataWindow() (int, int, error) {
 		return 15, 0, nil
 	}
 	return -1, -1, fmt.Errorf(
-		"WDW value has unknown Input Data Window '%x'", wdw&0b111,
+		"WDW value has unknown Input Data Window '%x'", *wdw&0b111,
 	)
 }
 
@@ -75,13 +75,13 @@ type NCBin uint16
 
 // FPGAColumns returns number FPGA columns to bin, Bit[11..8]
 //  the value is encoded as 2^x
-func (ncBin NCBin) FPGAColumns() int {
-	return 1 << ((ncBin >> 8) & 0x0f)
+func (ncBin *NCBin) FPGAColumns() int {
+	return 1 << ((*ncBin >> 8) & 0x0f)
 }
 
 // CCDColumns returns number of CCD columns to bin, Bit[7..0]
-func (ncBin NCBin) CCDColumns() int {
-	return (int)(ncBin & 0xff)
+func (ncBin *NCBin) CCDColumns() int {
+	return (int)(*ncBin & 0xff)
 }
 
 // CCDGain is game composite information
@@ -96,14 +96,14 @@ const (
 	LowSignalMode
 )
 
-func (mode CCDGainMode) String() string {
-	switch mode {
+func (mode *CCDGainMode) String() string {
+	switch *mode {
 	case HighSignalMode:
 		return "High"
 	case LowSignalMode:
 		return "Low"
 	default:
-		return fmt.Sprintf("Unrecognized CCDGainMode: %v", int(mode))
+		return fmt.Sprintf("Unrecognized CCDGainMode: %v", int(*mode))
 	}
 }
 
@@ -117,8 +117,8 @@ const (
 	FullTiming
 )
 
-func (timing CCDGainTiming) String() string {
-	switch timing {
+func (timing *CCDGainTiming) String() string {
+	switch *timing {
 	case FasterTiming:
 		return "Faster"
 	case FullTiming:
@@ -129,24 +129,24 @@ func (timing CCDGainTiming) String() string {
 }
 
 // Mode returns high/low signal mode, Bit[12]
-func (gain CCDGain) Mode() CCDGainMode {
-	if (gain & 0x1000) == 0 {
+func (gain *CCDGain) Mode() CCDGainMode {
+	if (*gain & 0x1000) == 0 {
 		return HighSignalMode
 	}
 	return LowSignalMode
 }
 
 // Timing returns the full timing flag, Bit[8]
-func (gain CCDGain) Timing() CCDGainTiming {
-	if (gain & 0x100) == 0 {
+func (gain *CCDGain) Timing() CCDGainTiming {
+	if (*gain & 0x100) == 0 {
 		return FasterTiming
 	}
 	return FullTiming
 }
 
 // Truncation returns number of bits to be truncated (digital gain), Bit[3..0]
-func (gain CCDGain) Truncation() uint8 {
-	return uint8(gain & 0b1111)
+func (gain *CCDGain) Truncation() uint8 {
+	return uint8(*gain & 0b1111)
 }
 
 // JPEGQUncompressed16bit is the value for non-12bit image data
@@ -243,11 +243,14 @@ func (ccd *CCDImagePackData) CSVHeaders() []string {
 // CSVRow returns the exportable field values
 func (ccd *CCDImagePackData) CSVRow() []string {
 	wdwhigh, wdwlow, _ := ccd.WDW.InputDataWindow()
+	wdwMode := ccd.WDW.Mode()
+	gainMode := ccd.GAIN.Mode()
+	gainTiming := ccd.GAIN.Timing()
 	return []string{
 		strconv.Itoa(int(ccd.CCDSEL)),
 		strconv.FormatInt(ccd.Nanoseconds(), 10),
 		ccd.Time(gpsTime).Format(time.RFC3339Nano),
-		ccd.WDW.Mode().String(),
+		(&wdwMode).String(),
 		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
 		strconv.Itoa(int(ccd.WDWOV)),
 		strconv.Itoa(int(ccd.JPEGQ)),
@@ -261,8 +264,8 @@ func (ccd *CCDImagePackData) CSVRow() []string {
 		strconv.Itoa(int(ccd.NCSKIP)),
 		strconv.Itoa(int(ccd.NFLUSH)),
 		strconv.Itoa(int(ccd.TEXPMS)),
-		ccd.GAIN.Mode().String(),
-		ccd.GAIN.Timing().String(),
+		(&gainMode).String(),
+		(&gainTiming).String(),
 		strconv.Itoa(int(ccd.TEMP)),
 		strconv.Itoa(int(ccd.FBINOV)),
 		strconv.Itoa(int(ccd.LBLNK)),

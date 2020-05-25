@@ -29,15 +29,15 @@ var htrResistances = [...]float64{
 
 type htr uint16
 
-func (data htr) voltage() float64 {
-	return voltageConstant * float64(data)
+func (data *htr) voltage() float64 {
+	return voltageConstant * float64(*data)
 }
 
-func (data htr) resistance() float64 {
+func (data *htr) resistance() float64 {
 	return 3.3*3900/data.voltage() - 3900
 }
 
-func (data htr) temperature() (float64, error) {
+func (data *htr) temperature() (float64, error) {
 	return Interpolate(
 		data.resistance(),
 		htrResistances[:],
