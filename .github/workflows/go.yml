@@ -55,19 +55,19 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
-        name: rac
-        path: $GOPATH/rac
+        name: rac-linux
+        path: ${{ env.GOPATH }}/rac
 
     - name: --macOS--- Upload binaries
       if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-mac
-        path: $GOPATH/rac
+        path: ${{ env.GOPATH }}/rac
 
     - name: --Windows-- Upload binaries
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
-        name: rac.exe
-        path: $GOPATH/rac.exe
+        name: rac-win.exe
+        path: ${{ env.GOPATH }}/rac.exe
