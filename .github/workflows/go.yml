@@ -10,9 +10,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+      #  os: [ubuntu-latest, windows-latest]
       # macOS doesn't work due to some build-error of jpegdecode
-      #  os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
 
     - name: Set up Go 1.14
@@ -41,8 +41,8 @@ jobs:
         fi
       shell: bash
 
-    - name: Build
-      run: make build
+    - name: Build & Install
+      run: make install
 
     - name: Lint
       run: make lint
@@ -51,32 +51,23 @@ jobs:
     - name: Test
       run: make test
 
-    - name: --Linux/macOS-- Build
-      if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
-      run: go build -o rac ./cmd/rac
-
-    - name: --Windows-- Build
-      if: ${{ runner.os == 'Windows' }}
-      run: go build -o rac.exe ./cmd/rac
-      shell: bash
-
     - name: --Linux--- Upload binaries
       if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac
-        path: ./rac
+        path: $GOPATH/rac
 
     - name: --macOS--- Upload binaries
       if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-mac
-        path: ./rac
+        path: $GOPATH/rac
 
     - name: --Windows-- Upload binaries
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac.exe
-        path: ./rac.exe
+        path: $GOPATH/rac.exe
