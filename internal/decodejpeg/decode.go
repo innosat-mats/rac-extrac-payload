@@ -5,7 +5,7 @@ package decodejpeg
 // #cgo linux CFLAGS: -I${SRCDIR}/../../third-party/linux/include
 // #cgo linux LDFLAGS: ${SRCDIR}/../../third-party/linux/lib/libjpeg.a
 // #cgo darwin CFLAGS: -I${SRCDIR}/../../third-party/darwin/include
-// #cgo darwin LDFLAGS: -L/${SRCDIR}/../../third-party/darwin/lib -Wl,-rpath,$ORIGIN/../lib -ljpeg
+// #cgo darwin LDFLAGS: ${SRCDIR}/../../third-party/darwin/lib/libjpeg.a
 // #include <stdlib.h>
 // #include "decode.h"
 import "C"
