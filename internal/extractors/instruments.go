@@ -14,25 +14,13 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
 	var err error
 	switch sid {
 	case aez.SIDSTAT:
-		stat := aez.STAT{}
-		err = stat.Read(buf)
-		dataPackage = stat
+		dataPackage, err = aez.NewSTAT(buf)
 	case aez.SIDHTR:
-		htr := aez.HTR{}
-		err = htr.Read(buf)
-		dataPackage = htr
+		dataPackage, err = aez.NewHTR(buf)
 	case aez.SIDPWR:
-		pwr := aez.PWR{}
-		err = pwr.Read(buf)
-		dataPackage = pwr
-	case aez.SIDCPRUA:
-		cpru := aez.CPRU{}
-		err = cpru.Read(buf)
-		dataPackage = cpru
-	case aez.SIDCPRUB:
-		cpru := aez.CPRU{}
-		err = cpru.Read(buf)
-		dataPackage = cpru
+		dataPackage, err = aez.NewPWR(buf)
+	case aez.SIDCPRUA, aez.SIDCPRUB:
+		dataPackage, err = aez.NewCPRU(buf)
 	default:
 		err = fmt.Errorf("unhandled SID %v", sid)
 	}
@@ -42,17 +30,11 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
 func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exporter, error) {
 	var dataPackage common.Exporter
 	var err error
-	switch rid {
-	case aez.CCD1, aez.CCD2, aez.CCD3, aez.CCD4, aez.CCD5, aez.CCD6, aez.CCD7:
-		ccdIPD := aez.CCDImagePackData{}
-		var badColumns []uint16
-		badColumns, err = ccdIPD.Read(buf)
-		ccdImg := aez.CCDImage{PackData: ccdIPD, BadColumns: badColumns}
-		dataPackage = ccdImg
-	case aez.PM:
-		pmData := aez.PMData{}
-		err = pmData.Read(buf)
-		dataPackage = pmData
+	switch {
+	case rid.IsCCD():
+		dataPackage, err = aez.NewCCDImage(buf)
+	case rid == aez.PM:
+		dataPackage, err = aez.NewPMData(buf)
 	default:
 		err = fmt.Errorf("unhandled RID %v", rid)
 	}
@@ -67,21 +49,13 @@ func instrumentVerification(
 	var err error
 	switch subtype {
 	case innosat.TCAcceptSuccess:
-		tcv := aez.TCAcceptSuccessData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCAcceptSuccessData(buf)
 	case innosat.TCAcceptFailure:
-		tcv := aez.TCAcceptFailureData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCAcceptFailureData(buf)
 	case innosat.TCExecSuccess:
-		tcv := aez.TCExecSuccessData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCExecSuccessData(buf)
 	case innosat.TCExecFailure:
-		tcv := aez.TCExecFailureData{}
-		err = tcv.Read(buf)
-		dataPackage = tcv
+		dataPackage, err = aez.NewTCExecFailureData(buf)
 	default:
 		err = fmt.Errorf("unhandled TC Verification subtype %v", subtype)
 	}

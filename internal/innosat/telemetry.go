@@ -13,8 +13,8 @@ import (
 type pus uint8
 
 // Version ...
-func (pus pus) Version() uint8 {
-	return uint8((pus << 1) >> 5)
+func (pus *pus) Version() uint8 {
+	return uint8((*pus << 1) >> 5)
 }
 
 //TMHeader (9 octets)
@@ -26,9 +26,11 @@ type TMHeader struct {
 	CUCTimeFraction uint16
 }
 
-// Read TMHeader
-func (header *TMHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, header)
+// NewTMHeader reads a TMHeader from buffer
+func NewTMHeader(buf io.Reader) (*TMHeader, error) {
+	header := TMHeader{}
+	err := binary.Read(buf, binary.BigEndian, &header)
+	return &header, err
 }
 
 // Time returns the telemetry data time in UTC
@@ -61,7 +63,7 @@ func (header *TMHeader) IsTCVerification() bool {
 }
 
 // CSVHeaders returns the header row
-func (header TMHeader) CSVHeaders() []string {
+func (header *TMHeader) CSVHeaders() []string {
 	return []string{
 		"TMHeaderTime",
 		"TMHeaderNanoseconds",
@@ -71,7 +73,7 @@ func (header TMHeader) CSVHeaders() []string {
 var gpsTime = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
 
 // CSVRow returns the data row
-func (header TMHeader) CSVRow() []string {
+func (header *TMHeader) CSVRow() []string {
 	tmTime := header.Time(gpsTime)
 	return []string{
 		tmTime.Format(time.RFC3339Nano),

@@ -17,14 +17,14 @@ const (
 	TC SourcePacketHeaderType = 1
 )
 
-func (headerType SourcePacketHeaderType) String() string {
-	switch headerType {
+func (headerType *SourcePacketHeaderType) String() string {
+	switch *headerType {
 	case TM:
 		return "TM"
 	case TC:
 		return "TC"
 	default:
-		return fmt.Sprintf("Unknown HeaderType %v", uint(headerType))
+		return fmt.Sprintf("Unknown HeaderType %v", uint(*headerType))
 	}
 }
 
@@ -42,8 +42,8 @@ const (
 	SPStandalone
 )
 
-func (continuationFlag SourcePackageContinuationFlagType) String() string {
-	switch continuationFlag {
+func (continuationFlag *SourcePackageContinuationFlagType) String() string {
+	switch *continuationFlag {
 	case SPCont:
 		return "Continuation"
 	case SPStart:
@@ -53,43 +53,43 @@ func (continuationFlag SourcePackageContinuationFlagType) String() string {
 	case SPStandalone:
 		return "Standalone"
 	default:
-		return fmt.Sprintf("Unknown ContinuationFlag %v", uint(continuationFlag))
+		return fmt.Sprintf("Unknown ContinuationFlag %v", uint(*continuationFlag))
 	}
 }
 
 type packetID uint16
 
 // Version ...
-func (pid packetID) Version() uint {
-	return uint(pid >> 13)
+func (pid *packetID) Version() uint {
+	return uint(*pid >> 13)
 }
 
 // Type is either Telecommand or Telemetry
-func (pid packetID) Type() SourcePacketHeaderType {
-	return SourcePacketHeaderType((pid << 3) >> 15)
+func (pid *packetID) Type() SourcePacketHeaderType {
+	return SourcePacketHeaderType((*pid << 3) >> 15)
 }
 
 // HeaderType ...
-func (pid packetID) HeaderType() uint {
-	return uint((pid << 4) >> 15)
+func (pid *packetID) HeaderType() uint {
+	return uint((*pid << 4) >> 15)
 }
 
 // APID ...
-func (pid packetID) APID() SourcePacketAPIDType {
-	return SourcePacketAPIDType(pid & 0x07FF)
+func (pid *packetID) APID() SourcePacketAPIDType {
+	return SourcePacketAPIDType(*pid & 0x07FF)
 }
 
 // PacketSequenceControl is the encoding of the sequence value
 type PacketSequenceControl uint16
 
 // GroupingFlags ...
-func (psc PacketSequenceControl) GroupingFlags() SourcePackageContinuationFlagType {
-	return SourcePackageContinuationFlagType(psc >> 14)
+func (psc *PacketSequenceControl) GroupingFlags() SourcePackageContinuationFlagType {
+	return SourcePackageContinuationFlagType(*psc >> 14)
 }
 
 // SequenceCount ...
-func (psc PacketSequenceControl) SequenceCount() uint16 {
-	return uint16((psc << 2) >> 2)
+func (psc *PacketSequenceControl) SequenceCount() uint16 {
+	return uint16((*psc << 2) >> 2)
 }
 
 // SourcePacketHeader Source Packet Header
@@ -99,25 +99,27 @@ type SourcePacketHeader struct {
 	PacketLength          uint16
 }
 
-//Read SourcePacketHeader
-func (sph *SourcePacketHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.BigEndian, sph)
+// NewSourcePacketHeader reads a SourcePacketHeader from buffer
+func NewSourcePacketHeader(buf io.Reader) (*SourcePacketHeader, error) {
+	sph := SourcePacketHeader{}
+	err := binary.Read(buf, binary.BigEndian, &sph)
+	return &sph, err
 }
 
 // CSVSpecifications returns the version of the spec used
-func (sph SourcePacketHeader) CSVSpecifications() []string {
+func (sph *SourcePacketHeader) CSVSpecifications() []string {
 	return []string{"INNOSAT", Specification}
 }
 
 // CSVHeaders returns the header row
-func (sph SourcePacketHeader) CSVHeaders() []string {
+func (sph *SourcePacketHeader) CSVHeaders() []string {
 	return []string{
 		"SPSequenceCount",
 	}
 }
 
 // CSVRow returns the data row
-func (sph SourcePacketHeader) CSVRow() []string {
+func (sph *SourcePacketHeader) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", sph.PacketSequenceControl.SequenceCount()),
 	}

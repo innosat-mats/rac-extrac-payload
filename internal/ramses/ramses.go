@@ -21,27 +21,29 @@ type Ramses struct {
 	Date   int32  // days since 2000-01-01 00:00:00.00
 }
 
-// Read Ramses reads buffer into the struct
+// NewRamses reads a Ramses from buffer
 //
 // returns io.EOF is there was exactly 0 bytes to read since this
 // indicates previous record was the last record of the buffer and
 // thus not really an error.
 //
 // for all other incomplete reads non EOF errors are produced.
-func (ramses *Ramses) Read(buf io.Reader) error {
+func NewRamses(buf io.Reader) (*Ramses, error) {
+	ramses := Ramses{}
 	size := binary.Size(ramses)
 	tmpBuf := make([]byte, size)
 	n, err := buf.Read(tmpBuf)
 	if err != nil && err != io.EOF {
-		return err
+		return nil, err
 	}
 	if n == 0 {
-		return io.EOF
+		return nil, io.EOF
 	} else if n != size {
-		return errors.New("not enough data to read Ramses header")
+		return nil, errors.New("not enough data to read Ramses header")
 	}
 
-	return binary.Read(bytes.NewReader(tmpBuf), binary.LittleEndian, ramses)
+	err = binary.Read(bytes.NewReader(tmpBuf), binary.LittleEndian, &ramses)
+	return &ramses, err
 }
 
 // Created is when the package was created
@@ -65,19 +67,19 @@ func (ramses *Ramses) Valid() bool {
 }
 
 // CSVSpecifications returns the specs used in creating the struct
-func (ramses Ramses) CSVSpecifications() []string {
+func (ramses *Ramses) CSVSpecifications() []string {
 	return []string{"RAMSES", Specification}
 }
 
 //CSVHeaders returns the field names
-func (ramses Ramses) CSVHeaders() []string {
+func (ramses *Ramses) CSVHeaders() []string {
 	return []string{
 		"RamsesTime",
 	}
 }
 
 //CSVRow returns the field values
-func (ramses Ramses) CSVRow() []string {
+func (ramses *Ramses) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", ramses.Created().Format(time.RFC3339Nano)),
 	}

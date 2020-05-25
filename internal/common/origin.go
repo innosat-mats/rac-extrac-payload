@@ -9,12 +9,12 @@ type OriginDescription struct {
 }
 
 //CSVHeaders returns the field names
-func (origin OriginDescription) CSVHeaders() []string {
+func (origin *OriginDescription) CSVHeaders() []string {
 	return []string{"File", "ProcessingDate"}
 }
 
 //CSVRow returns the field values
-func (origin OriginDescription) CSVRow() []string {
+func (origin *OriginDescription) CSVRow() []string {
 	return []string{
 		origin.Name,
 		origin.ProcessingDate.Format(time.RFC3339),

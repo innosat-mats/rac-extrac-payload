@@ -73,7 +73,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 				multiPackStart = sourcePacket
 				multiPackStart.Error = fmt.Errorf(
 					"got stop packet without a start packet (%s)",
-					sourcePacket.Origin.Name,
+					sourcePacket.OriginName(),
 				)
 			}
 
@@ -95,7 +95,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			sourcePacket.Error = fmt.Errorf(
 				"unhandled grouping flag %v (%s)",
 				sourcePacket.SourceHeader.PacketSequenceControl.GroupingFlags(),
-				sourcePacket.Origin.Name,
+				sourcePacket.OriginName(),
 			)
 			sourcePacket.Buffer = multiPackBuffer.Bytes()
 			target <- sourcePacket
@@ -107,7 +107,7 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		err := fmt.Errorf(
 			"dangling final multipacket with %v bytes (%s)",
 			multiPackBuffer.Len(),
-			multiPackStart.Origin.Name,
+			multiPackStart.OriginName(),
 		)
 		multiPackStart.Buffer = multiPackBuffer.Bytes()
 		multiPackStart.Error = err
@@ -119,7 +119,7 @@ func makeUnfinishedMultiPackError(multiPackBuffer *bytes.Buffer, sourcePacket co
 	errorPacket := sourcePacket
 	errorPacket.Error = fmt.Errorf(
 		"orphaned multi-package data without termination detected (%s)",
-		sourcePacket.Origin.Name,
+		sourcePacket.OriginName(),
 	)
 	errorPacket.Buffer = multiPackBuffer.Bytes()
 	return errorPacket

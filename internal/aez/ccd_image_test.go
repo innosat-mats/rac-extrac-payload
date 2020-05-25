@@ -1,6 +1,8 @@
 package aez
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"reflect"
 	"testing"
@@ -36,8 +38,8 @@ func TestCCDImage_CSVHeaders_AddsBC(t *testing.T) {
 }
 
 func TestCCDImage_CSVRow_AddsBC(t *testing.T) {
-	ccdI := CCDImage{BadColumns: []uint16{42, 6, 7}}
 	ccdIPD := CCDImagePackData{}
+	ccdI := CCDImage{PackData: &ccdIPD, BadColumns: []uint16{42, 6, 7}}
 	rowI := ccdI.CSVRow()
 	rowIPD := ccdIPD.CSVRow()
 	wantBC := "[42 6 7]"
@@ -57,7 +59,7 @@ func TestCCDImage_CSVRow_AddsBC(t *testing.T) {
 }
 
 func TestCCDImage_MarshalJSON(t *testing.T) {
-	ccd := &CCDImage{}
+	ccd := &CCDImage{PackData: &CCDImagePackData{}}
 	got, err := ccd.MarshalJSON()
 	if err != nil {
 		t.Errorf("CCDImage.MarshalJSON() error = %v", err)
@@ -66,5 +68,51 @@ func TestCCDImage_MarshalJSON(t *testing.T) {
 	var js map[string]interface{}
 	if json.Unmarshal(got, &js) != nil {
 		t.Errorf("DataRecord.MarshalJSON() = %v, not a valid json", string(got))
+	}
+}
+
+func TestNewCCDImage(t *testing.T) {
+	packData := CCDImagePackData{NBC: 2}
+	trailing := []byte{0xff, 0xff, 0x00, 0x00, 0xcc, 0xcc}
+	var buf bytes.Buffer
+	binary.Write(&buf, binary.LittleEndian, packData)
+	data := append(buf.Bytes(), trailing...)
+
+	tests := []struct {
+		name     string
+		truncate int
+		want     *CCDImage
+		wantErr  bool
+	}{
+		{
+			"Returns expected",
+			0,
+			&CCDImage{PackData: &packData, BadColumns: []uint16{0xffff, 0x0000}},
+			false,
+		},
+		{
+			"Not enough bad columns",
+			4,
+			nil,
+			true,
+		},
+		{
+			"Not enough for ccd",
+			24,
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		reader := bytes.NewReader(data[0 : len(data)-tt.truncate])
+
+		got, err := NewCCDImage(reader)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("NewCCDImage() error = %v, wantErr %v", err, tt.wantErr)
+			return
+		}
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("NewCCDImage() = %v, want %v", got, tt.want)
+		}
 	}
 }

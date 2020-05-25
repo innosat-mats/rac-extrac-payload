@@ -33,7 +33,7 @@ func Test_getGrayscaleImageName(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got := getGrayscaleImageName(tt.project, tt.originName, CCDImagePackData{EXPTS: tt.expts})
+		got := getGrayscaleImageName(tt.project, tt.originName, &CCDImagePackData{EXPTS: tt.expts})
 		if got != tt.want {
 			t.Errorf("getGrayscaleImageName() = %v, want %v", got, tt.want)
 		}
@@ -84,7 +84,7 @@ func Test_getImageData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getImageData(tt.args.buf, tt.args.packData, tt.args.outFileName)
+			got := getImageData(tt.args.buf, &tt.args.packData, tt.args.outFileName)
 			if len(got) != tt.wantLength {
 				t.Errorf("getImageData() returned %v pixels, want %v", len(got), tt.wantLength)
 			}
@@ -97,7 +97,7 @@ func Test_getImageData(t *testing.T) {
 
 func getTestImagePixels(packData CCDImagePackData) []uint16 {
 	buf := getTestImage()
-	return getImageData(buf, packData, "test.png")
+	return getImageData(buf, &packData, "test.png")
 }
 
 func Test_getGrayscaleImage(t *testing.T) {

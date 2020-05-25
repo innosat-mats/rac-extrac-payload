@@ -35,13 +35,15 @@ type TMHeader struct {
 	_                [5]byte
 }
 
-// Read a OhbseCssdsTMPacket header
-func (header *TMHeader) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, header)
+// NewTMHeader reads a TMHeader from buffer
+func NewTMHeader(buf io.Reader) (*TMHeader, error) {
+	header := TMHeader{}
+	err := binary.Read(buf, binary.LittleEndian, &header)
+	return &header, err
 }
 
 //CSVHeaders returns the field names
-func (header TMHeader) CSVHeaders() []string {
+func (header *TMHeader) CSVHeaders() []string {
 	return []string{
 		"QualityIndicator",
 		"LossFlag",
@@ -50,7 +52,7 @@ func (header TMHeader) CSVHeaders() []string {
 }
 
 //CSVRow returns the field values
-func (header TMHeader) CSVRow() []string {
+func (header *TMHeader) CSVRow() []string {
 	return []string{
 		strconv.Itoa(int(header.QualityIndicator)),
 		strconv.Itoa(int(header.LossFlag)),
