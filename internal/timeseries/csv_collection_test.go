@@ -7,6 +7,8 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
 func TestNewCollection_IsReadyToUse(t *testing.T) {
@@ -16,7 +18,16 @@ func TestNewCollection_IsReadyToUse(t *testing.T) {
 		return csv, nil
 	}
 	got := NewCollection(factory)
-	err := got.Write(&common.DataRecord{Data: aez.CCDImage{}})
+	err := got.Write(
+		&common.DataRecord{
+			Origin:         &common.OriginDescription{},
+			RamsesHeader:   &ramses.Ramses{},
+			RamsesTMHeader: &ramses.TMHeader{},
+			SourceHeader:   &innosat.SourcePacketHeader{},
+			TMHeader:       &innosat.TMHeader{},
+			Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+		},
+	)
 	if err != nil {
 		t.Errorf("NewCollection() returned collection that couldn't write, %v", err)
 	}
@@ -39,21 +50,64 @@ func TestCSVCollection_Write(t *testing.T) {
 		},
 		{
 			"CCDImage -> CCD",
-			[]common.DataRecord{{Data: aez.CCDImage{}}},
+			[]common.DataRecord{
+				{
+					Origin:         &common.OriginDescription{},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+				},
+			},
 			false,
 			3,
 			[]OutStream{CCD},
 		},
 		{
 			"Writing twice adds just one more line",
-			[]common.DataRecord{{Data: aez.CCDImage{}}, {Data: aez.CCDImage{}}},
+			[]common.DataRecord{
+				{
+					Origin:         &common.OriginDescription{},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+				},
+				{
+					Origin:         &common.OriginDescription{},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.CCDImage{PackData: &aez.CCDImagePackData{}},
+				},
+			},
 			false,
 			4,
 			[]OutStream{CCD},
 		},
 		{
 			"Two different streams",
-			[]common.DataRecord{{Data: aez.HTR{}}, {Data: aez.STAT{}}},
+			[]common.DataRecord{
+				{
+					Origin:         &common.OriginDescription{},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.HTR{},
+				},
+				{
+					Origin:         &common.OriginDescription{},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.STAT{},
+				},
+			},
 			false,
 			6, //Our simple factory puts everything in same buffer
 			[]OutStream{HTR, STAT},

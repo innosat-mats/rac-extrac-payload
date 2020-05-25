@@ -14,6 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
+	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 	"github.com/innosat-mats/rac-extract-payload/internal/timeseries"
 )
 
@@ -77,9 +79,13 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: true,
 			},
 			[]common.DataRecord{{
-				Origin: common.OriginDescription{Name: "MyRac.rac"},
-				Data: aez.CCDImage{
-					PackData: aez.CCDImagePackData{
+				Origin:         &common.OriginDescription{Name: "MyRac.rac"},
+				RamsesHeader:   &ramses.Ramses{},
+				RamsesTMHeader: &ramses.TMHeader{},
+				SourceHeader:   &innosat.SourcePacketHeader{},
+				TMHeader:       &innosat.TMHeader{},
+				Data: &aez.CCDImage{
+					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
 						JPEGQ: aez.JPEGQUncompressed16bit,
 						NCOL:  1,
@@ -100,9 +106,13 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: false,
 			},
 			[]common.DataRecord{{
-				Origin: common.OriginDescription{Name: "MyRac.rac"},
-				Data: aez.CCDImage{
-					PackData: aez.CCDImagePackData{
+				Origin:         &common.OriginDescription{Name: "MyRac.rac"},
+				RamsesHeader:   &ramses.Ramses{},
+				RamsesTMHeader: &ramses.TMHeader{},
+				SourceHeader:   &innosat.SourcePacketHeader{},
+				TMHeader:       &innosat.TMHeader{},
+				Data: &aez.CCDImage{
+					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
 						JPEGQ: aez.JPEGQUncompressed16bit,
 						NCOL:  1,
@@ -120,9 +130,13 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				writeImages: true,
 			},
 			[]common.DataRecord{{
-				Origin: common.OriginDescription{Name: "MyRac.rac"},
-				Data: aez.CCDImage{
-					PackData: aez.CCDImagePackData{
+				Origin:         &common.OriginDescription{Name: "MyRac.rac"},
+				RamsesHeader:   &ramses.Ramses{},
+				RamsesTMHeader: &ramses.TMHeader{},
+				SourceHeader:   &innosat.SourcePacketHeader{},
+				TMHeader:       &innosat.TMHeader{},
+				Data: &aez.CCDImage{
+					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
 						JPEGQ: aez.JPEGQUncompressed16bit,
 						NCOL:  1,
@@ -145,9 +159,13 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 			[]common.DataRecord{
 				{
-					Origin: common.OriginDescription{Name: "MyRac.rac"},
-					Data: aez.CCDImage{
-						PackData: aez.CCDImagePackData{
+					Origin:         &common.OriginDescription{Name: "MyRac.rac"},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
 							EXPTS: 5,
 							JPEGQ: aez.JPEGQUncompressed16bit,
 							NCOL:  1,
@@ -157,7 +175,12 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 				},
 				{
-					Data: aez.HTR{},
+					Origin:         &common.OriginDescription{Name: "MyOtherRac.rac"},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.HTR{},
 				},
 			},
 			map[string]int{
@@ -165,7 +188,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				"myproj/MyRac_5000000000.png":  76,  // 8 + header
 				"myproj/MyRac_5000000000.json": 853, // length of the json
 				"myproj/CCD.csv":               665, // length of the first three lines csv (specs, header, datarow)
-				"myproj/HTR.csv":               991,
+				"myproj/HTR.csv":               1005,
 			},
 		},
 	}
@@ -188,7 +211,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					if !ok {
 						t.Errorf("Upload %v: key = %v, key not wanted", idxUp, key)
 					} else if bodyLen != len(buf) {
-						t.Errorf("Upload %v: len(buf) = %v, want %v ", idxUp, len(buf), bodyLen)
+						t.Errorf("Upload %v/%v: len(buf) = %v, want %v ", idxUp, key, len(buf), bodyLen)
 					}
 				}
 
@@ -257,7 +280,7 @@ func Test_csvAWSWriterFactoryCreator(t *testing.T) {
 		uploads[key] = len(buf)
 	}
 	factory := csvAWSWriterFactoryCreator(uploader, upload, "myproject")
-	writer, err := factory(&common.DataRecord{Data: aez.HTR{}}, timeseries.HTR)
+	writer, err := factory(&common.DataRecord{Data: &aez.HTR{}}, timeseries.HTR)
 	if err != nil {
 		t.Errorf("csvAWSWriterFactoryCreator()'s factory returned error %v", err)
 	}

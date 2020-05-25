@@ -20,35 +20,36 @@ func Test_makeUnfinishedMultiPackError(t *testing.T) {
 		sourcePacket    common.DataRecord
 	}
 	tests := []struct {
-		name string
-		args args
-		want common.DataRecord
+		name       string
+		args       args
+		wantErr    string
+		wantBuffer []byte
 	}{
 		{
 			"Adds error and buffer to DataRecord",
 			args{
 				multiPackBuffer: bytes.NewBuffer([]byte("Hello")),
 				sourcePacket: common.DataRecord{
-					Origin: common.OriginDescription{Name: "myname"},
+					Origin: &common.OriginDescription{Name: "myname"},
 					RID:    aez.CCD4,
 				},
 			},
-			common.DataRecord{
-				Origin: common.OriginDescription{Name: "myname"},
-				RID:    aez.CCD4,
-				Error:  errors.New("orphaned multi-package data without termination detected (myname)"),
-				Buffer: []byte("Hello"),
-			},
+			"orphaned multi-package data without termination detected (myname)",
+			[]byte("Hello"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := makeUnfinishedMultiPackError(tt.args.multiPackBuffer, tt.args.sourcePacket)
-			if got.Error.Error() != tt.want.Error.Error() {
-				t.Errorf("makeUnfinishedMultiPackError().Error = %v, want %v", got.Error, tt.want.Error)
+			if got.Error.Error() != tt.wantErr {
+				t.Errorf("makeUnfinishedMultiPackError().Error = %v, want %v", got.Error, tt.wantErr)
 			}
-			if fmt.Sprintf("%+v", got) != fmt.Sprintf("%+v", tt.want) {
-				t.Errorf("makeUnfinishedMultiPackError() = %v, want %v", got, tt.want)
+			if fmt.Sprintf("%v", got.Buffer) != fmt.Sprintf("%v", tt.wantBuffer) {
+				t.Errorf(
+					"makeUnfinishedMultiPackError().Buffer = %v, want %v",
+					got.Buffer,
+					tt.wantBuffer,
+				)
 			}
 		})
 	}
@@ -73,7 +74,23 @@ func TestAggregator(t *testing.T) {
 		},
 		{
 			"Three continuation packages makes one error for lacking end",
-			[]common.DataRecord{{Buffer: []byte("42")}, {Buffer: []byte("42")}, {Buffer: []byte("42")}},
+			[]common.DataRecord{
+				{
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Buffer:       []byte("42"),
+				},
+				{
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Buffer:       []byte("42"),
+				},
+				{
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Buffer:       []byte("42"),
+				},
+			},
 			[]outcome{
 				// For the unexpected start error we don't care about removing SID/RID
 				{wantErr: true, partialErrMsg: "dangling final multipacket"},
@@ -82,7 +99,8 @@ func TestAggregator(t *testing.T) {
 		{
 			"Returns standalone as it is",
 			[]common.DataRecord{{
-				SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
+				Origin:       &common.OriginDescription{},
+				SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
 				Buffer:       []byte("Hello"),
 			}},
 			[]outcome{{wantErr: false, bufferLength: 5}},
@@ -91,19 +109,23 @@ func TestAggregator(t *testing.T) {
 			"Returns aggregated",
 			[]common.DataRecord{
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
 					Buffer:       []byte("42 "),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x0000},
 					Buffer:       []byte("42World"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
 					Buffer:       []byte("42!"),
 				},
 			},
@@ -113,15 +135,18 @@ func TestAggregator(t *testing.T) {
 			"Errors if already started then continues multi",
 			[]common.DataRecord{
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x8000},
 					Buffer:       []byte("42World!"),
 				},
 			},
@@ -134,11 +159,13 @@ func TestAggregator(t *testing.T) {
 			"Errors if already started then reports standalone",
 			[]common.DataRecord{
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0x4000},
 					Buffer:       []byte("Hello"),
 				},
 				{
-					SourceHeader: innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
+					Origin:       &common.OriginDescription{},
+					SourceHeader: &innosat.SourcePacketHeader{PacketSequenceControl: 0xc000},
 					Buffer:       []byte("World!"),
 				},
 			},

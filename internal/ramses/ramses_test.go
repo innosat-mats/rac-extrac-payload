@@ -268,7 +268,7 @@ func TestRamses_Nanoseconds(t *testing.T) {
 	}
 }
 
-func TestRamses_Read(t *testing.T) {
+func TestNewRamses(t *testing.T) {
 	tests := []struct {
 		name          string
 		buf           []byte
@@ -300,16 +300,15 @@ func TestRamses_Read(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ramses := Ramses{}
 			reader := bytes.NewReader(tt.buf)
-			err := ramses.Read(reader)
+			ramses, err := NewRamses(reader)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Ramses.Read() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if (err == io.EOF) != tt.wantEOF {
 				t.Errorf("Ramses.Read() error = %v, wantEOF %v", err, tt.wantEOF)
 			}
-			if !tt.wantErr && !reflect.DeepEqual(ramses, tt.ramsesOutcome) {
+			if !tt.wantErr && !reflect.DeepEqual(*ramses, tt.ramsesOutcome) {
 				t.Errorf("Ramses.Read() => %+v, want %+v", ramses, tt.ramsesOutcome)
 			}
 		})

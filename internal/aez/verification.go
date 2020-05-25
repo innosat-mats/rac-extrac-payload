@@ -17,18 +17,20 @@ type TCAcceptSuccessData struct {
 	PSC   uint16 // PSC is a copy if the Sequence Control Header field of the TC
 }
 
-// Read TCAcceptSuccess
-func (tcv *TCAcceptSuccessData) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, tcv)
+// NewTCAcceptSuccessData reads a TCAcceptSuccessData from buffer
+func NewTCAcceptSuccessData(buf io.Reader) (*TCAcceptSuccessData, error) {
+	tcv := TCAcceptSuccessData{}
+	err := binary.Read(buf, binary.LittleEndian, &tcv)
+	return &tcv, err
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCAcceptSuccessData) CSVSpecifications() []string {
+func (tcv *TCAcceptSuccessData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCAcceptSuccessData) CSVHeaders() []string {
+func (tcv *TCAcceptSuccessData) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, "TCV")
 	headers = append(headers, csvHeader(tcv)...)
@@ -36,7 +38,7 @@ func (tcv TCAcceptSuccessData) CSVHeaders() []string {
 }
 
 // CSVRow returns the data row
-func (tcv TCAcceptSuccessData) CSVRow() []string {
+func (tcv *TCAcceptSuccessData) CSVRow() []string {
 	var row []string
 	row = append(row, "Accept")
 	val := reflect.Indirect(reflect.ValueOf(tcv))
@@ -57,25 +59,27 @@ type TCAcceptFailureData struct {
 	ErrorCode uint8  // Error code
 }
 
-// Read TCAcceptFailure
-func (tcv *TCAcceptFailureData) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, tcv)
+// NewTCAcceptFailureData reads a TCAcceptFailureData from buffer
+func NewTCAcceptFailureData(buf io.Reader) (*TCAcceptFailureData, error) {
+	tcv := TCAcceptFailureData{}
+	err := binary.Read(buf, binary.LittleEndian, &tcv)
+	return &tcv, err
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCAcceptFailureData) CSVSpecifications() []string {
+func (tcv *TCAcceptFailureData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCAcceptFailureData) CSVHeaders() []string {
+func (tcv *TCAcceptFailureData) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, "TCV")
 	return append(headers, csvHeader(tcv)...)
 }
 
 // CSVRow returns the data row
-func (tcv TCAcceptFailureData) CSVRow() []string {
+func (tcv *TCAcceptFailureData) CSVRow() []string {
 	var row []string
 	row = append(row, "Accept")
 	val := reflect.Indirect(reflect.ValueOf(tcv))
@@ -95,18 +99,20 @@ type TCExecSuccessData struct {
 	PSC   uint16 // PSC is a copy if the Sequence Control Header field of the TC
 }
 
-// Read TCExecSuccess
-func (tcv *TCExecSuccessData) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, tcv)
+// NewTCExecSuccessData reads a TCExecSuccessData from buffer
+func NewTCExecSuccessData(buf io.Reader) (*TCExecSuccessData, error) {
+	tcv := TCExecSuccessData{}
+	err := binary.Read(buf, binary.LittleEndian, &tcv)
+	return &tcv, err
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCExecSuccessData) CSVSpecifications() []string {
+func (tcv *TCExecSuccessData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCExecSuccessData) CSVHeaders() []string {
+func (tcv *TCExecSuccessData) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, "TCV")
 	headers = append(headers, csvHeader(tcv)...)
@@ -114,7 +120,7 @@ func (tcv TCExecSuccessData) CSVHeaders() []string {
 }
 
 // CSVRow returns the data row
-func (tcv TCExecSuccessData) CSVRow() []string {
+func (tcv *TCExecSuccessData) CSVRow() []string {
 	var row []string
 	row = append(row, "Exec")
 	val := reflect.Indirect(reflect.ValueOf(tcv))
@@ -136,25 +142,27 @@ type TCExecFailureData struct {
 	// TODO? There is also an optional variable length data field
 }
 
-// Read TCExecFailure
-func (tcv *TCExecFailureData) Read(buf io.Reader) error {
-	return binary.Read(buf, binary.LittleEndian, tcv)
+// NewTCExecFailureData reads a TCExecFailureData from buffer
+func NewTCExecFailureData(buf io.Reader) (*TCExecFailureData, error) {
+	tcv := TCExecFailureData{}
+	err := binary.Read(buf, binary.LittleEndian, &tcv)
+	return &tcv, err
 }
 
 // CSVSpecifications returns the version of the spec used
-func (tcv TCExecFailureData) CSVSpecifications() []string {
+func (tcv *TCExecFailureData) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the header row
-func (tcv TCExecFailureData) CSVHeaders() []string {
+func (tcv *TCExecFailureData) CSVHeaders() []string {
 	var headers []string
 	headers = append(headers, "TCV")
 	return append(headers, csvHeader(tcv)...)
 }
 
 // CSVRow returns the data row
-func (tcv TCExecFailureData) CSVRow() []string {
+func (tcv *TCExecFailureData) CSVRow() []string {
 	var row []string
 	row = append(row, "Exec")
 	val := reflect.Indirect(reflect.ValueOf(tcv))

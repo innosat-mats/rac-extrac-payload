@@ -82,7 +82,10 @@ func TestGetRecord(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := getRecord(StreamBatch{Buf: tt.args.buf})
+			got, _ := getRecord(StreamBatch{
+				Origin: &common.OriginDescription{Name: "myname.rac"},
+				Buf:    tt.args.buf,
+			})
 			if !reflect.DeepEqual(got.Buffer, tt.want) {
 				t.Errorf("Package.Payload = %v, want %v", got.Buffer, tt.want)
 			}
@@ -131,7 +134,10 @@ func TestGetRecord_FromFile(t *testing.T) {
 		}
 		file.Write(tt.params.fileContent)
 		file.Seek(0, 0)
-		got, done := getRecord(StreamBatch{Buf: file})
+		got, done := getRecord(StreamBatch{
+			Origin: &common.OriginDescription{Name: "myname.rac"},
+			Buf:    file,
+		})
 		if done != tt.params.wantDone {
 			t.Errorf("getRecord() done = %v, want %v", done, tt.params.wantDone)
 		}
@@ -278,7 +284,7 @@ func TestDecodeRamses(t *testing.T) {
 			for i := range streams {
 				streams[i] = StreamBatch{
 					Buf:    bytes.NewReader(tt.streams[i].buf),
-					Origin: tt.streams[i].origin,
+					Origin: &tt.streams[i].origin,
 				}
 			}
 			go DecodeRamses(packs, streams...)
@@ -321,6 +327,25 @@ func TestDecodeRamses(t *testing.T) {
 			}
 			if idxOutcome+1 != len(tt.outcomes) {
 				t.Errorf("Got %v DataRecords, want %v", idxOutcome+1, len(tt.outcomes))
+			}
+		})
+	}
+}
+
+func TestStreamBatch_OriginName(t *testing.T) {
+	tests := []struct {
+		name   string
+		origin *common.OriginDescription
+		want   string
+	}{
+		{"Default empty", nil, ""},
+		{"Returns name", &common.OriginDescription{Name: "Test"}, "Test"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stream := &StreamBatch{Origin: tt.origin}
+			if got := stream.OriginName(); got != tt.want {
+				t.Errorf("StreamBatch.OriginName() = %v, want %v", got, tt.want)
 			}
 		})
 	}

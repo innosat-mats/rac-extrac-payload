@@ -56,8 +56,8 @@ func DiskCallbackFactory(
 		}
 		if writeImages {
 			switch pkg.Data.(type) {
-			case aez.CCDImage:
-				ccdImage, ok := pkg.Data.(aez.CCDImage)
+			case *aez.CCDImage:
+				ccdImage, ok := pkg.Data.(*aez.CCDImage)
 				if !ok {
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
@@ -67,7 +67,7 @@ func DiskCallbackFactory(
 				go func() {
 					defer wg.Done()
 
-					img, imgFileName := ccdImage.Image(pkg.Buffer, output, pkg.Origin.Name)
+					img, imgFileName := ccdImage.Image(pkg.Buffer, output, pkg.OriginName())
 					imgFile, err := os.Create(imgFileName)
 					if err != nil {
 						log.Printf("failed creating %s: %s", imgFileName, err)

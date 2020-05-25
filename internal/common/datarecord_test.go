@@ -15,11 +15,11 @@ import (
 
 func TestDataRecord_CSVSpecifications(t *testing.T) {
 	type fields struct {
-		Origin         OriginDescription
-		RamsesHeader   ramses.Ramses
-		RamsesTMHeader ramses.TMHeader
-		SourceHeader   innosat.SourcePacketHeader
-		TMHeader       innosat.TMHeader
+		Origin         *OriginDescription
+		RamsesHeader   *ramses.Ramses
+		RamsesTMHeader *ramses.TMHeader
+		SourceHeader   *innosat.SourcePacketHeader
+		TMHeader       *innosat.TMHeader
 		SID            aez.SID
 		RID            aez.RID
 		Data           Exporter
@@ -43,9 +43,9 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 		{
 			"Returns specs",
 			fields{
-				RamsesHeader: ramses.Ramses{Type: 4},
-				SourceHeader: innosat.SourcePacketHeader{PacketLength: 42},
-				Data:         aez.HTR{},
+				RamsesHeader: &ramses.Ramses{Type: 4},
+				SourceHeader: &innosat.SourcePacketHeader{PacketLength: 42},
+				Data:         &aez.HTR{},
 			},
 			[]string{
 				"CODE", FullVersion(),
@@ -80,11 +80,11 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 
 func TestDataRecord_CSVHeaders(t *testing.T) {
 	type fields struct {
-		Origin         OriginDescription
-		RamsesHeader   ramses.Ramses
-		RamsesTMHeader ramses.TMHeader
-		SourceHeader   innosat.SourcePacketHeader
-		TMHeader       innosat.TMHeader
+		Origin         *OriginDescription
+		RamsesHeader   *ramses.Ramses
+		RamsesTMHeader *ramses.TMHeader
+		SourceHeader   *innosat.SourcePacketHeader
+		TMHeader       *innosat.TMHeader
 		SID            aez.SID
 		RID            aez.RID
 		Data           Exporter
@@ -97,7 +97,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 		want   []string
 	}{
 		{
-			"Handles missing Data",
+			"Handles missing pointers",
 			fields{},
 			[]string{
 				"File",
@@ -116,7 +116,14 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 		},
 		{
 			"Returns expected headers",
-			fields{Data: aez.STAT{}},
+			fields{
+				Origin:         &OriginDescription{},
+				RamsesHeader:   &ramses.Ramses{},
+				RamsesTMHeader: &ramses.TMHeader{},
+				SourceHeader:   &innosat.SourcePacketHeader{},
+				TMHeader:       &innosat.TMHeader{},
+				Data:           &aez.STAT{},
+			},
 			[]string{
 				"File",
 				"ProcessingDate",
@@ -174,11 +181,11 @@ var procDate = time.Now()
 
 func TestDataRecord_CSVRow(t *testing.T) {
 	type fields struct {
-		Origin         OriginDescription
-		RamsesHeader   ramses.Ramses
-		RamsesTMHeader ramses.TMHeader
-		SourceHeader   innosat.SourcePacketHeader
-		TMHeader       innosat.TMHeader
+		Origin         *OriginDescription
+		RamsesHeader   *ramses.Ramses
+		RamsesTMHeader *ramses.TMHeader
+		SourceHeader   *innosat.SourcePacketHeader
+		TMHeader       *innosat.TMHeader
 		SID            aez.SID
 		RID            aez.RID
 		Data           Exporter
@@ -193,11 +200,11 @@ func TestDataRecord_CSVRow(t *testing.T) {
 		{
 			"Handles missing Data",
 			fields{
-				Origin:         OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
-				RamsesHeader:   ramses.Ramses{Date: 24, Time: 42000},
-				RamsesTMHeader: ramses.TMHeader{LossFlag: 1, VCFrameCounter: 42},
-				SourceHeader:   innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
-				TMHeader:       innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
+				Origin:         &OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
+				RamsesHeader:   &ramses.Ramses{Date: 24, Time: 42000},
+				RamsesTMHeader: &ramses.TMHeader{LossFlag: 1, VCFrameCounter: 42},
+				SourceHeader:   &innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
+				TMHeader:       &innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
 				SID:            aez.SIDSTAT,
 				RID:            aez.CCD1,
 				Error:          errors.New("Test"),
@@ -218,15 +225,39 @@ func TestDataRecord_CSVRow(t *testing.T) {
 			},
 		},
 		{
+			"Handles missing Everything but Data",
+			fields{
+				Data: &aez.TCAcceptFailureData{},
+			},
+			[]string{
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"Accept",
+				"0",
+				"0",
+				"0",
+				"",
+			},
+		},
+		{
 			"Handles missing Error",
 			fields{
-				Origin:         OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
-				RamsesHeader:   ramses.Ramses{Date: 24, Time: 42000},
-				RamsesTMHeader: ramses.TMHeader{LossFlag: 1, VCFrameCounter: 42},
-				SourceHeader:   innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
-				TMHeader:       innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
+				Origin:         &OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
+				RamsesHeader:   &ramses.Ramses{Date: 24, Time: 42000},
+				RamsesTMHeader: &ramses.TMHeader{LossFlag: 1, VCFrameCounter: 42},
+				SourceHeader:   &innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
+				TMHeader:       &innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
 				SID:            aez.SIDSTAT,
-				Data: aez.STAT{
+				Data: &aez.STAT{
 					SPID:    1,
 					SPREV:   2,
 					FPID:    3,
@@ -309,8 +340,8 @@ func TestDataRecord_MarshalJSON(t *testing.T) {
 	}{
 		{"No Data, No Error", fields{}},
 		{"Error", fields{Error: io.EOF}},
-		{"Image Data", fields{Data: aez.CCDImage{}}},
-		{"Non-image Data", fields{Data: aez.STAT{}}},
+		{"Image Data", fields{Data: &aez.CCDImage{PackData: &aez.CCDImagePackData{}}}},
+		{"Non-image Data", fields{Data: &aez.STAT{}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -326,6 +357,27 @@ func TestDataRecord_MarshalJSON(t *testing.T) {
 			var js map[string]interface{}
 			if json.Unmarshal(got, &js) != nil {
 				t.Errorf("DataRecord.MarshalJSON() = %v, not a valid json", string(got))
+			}
+		})
+	}
+}
+
+func TestDataRecord_OriginName(t *testing.T) {
+	tests := []struct {
+		name   string
+		origin *OriginDescription
+		want   string
+	}{
+		{"Defaults to empty", nil, ""},
+		{"Returns name", &OriginDescription{Name: "Test"}, "Test"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			record := &DataRecord{
+				Origin: tt.origin,
+			}
+			if got := record.OriginName(); got != tt.want {
+				t.Errorf("DataRecord.OriginName() = %v, want %v", got, tt.want)
 			}
 		})
 	}

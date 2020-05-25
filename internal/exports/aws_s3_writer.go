@@ -70,8 +70,8 @@ func AWSS3CallbackFactory(
 		}
 		if writeImages {
 			switch pkg.Data.(type) {
-			case aez.CCDImage:
-				ccdImage, ok := pkg.Data.(aez.CCDImage)
+			case *aez.CCDImage:
+				ccdImage, ok := pkg.Data.(*aez.CCDImage)
 				if !ok {
 					log.Print("Could not understand packet as CCDImage, this should be impossible.")
 					break
@@ -81,7 +81,7 @@ func AWSS3CallbackFactory(
 				go func() {
 					defer wg.Done()
 
-					img, imgFileName := ccdImage.Image(pkg.Buffer, project, pkg.Origin.Name)
+					img, imgFileName := ccdImage.Image(pkg.Buffer, project, pkg.OriginName())
 					pngBuffer := bytes.NewBuffer([]byte{})
 					png.Encode(pngBuffer, img)
 					upload(uploader, imgFileName, pngBuffer)
