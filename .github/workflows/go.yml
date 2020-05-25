@@ -43,6 +43,7 @@ jobs:
 
     - name: Build & Install
       run: make install
+      shell: bash
 
     - name: Lint
       run: make lint
