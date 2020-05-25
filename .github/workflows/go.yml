@@ -56,18 +56,18 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: rac-linux
-        path: ${{ env.GOROOT }}/bin/rac
+        path: ${{ env.HOME }}/go/bin/rac
 
     - name: --macOS--- Upload binaries
       if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-mac
-        path: ${{ env.GOROOT }}/bin/rac
+        path: ${{ env.HOME }}/go/bin/rac
 
     - name: --Windows-- Upload binaries
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-win.exe
-        path: ${{ env.GOROOT }}/bin/rac.exe
+        path: ${{ env.HOME }}/go/bin/rac.exe
