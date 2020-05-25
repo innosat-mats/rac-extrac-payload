@@ -23,11 +23,6 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get install -y gcc-mingw-w64
 
-    - name: isntall mingw Windows
-      if: ${{ runner.os == 'Windows' }}
-      run:  choco install mingw
-      shell: bash
-
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
       with:
@@ -40,6 +35,7 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+      shell: bash
 
     - name: Build
       run: make build
