@@ -52,12 +52,14 @@ jobs:
     - name: Test
       run: make test
 
-    - name: --Linux--- Upload binaries
-      if: ${{ runner.os == 'Linux' }}
+    - name: Whatsmyenv
       run: |
         echo $GOBIN
         echo $GOPATH
         echo $HOME
+
+    - name: --Linux--- Upload binaries
+      if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
         name: rac-linux
@@ -65,10 +67,6 @@ jobs:
 
     - name: --macOS--- Upload binaries
       if: ${{ runner.os == 'macOS' }}
-      run: |
-        echo $GOBIN
-        echo $GOPATH
-        echo $HOME
       uses: actions/upload-artifact@v2
       with:
         name: rac-mac
