@@ -25,7 +25,8 @@ jobs:
 
     - name: isntall mingw Windows
       if: ${{ runner.os == 'Windows' }}
-      run:  pacman -S mingw-w64-x86_64-clang
+      run:  choco install mingw
+      shell: bash
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
