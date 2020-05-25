@@ -187,8 +187,8 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				"myproj/ABOUT.json":            7,
 				"myproj/MyRac_5000000000.png":  76,  // 8 + header
 				"myproj/MyRac_5000000000.json": 853, // length of the json
-				"myproj/CCD.csv":               649, // length of the first three lines csv (specs, header, datarow)
-				"myproj/HTR.csv":               989,
+				"myproj/CCD.csv":               665, // length of the first three lines csv (specs, header, datarow)
+				"myproj/HTR.csv":               1005,
 			},
 		},
 	}

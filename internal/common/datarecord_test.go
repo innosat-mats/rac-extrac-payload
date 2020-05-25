@@ -34,7 +34,11 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 		{
 			"Works on empty package",
 			fields{},
-			[]string{"RAMSES", ramses.Specification, "INNOSAT", innosat.Specification},
+			[]string{
+				"CODE", FullVersion(),
+				"RAMSES", ramses.Specification,
+				"INNOSAT", innosat.Specification,
+			},
 		},
 		{
 			"Returns specs",
@@ -44,6 +48,7 @@ func TestDataRecord_CSVSpecifications(t *testing.T) {
 				Data:         &aez.HTR{},
 			},
 			[]string{
+				"CODE", FullVersion(),
 				"RAMSES", ramses.Specification,
 				"INNOSAT", innosat.Specification,
 				"AEZ", aez.Specification,

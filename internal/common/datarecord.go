@@ -71,7 +71,7 @@ func (record *DataRecord) MarshalJSON() ([]byte, error) {
 
 // CSVSpecifications returns specifications used to generate content in CSV compatible format
 func (record *DataRecord) CSVSpecifications() []string {
-	var specifications []string
+	specifications := []string{"CODE", FullVersion()}
 	if record.RamsesHeader != nil {
 		specifications = append(
 			specifications,

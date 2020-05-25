@@ -15,12 +15,22 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/extractors"
 )
 
+// Version is the version of the source code
+var Version string
+
+// Head is the short commit id of head
+var Head string
+
+// Buildtime is the time of the build
+var Buildtime string
+
 var skipImages *bool
 var skipTimeseries *bool
 var project *string
 var stdout *bool
 var aws *bool
 var awsDescription *string
+var version *bool
 
 //myUsage replaces default usage since it doesn't include information on non-flags
 func myUsage() {
@@ -108,18 +118,53 @@ func processFiles(
 }
 
 func init() {
+	common.Version = Version
+	common.Head = Head
+	common.Buildtime = Buildtime
+
 	skipImages = flag.Bool("skip-images", false, "Extract images from rac-files.\n(Default: false)")
-	skipTimeseries = flag.Bool("skip-timeseries", false, "Extract timeseries from rac-files.\n(Default: false)")
-	project = flag.String("project", "", "Name for experiments, when outputting to disk a directory will be created with this name, when sending to AWS files will have this as a prefix")
-	stdout = flag.Bool("stdout", false, "Output to standard out instead of to disk (only timeseries)\n(Default: false)")
-	aws = flag.Bool("aws", false, "Output to aws instead of disk (requires credentials and permissions)")
-	awsDescription = flag.String("description", "", "Path to a file containing a project description to be uploaded to AWS")
+	skipTimeseries = flag.Bool(
+		"skip-timeseries",
+		false,
+		"Extract timeseries from rac-files.\n(Default: false)",
+	)
+	project = flag.String(
+		"project",
+		"",
+		"Name for experiments, when outputting to disk a directory will be created with this name, when sending to AWS files will have this as a prefix",
+	)
+	stdout = flag.Bool(
+		"stdout",
+		false,
+		"Output to standard out instead of to disk (only timeseries)\n(Default: false)",
+	)
+	aws = flag.Bool(
+		"aws",
+		false,
+		"Output to aws instead of disk (requires credentials and permissions)",
+	)
+	awsDescription = flag.String(
+		"description",
+		"",
+		"Path to a file containing a project description to be uploaded to AWS",
+	)
+	version = flag.Bool(
+		"version",
+		false,
+		"Only display current version of the program",
+	)
+
 	flag.Usage = myUsage
 }
 
 func main() {
 	var wg sync.WaitGroup
 	flag.Parse()
+	if *version {
+		fmt.Println("Version", Version, "Commit", Head, "@", Buildtime)
+		return
+	}
+
 	inputFiles := flag.Args()
 	if len(inputFiles) == 0 {
 		flag.Usage()
