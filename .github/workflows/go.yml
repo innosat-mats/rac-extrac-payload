@@ -30,7 +30,8 @@ jobs:
 
     - name: Get dependencies
       run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
+        export GOPATH=$(go env GOPATH)
+        echo "GOPATH is $GOPATH"
         go get -v -t -d ./...
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -43,6 +44,7 @@ jobs:
 
     - name: Lint
       run: make lint
+      shell: bash
 
     - name: Test
       run: make test
