@@ -57,8 +57,16 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       run: go build -o rac.exe ./cmd/rac
 
-    - name: binaries
+    - name: binaries linux
+      if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
-        name: CLI
-        path: ./rac*
+        name: rac
+        path: ./rac
+
+    - name: binaries windows
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: rac.exe
+        path: ./rac.exe
