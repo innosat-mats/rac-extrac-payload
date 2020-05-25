@@ -10,8 +10,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-      #  os: [ubuntu-latest, windows-latest]
-      # macOS doesn't work due to some build-error of jpegdecode
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
 
