@@ -19,7 +19,7 @@ jobs:
         go-version: 1.14
       id: go
 
-    - name: install mingw Linux
+    - name: Install mingw Linux
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get install -y gcc-mingw-w64
 
