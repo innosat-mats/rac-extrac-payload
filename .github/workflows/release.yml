@@ -93,7 +93,7 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       uses: ncipollo/release-action@v1.6.1
       with:
-        artifact: "C:\Rac for Windows.tar.gz"
+        artifact: "C:\\Rac for Windows.tar.gz"
         allowUpdates: true
         omitBody: true
         omitName: true
