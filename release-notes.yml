@@ -1,3 +1,8 @@
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## Changes since $PREVIOUS_TAG
+
+  $CHANGES
 categories:
     - title: '🚀 Features'
       labels:
@@ -14,8 +19,3 @@ categories:
       labels:
         - 'chore'
         - 'system'
-change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
-template: |
-  ## Changes
-
-  $CHANGES
