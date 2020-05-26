@@ -15,11 +15,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
 
-    ## - name: --Linux-- Draft release notes only run once and early
-    ##  if: ${{ runner.os == 'Linux' }}
-    ##  uses: release-drafter/release-drafter@v5
-    ##  env:
-    ##    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: --Linux-- Draft release notes only run once and early
+      if: ${{ runner.os == 'Linux' }}
+      uses: release-drafter/release-drafter@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Go 1.14
       uses: actions/setup-go@v1
@@ -47,12 +47,14 @@ jobs:
     - name: --Linux--- Bundle binaries
       if: ${{ runner.os == 'Linux' }}
       run: |
-        tar -czvf "Rac_for_Linux.tar.gz" -C /home/runner/go/bin rac
+        cd /home/runner/go/bin
+        tar -czvf "Rac_for_Linux.tar.gz" rac
 
     - name: --macOS--- Bundle binaries
       if: ${{ runner.os == 'macOS' }}
       run: |
-        tar -zcvf "Rac_for_macOS.tar.gz" -C /Users/runner/go/bin rac
+        cd /Users/runner/go/bin
+        tar -zcvf "Rac_for_macOS.tar.gz" rac
 
     - name: --Windows-- Bundle binaries
       if: ${{ runner.os == 'Windows' }}
@@ -69,7 +71,7 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       uses: ncipollo/release-action@v1.7.0
       with:
-        artifacts: "Rac_for_Linux.tar.gz"
+        artifacts: "/home/runner/go/bin/Rac_for_Linux.tar.gz"
         allowUpdates: true
         prerelease: true
         omitBody: true
@@ -80,7 +82,7 @@ jobs:
       if: ${{ runner.os == 'macOS' }}
       uses: ncipollo/release-action@v1.7.0
       with:
-        artifacts: "Rac_for_macOS.tar.gz"
+        artifacts: "/Users/runner/go/bin/Rac_for_macOS.tar.gz"
         allowUpdates: true
         prerelease: true
         omitBody: true
