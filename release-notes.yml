@@ -14,8 +14,8 @@ categories:
       labels:
         - 'chore'
         - 'system'
-  change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
-  template: |
-    ## Changes
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## Changes
 
-    $CHANGES
+  $CHANGES

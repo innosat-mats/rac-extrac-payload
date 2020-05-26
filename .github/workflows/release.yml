@@ -70,7 +70,7 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       uses: ncipollo/release-action@v1.6.1
       with:
-        artifact: "Rac for Linux.tar.gz"
+        artifact: "Rac_for_Linux.tar.gz"
         allowUpdates: true
         omitBody: true
         omitName: true
@@ -81,7 +81,7 @@ jobs:
       if: ${{ runner.os == 'macOS' }}
       uses: ncipollo/release-action@v1.6.1
       with:
-        artifact: "Rac for macOS.tar.gz"
+        artifact: "Rac_for_macOS.tar.gz"
         allowUpdates: true
         omitBody: true
         omitName: true
@@ -92,7 +92,7 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       uses: ncipollo/release-action@v1.6.1
       with:
-        artifact: "C:\\Rac for Windows.tar.gz"
+        artifact: "C:\\Rac_for_Windows.tar.gz"
         allowUpdates: true
         omitBody: true
         omitName: true
