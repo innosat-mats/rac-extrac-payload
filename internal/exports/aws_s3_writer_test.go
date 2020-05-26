@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 
@@ -198,6 +199,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			var idxUp = 0
 
 			var uploader = func(uploader *s3manager.Uploader, key string, bodyBuffer io.Reader) {
+				key = strings.ReplaceAll(key, "\\", "/")
 				buf, _ := ioutil.ReadAll(bodyBuffer)
 				if idxUp >= len(tt.uploads) {
 					t.Errorf(

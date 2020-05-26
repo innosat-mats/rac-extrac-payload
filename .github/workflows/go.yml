@@ -7,7 +7,10 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
 
     - name: Set up Go 1.14
@@ -16,9 +19,6 @@ jobs:
         go-version: 1.14
       id: go
 
-    - name: install mingw
-      run : sudo apt-get install -y gcc-mingw-w64
-
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
       with:
@@ -26,30 +26,43 @@ jobs:
 
     - name: Get dependencies
       run: |
+        export GOPATH=$(go env GOPATH)
+        echo "GOPATH is $GOPATH"
         go get -v -t -d ./...
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+      shell: bash
 
-    - name: Build
-      run: make build
+    - name: Build & Install
+      run: make install
+      shell: bash
 
     - name: Lint
       run: make lint
+      shell: bash
 
     - name: Test
       run: make test
 
-    # # TODO: wait for #https://github.com/actions/virtual-environments/issues/228
-    # - name: Build windows
-    #   run: CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o rac.exe ./cmd/rac
-
-    - name: Build linux
-      run: go build -o rac ./cmd/rac
-
-    - name: binaries
+    - name: --Linux--- Upload binaries
+      if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
-        name: CLI
-        path: ./rac*
+        name: Rac for Linux
+        path: /home/runner/go/bin/rac
+
+    - name: --macOS--- Upload binaries
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: Rac for macOS
+        path: /Users/runner/go/bin/rac
+
+    - name: --Windows-- Upload binaries
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: Rac for Windows
+        path: C:\Users\runneradmin\go\bin\rac.exe
