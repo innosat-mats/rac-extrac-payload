@@ -14,6 +14,26 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
+    - name: --Linux--- Generate Changelog
+      if: ${{ runner.os == 'Linux' }}
+      uses: scottbrenner/generate-changelog-action@master
+      id: Changelog
+      env:
+        REPO: ${{ github.repository }}
+
+    - name: --Linux--- Create release note
+      if: ${{ runner.os == 'Linux' }}
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ${{ steps.Changelog.outputs.changelog }}
+        draft: false
+        prerelease: true
 
     - name: Set up Go 1.14
       uses: actions/setup-go@v1
@@ -93,9 +113,3 @@ jobs:
         omitBody: true
         omitName: true
         token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: --Linux-- Draft release notes only run once and last
-      if: ${{ runner.os == 'Linux' }}
-      uses: release-drafter/release-drafter@v5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
