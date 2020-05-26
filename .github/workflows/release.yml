@@ -94,8 +94,8 @@ jobs:
         omitName: true
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: --Windows-- Draft release notes only run once and last
-      if: ${{ runner.os == 'Windows' }}
+    - name: --Linux-- Draft release notes only run once and last
+      if: ${{ runner.os == 'Linux' }}
       uses: release-drafter/release-drafter@v5
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
