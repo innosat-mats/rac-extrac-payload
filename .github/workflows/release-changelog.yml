@@ -6,8 +6,11 @@ jobs:
     name: Release Changelog
     runs-on: ubuntu-latest
     steps:
-      - name: Create a release draft for a version tag
-        id: create-release-draft
-        uses: ecampidoglio/auto-release-draft@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Create a release draft for a version tag
+      id: create-release-draft
+      uses: ecampidoglio/auto-release-draft@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
