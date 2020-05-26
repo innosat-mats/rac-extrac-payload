@@ -53,5 +53,15 @@ Timeseries like data will be in e.g. "HTR.csv"
 
 CCD-metadata will both be in a json per image and for all images in the "CCD.csv"
 
+### Downloading files from AWS
+
+With the aws-cli installed and the credetials file in place, you can easily download files or entire projects on the commandline. The following example downloads the project "MyArchive1_20200511" from S3 to the local directory "test"
+
+```aws s3 cp s3://mats-l0-artifacts/MyArchive1_20200511 ./test --recursive```
+
+Next example downloads all csv-files from the "MyArchive1_20200511" project to you current local directory.
+
+```aws s3 cp s3://mats-lo-artifacts/MyArchive1_20200511 . --recursive --exclude "*" --include "*.csv"```
+
 # Design
 [Design map](docs/README.md)
