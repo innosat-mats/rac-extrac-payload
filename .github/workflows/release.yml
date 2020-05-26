@@ -15,13 +15,13 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
 
-    ## - name: --Linux-- Draft release notes only run once and early
-    ##  if: ${{ runner.os == 'Linux' }}
-    ##  uses: release-drafter/release-drafter@v5
-    ##  with:
-    ##    config-name: release-notes.yml
-    ##  env:
-    ##    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: --Linux-- Draft release notes only run once and early
+      if: ${{ runner.os == 'Linux' }}
+      uses: release-drafter/release-drafter@v5
+      with:
+        config-name: release-notes.yml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Go 1.14
       uses: actions/setup-go@v1
@@ -49,12 +49,12 @@ jobs:
     - name: --Linux--- Bundle binaries
       if: ${{ runner.os == 'Linux' }}
       run: |
-        tar -czvf "Rac_for_Linux.tar.gz" /home/runner/go/bin/rac
+        tar -czvf "Rac_for_Linux.tar.gz" -C /home/runner/go/bin rac
 
     - name: --macOS--- Bundle binaries
       if: ${{ runner.os == 'macOS' }}
       run: |
-        tar -zcvf "Rac_for_macOS.tar.gz" /Users/runner/go/bin/rac
+        tar -zcvf "Rac_for_macOS.tar.gz" -C /Users/runner/go/bin rac
 
     - name: --Windows-- Bundle binaries
       if: ${{ runner.os == 'Windows' }}
@@ -62,7 +62,7 @@ jobs:
         $compress = @{
           Path = "C:\Users\runneradmin\go\bin\rac.exe"
           CompressionLevel = "Fastest"
-          DestinationPath = "C:\Rac_for_Windows.Zip"
+          DestinationPath = "C:\Rac_for_Windows.zip"
         }
         Compress-Archive @compress
       shell: powershell
@@ -93,7 +93,7 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       uses: ncipollo/release-action@v1.7.0
       with:
-        artifacts: "C:\\Rac_for_Windows.tar.gz"
+        artifacts: "C:\\Rac_for_Windows.zip"
         allowUpdates: true
         prerelease: true
         omitBody: true
