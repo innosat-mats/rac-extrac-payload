@@ -57,7 +57,6 @@ jobs:
 
     - name: --Windows-- Bundle binaries
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v2
       run: |
         $compress = @{
           Path = "C:\Users\runneradmin\go\bin\rac.exe"
