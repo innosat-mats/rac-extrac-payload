@@ -14,13 +14,14 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-    - name: --Linux-- Draft release notes only run once and early
-      if: ${{ runner.os == 'Linux' }}
-      uses: release-drafter/release-drafter@v5
-      with:
-        config-name: release-notes.yml
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    ## - name: --Linux-- Draft release notes only run once and early
+    ##  if: ${{ runner.os == 'Linux' }}
+    ##  uses: release-drafter/release-drafter@v5
+    ##  with:
+    ##    config-name: release-notes.yml
+    ##  env:
+    ##    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Go 1.14
       uses: actions/setup-go@v1
