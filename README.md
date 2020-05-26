@@ -61,7 +61,7 @@ With the aws-cli installed and the credetials file in place, you can easily down
 
 Next example downloads all csv-files from the "MyArchive1_20200511" project to you current local directory.
 
-```aws s3 cp s3://mats-lo-artifacts/MyArchive1_20200511 . --recursive --exclude "*" --include "*.csv"```
+```aws s3 cp s3://mats-l0-artifacts/MyArchive1_20200511 . --recursive --exclude "*" --include "*.csv"```
 
 # Design
 [Design map](docs/README.md)
