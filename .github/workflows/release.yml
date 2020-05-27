@@ -37,13 +37,13 @@ jobs:
       run: make install
       shell: bash
 
-    - name: --Linux--- Bundle binaries
+    - name: --Linux-- Bundle binaries
       if: ${{ runner.os == 'Linux' }}
       run: |
         cd /home/runner/go/bin
         tar -czvf "/home/runner/Rac_for_Linux.tar.gz" rac
 
-    - name: --macOS--- Bundle binaries
+    - name: --macOS-- Bundle binaries
       if: ${{ runner.os == 'macOS' }}
       run: |
         cd /Users/runner/go/bin
