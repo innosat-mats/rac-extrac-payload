@@ -4,7 +4,7 @@ package decodejpeg
 // #cgo windows LDFLAGS: ${SRCDIR}/../../third-party/windows/lib/libjpeg.a
 // #cgo linux CFLAGS: -I${SRCDIR}/../../third-party/linux/include
 // #cgo linux LDFLAGS: ${SRCDIR}/../../third-party/linux/lib/libjpeg.a
-// #cgo darwin CFLAGS: -I${SRCDIR}/../../third-party/darwin/include
+// #cgo darwin CFLAGS: -w -I${SRCDIR}/../../third-party/darwin/include
 // #cgo darwin LDFLAGS: ${SRCDIR}/../../third-party/darwin/lib/libjpeg.a
 // #include <stdlib.h>
 // #include "decode.h"
