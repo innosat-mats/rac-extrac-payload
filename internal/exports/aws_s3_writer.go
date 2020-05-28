@@ -52,15 +52,11 @@ func AWSS3CallbackFactory(
 		if err != nil {
 			log.Fatalf("Could not find %v: %v", awsDescriptionPath, err)
 		}
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			key := fmt.Sprintf("ABOUT%v", filepath.Ext(awsDescriptionPath))
-			if project != "" {
-				key = fmt.Sprintf("%v/%v", project, key)
-			}
-			upload(uploader, key, awsDescription)
-		}()
+		key := fmt.Sprintf("ABOUT%v", filepath.Ext(awsDescriptionPath))
+		if project != "" {
+			key = fmt.Sprintf("%v/%v", project, key)
+		}
+		upload(uploader, key, awsDescription)
 	}
 
 	callback := func(pkg common.DataRecord) {
