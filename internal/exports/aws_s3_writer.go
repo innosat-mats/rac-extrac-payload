@@ -100,8 +100,8 @@ func AWSS3CallbackFactory(
 	}
 
 	teardown := func() {
-		timeseriesCollection.CloseAll()
 		wg.Wait()
+		timeseriesCollection.CloseAll()
 	}
 
 	return callback, teardown
