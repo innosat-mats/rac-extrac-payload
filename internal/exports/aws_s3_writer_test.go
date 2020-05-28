@@ -263,6 +263,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			for _, record := range tt.records {
 				callback(record)
 			}
+			wg.Wait()
 			teardown()
 
 			if idxUp < len(tt.uploads) {

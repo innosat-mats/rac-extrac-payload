@@ -54,12 +54,12 @@ func AWSS3CallbackFactory(
 		}
 		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			key := fmt.Sprintf("ABOUT%v", filepath.Ext(awsDescriptionPath))
 			if project != "" {
 				key = fmt.Sprintf("%v/%v", project, key)
 			}
 			upload(uploader, key, awsDescription)
-			wg.Done()
 		}()
 	}
 
