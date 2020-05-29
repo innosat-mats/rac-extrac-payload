@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var milliesPerSecond float64 = math.Pow10(9)
+const nanosPerSecond float64 = 1e9
 
 // TAI is the CCSDS recommended epoch for unsegmented time
 var TAI = time.Date(1958, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -23,11 +23,11 @@ var TAI = time.Date(1958, time.January, 1, 0, 0, 0, 0, time.UTC)
 // * coarseTime is time since epoch in seconds
 // * fineTime is subseconds is a binary division of a second
 func UnsegmentedTimeNanoseconds(coarseTime uint32, fineTime uint16) int64 {
-	var nanos int64 = int64(coarseTime) * int64(milliesPerSecond)
+	var nanos int64 = int64(coarseTime) * int64(nanosPerSecond)
 	var fine = big.NewFloat(float64(fineTime))
 	fine.SetMantExp(fine, -16)
 	fineValue, _ := fine.Float64()
-	return nanos + int64(math.Round(fineValue*milliesPerSecond))
+	return nanos + int64(math.Round(fineValue*nanosPerSecond))
 }
 
 // UnsegmentedTimeDate iterprets CCSDS Unsegmented time Code (CUC)
