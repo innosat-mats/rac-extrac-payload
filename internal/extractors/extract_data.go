@@ -23,12 +23,12 @@ func ExtractData(callback common.Callback, streamBatch ...StreamBatch) {
 	go Aggregator(aggregatorChannel, innosatChannel)
 	go DecodeAEZ(aezChannel, aggregatorChannel)
 
+	waitGroup.Add(1)
 	go func() {
-		waitGroup.Add(1)
+		defer waitGroup.Done()
 		for data := range aezChannel {
 			callback(data)
 		}
-		waitGroup.Done()
 	}()
 
 	for record := range ramsesChannel {

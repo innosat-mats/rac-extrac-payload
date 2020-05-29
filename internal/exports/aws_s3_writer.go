@@ -52,15 +52,11 @@ func AWSS3CallbackFactory(
 		if err != nil {
 			log.Fatalf("Could not find %v: %v", awsDescriptionPath, err)
 		}
-		wg.Add(1)
-		go func() {
-			key := fmt.Sprintf("ABOUT%v", filepath.Ext(awsDescriptionPath))
-			if project != "" {
-				key = fmt.Sprintf("%v/%v", project, key)
-			}
-			upload(uploader, key, awsDescription)
-			wg.Done()
-		}()
+		key := fmt.Sprintf("ABOUT%v", filepath.Ext(awsDescriptionPath))
+		if project != "" {
+			key = fmt.Sprintf("%v/%v", project, key)
+		}
+		upload(uploader, key, awsDescription)
 	}
 
 	callback := func(pkg common.DataRecord) {
@@ -104,8 +100,8 @@ func AWSS3CallbackFactory(
 	}
 
 	teardown := func() {
-		timeseriesCollection.CloseAll()
 		wg.Wait()
+		timeseriesCollection.CloseAll()
 	}
 
 	return callback, teardown
