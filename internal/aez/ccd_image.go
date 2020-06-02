@@ -30,8 +30,13 @@ func NewCCDImage(buf io.Reader) (*CCDImage, error) {
 }
 
 // Image returns the 16bit gray image and the name of the file/bucket object
-func (ccd *CCDImage) Image(buf []byte, prefix string, originName string) (*image.Gray16, string) {
-	imgFileName := getGrayscaleImageName(prefix, originName, ccd.PackData)
+func (ccd *CCDImage) Image(
+	buf []byte,
+	prefix string,
+	originName string,
+	rid RID,
+) (*image.Gray16, string) {
+	imgFileName := getGrayscaleImageName(prefix, originName, ccd.PackData, rid)
 
 	imgData := getImageData(
 		buf,

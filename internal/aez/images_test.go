@@ -15,6 +15,7 @@ func Test_getGrayscaleImageName(t *testing.T) {
 		project    string
 		originName string
 		expts      uint32
+		rid        RID
 		want       string
 	}{
 		{
@@ -22,18 +23,25 @@ func Test_getGrayscaleImageName(t *testing.T) {
 			"test",
 			"my/path/MyFile.rac",
 			5,
-			filepath.Join("test", "MyFile_5000000000.png"),
+			CCD1,
+			filepath.Join("test", "MyFile_5000000000_1.png"),
 		},
 		{
 			"Omits project if empty",
 			"",
 			"my/path/MyFile.rac",
 			5,
-			"MyFile_5000000000.png",
+			CCD7,
+			"MyFile_5000000000_7.png",
 		},
 	}
 	for _, tt := range tests {
-		got := getGrayscaleImageName(tt.project, tt.originName, &CCDImagePackData{EXPTS: tt.expts})
+		got := getGrayscaleImageName(
+			tt.project,
+			tt.originName,
+			&CCDImagePackData{EXPTS: tt.expts},
+			tt.rid,
+		)
 		if got != tt.want {
 			t.Errorf("getGrayscaleImageName() = %v, want %v", got, tt.want)
 		}

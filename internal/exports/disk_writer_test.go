@@ -237,6 +237,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeImages: true},
 			[]common.DataRecord{
 				{
+					RID:    aez.CCD2,
 					Origin: &common.OriginDescription{Name: "File1.rac"},
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
@@ -249,6 +250,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
 				{
+					RID:    aez.CCD3,
 					Origin: &common.OriginDescription{Name: "File1.rac"},
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
@@ -262,10 +264,10 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_5000000000.png", 0, true},
-				{"File1_5000000000.json", 0, true},
-				{"File1_6000000000.png", 0, true},
-				{"File1_6000000000.json", 0, true},
+				{"File1_5000000000_2.png", 0, true},
+				{"File1_5000000000_2.json", 0, true},
+				{"File1_6000000000_3.png", 0, true},
+				{"File1_6000000000_3.json", 0, true},
 			},
 		},
 		{

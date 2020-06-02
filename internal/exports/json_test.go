@@ -1,6 +1,8 @@
 package exports
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetJSONFilename(t *testing.T) {
 	templateName := "my/file.png"

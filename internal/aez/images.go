@@ -49,9 +49,14 @@ func getGrayscaleImage(
 	return img
 }
 
-func getGrayscaleImageName(dir string, originName string, imgPackData *CCDImagePackData) string {
+func getGrayscaleImageName(
+	dir string,
+	originName string,
+	imgPackData *CCDImagePackData,
+	rid RID,
+) string {
 	racName := strings.TrimSuffix(filepath.Base(originName), filepath.Ext(originName))
-	fileName := fmt.Sprintf("%v_%v.png", racName, imgPackData.Nanoseconds())
+	fileName := fmt.Sprintf("%v_%v_%v.png", racName, imgPackData.Nanoseconds(), rid.CCDNumber())
 	if dir == "" {
 		return fileName
 	}

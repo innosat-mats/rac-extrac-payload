@@ -67,7 +67,12 @@ func DiskCallbackFactory(
 				go func() {
 					defer wg.Done()
 
-					img, imgFileName := ccdImage.Image(pkg.Buffer, output, pkg.OriginName())
+					img, imgFileName := ccdImage.Image(
+						pkg.Buffer,
+						output,
+						pkg.OriginName(),
+						pkg.RID,
+					)
 					imgFile, err := os.Create(imgFileName)
 					if err != nil {
 						log.Printf("failed creating %s: %s", imgFileName, err)
