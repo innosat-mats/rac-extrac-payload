@@ -93,6 +93,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 						NCOL:  1,
 						NROW:  2,
 					},
+					ImageFileName: "MyRac_5000000000_5.png",
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			}},
@@ -120,6 +121,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 						NCOL:  1,
 						NROW:  2,
 					},
+					ImageFileName: "MyRac_5000000000_5.png",
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			}},
@@ -144,6 +146,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 						NCOL:  1,
 						NROW:  2,
 					},
+					ImageFileName: "MyRac_5000000000_5.png",
 				},
 				Error:  errors.New("here be dragons"),
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
@@ -174,6 +177,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 							NCOL:  1,
 							NROW:  2,
 						},
+						ImageFileName: "MyRac_5000000000_6.png",
 					},
 					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 				},
@@ -190,7 +194,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				"myproj/ABOUT.json":              7,
 				"myproj/MyRac_5000000000_6.png":  76,  // 8 + header
 				"myproj/MyRac_5000000000_6.json": 857, // length of the json
-				"myproj/CCD.csv":                 669, // length of the first three lines csv (specs, header, datarow)
+				"myproj/CCD.csv":                 708, // length of the first three lines csv (specs, header, datarow)
 				"myproj/HTR.csv":                 1005,
 			},
 		},

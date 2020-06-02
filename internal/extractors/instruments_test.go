@@ -72,7 +72,9 @@ func Test_instrumentTransparentData(t *testing.T) {
 	type args struct {
 		rid aez.RID
 		buf io.Reader
+		pkg common.DataRecord
 	}
+	origin := common.OriginDescription{Name: "hello"}
 	tests := []struct {
 		name    string
 		args    args
@@ -80,49 +82,81 @@ func Test_instrumentTransparentData(t *testing.T) {
 	}{
 		{
 			"CCD1",
-			args{rid: aez.CCD1, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.CCD1,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{
 			"CCD2",
-			args{rid: aez.CCD2, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.CCD2,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{
 			"CCD3",
-			args{rid: aez.CCD3, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.CCD3,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{
 			"CCD4",
-			args{rid: aez.CCD4, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.CCD4,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{
 			"CCD5",
-			args{rid: aez.CCD5, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.CCD5,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{
 			"CCD6",
-			args{rid: aez.CCD6, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.CCD6,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{
 			"CCD7",
-			args{rid: aez.CCD7, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.CCD7,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{
 			"PM",
-			args{rid: aez.PM, buf: bytes.NewReader(make([]byte, 100))},
+			args{
+				rid: aez.PM,
+				buf: bytes.NewReader(make([]byte, 100)),
+				pkg: common.DataRecord{Origin: &origin},
+			},
 			false,
 		},
 		{"Unknown", args{rid: aez.RID(0)}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := instrumentTransparentData(tt.args.rid, tt.args.buf)
+			got, err := instrumentTransparentData(tt.args.rid, tt.args.buf, &tt.args.pkg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("instrumentTransparentData() error = %v, wantErr %v", err, tt.wantErr)
 				return

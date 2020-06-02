@@ -12,32 +12,21 @@ import (
 func Test_getGrayscaleImageName(t *testing.T) {
 	tests := []struct {
 		name       string
-		project    string
 		originName string
 		expts      uint32
 		rid        RID
 		want       string
 	}{
 		{
-			"Adds project",
-			"test",
+			"Returns expected name",
 			"my/path/MyFile.rac",
 			5,
 			CCD1,
-			filepath.Join("test", "MyFile_5000000000_1.png"),
-		},
-		{
-			"Omits project if empty",
-			"",
-			"my/path/MyFile.rac",
-			5,
-			CCD7,
-			"MyFile_5000000000_7.png",
+			"MyFile_5000000000_1.png",
 		},
 	}
 	for _, tt := range tests {
 		got := getGrayscaleImageName(
-			tt.project,
 			tt.originName,
 			&CCDImagePackData{EXPTS: tt.expts},
 			tt.rid,

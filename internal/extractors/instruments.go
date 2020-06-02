@@ -27,12 +27,16 @@ func instrumentHK(sid aez.SID, buf io.Reader) (common.Exporter, error) {
 	return dataPackage, err
 }
 
-func instrumentTransparentData(rid aez.RID, buf io.Reader) (common.Exporter, error) {
+func instrumentTransparentData(
+	rid aez.RID,
+	buf io.Reader,
+	pkg *common.DataRecord,
+) (common.Exporter, error) {
 	var dataPackage common.Exporter
 	var err error
 	switch {
 	case rid.IsCCD():
-		dataPackage, err = aez.NewCCDImage(buf)
+		dataPackage, err = aez.NewCCDImage(buf, pkg.OriginName(), rid)
 	case rid == aez.PM:
 		dataPackage, err = aez.NewPMData(buf)
 	default:
