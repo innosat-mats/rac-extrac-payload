@@ -145,7 +145,7 @@ func TestCCDImage_FullImageName(t *testing.T) {
 		want          string
 	}{
 		{"no prefix just filename", "test.png", "", "test.png"},
-		{"no prefix just filename", "😓️.png", "🌞️", filepath.Join("🌞️", "😓️.png")},
+		{"filename with prefix", "😓️.png", "🌞️", filepath.Join("🌞️", "😓️.png")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
