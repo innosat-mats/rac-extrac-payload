@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -16,45 +17,52 @@ func TestCCDImage_CSVSpecifications(t *testing.T) {
 	}
 }
 
-func TestCCDImage_CSVHeaders_AddsBC(t *testing.T) {
+func TestCCDImage_CSVHeaders_AddsOwn(t *testing.T) {
 	ccdI := CCDImage{}
 	ccdIPD := CCDImagePackData{}
 	headersI := ccdI.CSVHeaders()
-	headersIPD := ccdIPD.CSVHeaders()
-	wantBC := "BC"
+	want := append(ccdIPD.CSVHeaders(), "BC", "Image File Name")
+
 	for i, header := range headersI {
-		if i < len(headersIPD) {
-			if header != headersIPD[i] {
-				t.Errorf("%v: got %v, want %v", i, header, headersIPD[i])
-			}
-		} else if i == len(headersIPD) {
-			if header != wantBC {
-				t.Errorf("%v: got %v, want %v", i, header, wantBC)
+		if i < len(want) {
+			if header != want[i] {
+				t.Errorf("%v: got %v, want %v", i, header, want[i])
 			}
 		} else {
 			t.Errorf("Unexpected %vth header %v", i, header)
 		}
 	}
+	if len(headersI) < len(want) {
+		t.Errorf(
+			"Got %v headers, want %v (missing %v)",
+			len(headersI),
+			len(want),
+			want[len(headersI):],
+		)
+	}
 }
 
-func TestCCDImage_CSVRow_AddsBC(t *testing.T) {
+func TestCCDImage_CSVRow_AddsOwn(t *testing.T) {
 	ccdIPD := CCDImagePackData{}
-	ccdI := CCDImage{PackData: &ccdIPD, BadColumns: []uint16{42, 6, 7}}
+	ccdI := CCDImage{PackData: &ccdIPD, BadColumns: []uint16{42, 6, 7}, ImageFileName: "my_🖼️.png"}
 	rowI := ccdI.CSVRow()
-	rowIPD := ccdIPD.CSVRow()
-	wantBC := "[42 6 7]"
+	want := append(ccdIPD.CSVRow(), "[42 6 7]", "my_🖼️.png")
 	for i, value := range rowI {
-		if i < len(rowIPD) {
-			if value != rowIPD[i] {
-				t.Errorf("%v: got %v, want %v", i, value, rowIPD[i])
-			}
-		} else if i == len(rowIPD) {
-			if value != wantBC {
-				t.Errorf("%v: got %v, want %v", i, value, wantBC)
+		if i < len(want) {
+			if value != want[i] {
+				t.Errorf("%v: got %v, want %v", i, value, want[i])
 			}
 		} else {
 			t.Errorf("Unexpected %vth column %v", i, value)
 		}
+	}
+	if len(rowI) < len(want) {
+		t.Errorf(
+			"Got %v headers, want %v (missing %v)",
+			len(rowI),
+			len(want),
+			want[len(rowI):],
+		)
 	}
 }
 
@@ -79,26 +87,38 @@ func TestNewCCDImage(t *testing.T) {
 	data := append(buf.Bytes(), trailing...)
 
 	tests := []struct {
-		name     string
-		truncate int
-		want     *CCDImage
-		wantErr  bool
+		name       string
+		truncate   int
+		originName string
+		rid        RID
+		want       *CCDImage
+		wantErr    bool
 	}{
 		{
 			"Returns expected",
 			0,
-			&CCDImage{PackData: &packData, BadColumns: []uint16{0xffff, 0x0000}},
+			"my_rac.rac",
+			CCD1,
+			&CCDImage{
+				PackData:      &packData,
+				BadColumns:    []uint16{0xffff, 0x0000},
+				ImageFileName: "my_rac_0_1.png",
+			},
 			false,
 		},
 		{
 			"Not enough bad columns",
 			4,
+			"my_rac.rac",
+			CCD1,
 			nil,
 			true,
 		},
 		{
 			"Not enough for ccd",
 			24,
+			"my_rac.rac",
+			CCD1,
 			nil,
 			true,
 		},
@@ -106,7 +126,7 @@ func TestNewCCDImage(t *testing.T) {
 	for _, tt := range tests {
 		reader := bytes.NewReader(data[0 : len(data)-tt.truncate])
 
-		got, err := NewCCDImage(reader)
+		got, err := NewCCDImage(reader, tt.originName, tt.rid)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("NewCCDImage() error = %v, wantErr %v", err, tt.wantErr)
 			return
@@ -114,5 +134,27 @@ func TestNewCCDImage(t *testing.T) {
 		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("NewCCDImage() = %v, want %v", got, tt.want)
 		}
+	}
+}
+
+func TestCCDImage_FullImageName(t *testing.T) {
+	tests := []struct {
+		name          string
+		imageFileName string
+		prefix        string
+		want          string
+	}{
+		{"no prefix just filename", "test.png", "", "test.png"},
+		{"filename with prefix", "😓️.png", "🌞️", filepath.Join("🌞️", "😓️.png")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ccd := &CCDImage{
+				ImageFileName: tt.imageFileName,
+			}
+			if got := ccd.FullImageName(tt.prefix); got != tt.want {
+				t.Errorf("CCDImage.FullImageName() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

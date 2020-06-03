@@ -237,6 +237,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			args{writeImages: true},
 			[]common.DataRecord{
 				{
+					RID:    aez.CCD2,
 					Origin: &common.OriginDescription{Name: "File1.rac"},
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
@@ -245,10 +246,12 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 							NROW:  2,
 							EXPTS: 5,
 						},
+						ImageFileName: "File1_5000000000_2.png",
 					},
 					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
 				{
+					RID:    aez.CCD3,
 					Origin: &common.OriginDescription{Name: "File1.rac"},
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
@@ -257,15 +260,16 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 							NROW:  2,
 							EXPTS: 6,
 						},
+						ImageFileName: "File1_6000000000_3.png",
 					},
 					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
 			},
 			[]wantFile{
-				{"File1_5000000000.png", 0, true},
-				{"File1_5000000000.json", 0, true},
-				{"File1_6000000000.png", 0, true},
-				{"File1_6000000000.json", 0, true},
+				{"File1_5000000000_2.png", 0, true},
+				{"File1_5000000000_2.json", 0, true},
+				{"File1_6000000000_3.png", 0, true},
+				{"File1_6000000000_3.json", 0, true},
 			},
 		},
 		{
@@ -280,6 +284,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 							NROW:  2,
 							EXPTS: 5,
 						},
+						ImageFileName: "File1_6000000000_3.png",
 					},
 					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},

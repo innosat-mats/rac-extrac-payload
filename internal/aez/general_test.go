@@ -111,3 +111,27 @@ func TestRID_IsCCD(t *testing.T) {
 		})
 	}
 }
+
+func TestRID_CCDNumber(t *testing.T) {
+	tests := []struct {
+		name string
+		rid  RID
+		want int32
+	}{
+		{"CCD1", CCD1, 1},
+		{"CCD2", CCD2, 2},
+		{"CCD3", CCD3, 3},
+		{"CCD4", CCD4, 4},
+		{"CCD5", CCD5, 5},
+		{"CCD6", CCD6, 6},
+		{"CCD7", CCD7, 7},
+		{"PM", PM, -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.rid.CCDNumber(); got != tt.want {
+				t.Errorf("RID.CCDNumber() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

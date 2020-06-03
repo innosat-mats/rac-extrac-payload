@@ -77,6 +77,7 @@ func TestDecodeAEZ(t *testing.T) {
 		{
 			"Transparent Data package",
 			common.DataRecord{
+				Origin:   &common.OriginDescription{Name: "hello🌍️.rac"},
 				TMHeader: &innosat.TMHeader{ServiceType: 128, ServiceSubType: 25},
 				Buffer: makeInstrumentData(
 					uint16(aez.CCD2),
@@ -84,7 +85,11 @@ func TestDecodeAEZ(t *testing.T) {
 					[]byte{0xff, 0xff, 0x00, 0x00, 0xcc, 0xcc},
 				),
 			},
-			&aez.CCDImage{PackData: &aez.CCDImagePackData{NBC: 2}, BadColumns: []uint16{0xffff, 0x0000}},
+			&aez.CCDImage{
+				PackData:      &aez.CCDImagePackData{NBC: 2},
+				BadColumns:    []uint16{0xffff, 0x0000},
+				ImageFileName: "hello🌍️_0_2.png",
+			},
 			aez.SID(0),
 			aez.CCD2,
 			2,

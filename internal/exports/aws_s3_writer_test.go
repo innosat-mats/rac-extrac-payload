@@ -85,6 +85,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				RamsesTMHeader: &ramses.TMHeader{},
 				SourceHeader:   &innosat.SourcePacketHeader{},
 				TMHeader:       &innosat.TMHeader{},
+				RID:            aez.CCD5,
 				Data: &aez.CCDImage{
 					PackData: &aez.CCDImagePackData{
 						EXPTS: 5,
@@ -92,12 +93,13 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 						NCOL:  1,
 						NROW:  2,
 					},
+					ImageFileName: "MyRac_5000000000_5.png",
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			}},
 			map[string]int{
-				"myproj/MyRac_5000000000.png":  76,  // 8 + header
-				"myproj/MyRac_5000000000.json": 853, // length of the json
+				"myproj/MyRac_5000000000_5.png":  76,  // 8 + header
+				"myproj/MyRac_5000000000_5.json": 857, // length of the json
 			},
 		},
 		{
@@ -119,6 +121,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 						NCOL:  1,
 						NROW:  2,
 					},
+					ImageFileName: "MyRac_5000000000_5.png",
 				},
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 			}},
@@ -143,6 +146,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 						NCOL:  1,
 						NROW:  2,
 					},
+					ImageFileName: "MyRac_5000000000_5.png",
 				},
 				Error:  errors.New("here be dragons"),
 				Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
@@ -165,6 +169,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
 					TMHeader:       &innosat.TMHeader{},
+					RID:            aez.CCD6,
 					Data: &aez.CCDImage{
 						PackData: &aez.CCDImagePackData{
 							EXPTS: 5,
@@ -172,6 +177,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 							NCOL:  1,
 							NROW:  2,
 						},
+						ImageFileName: "MyRac_5000000000_6.png",
 					},
 					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
 				},
@@ -185,11 +191,11 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 				},
 			},
 			map[string]int{
-				"myproj/ABOUT.json":            7,
-				"myproj/MyRac_5000000000.png":  76,  // 8 + header
-				"myproj/MyRac_5000000000.json": 853, // length of the json
-				"myproj/CCD.csv":               665, // length of the first three lines csv (specs, header, datarow)
-				"myproj/HTR.csv":               1005,
+				"myproj/ABOUT.json":              7,
+				"myproj/MyRac_5000000000_6.png":  76,  // 8 + header
+				"myproj/MyRac_5000000000_6.json": 857, // length of the json
+				"myproj/CCD.csv":                 708, // length of the first three lines csv (specs, header, datarow)
+				"myproj/HTR.csv":                 1005,
 			},
 		},
 	}

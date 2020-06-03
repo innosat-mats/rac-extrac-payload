@@ -76,8 +76,8 @@ func AWSS3CallbackFactory(
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-
-					img, imgFileName := ccdImage.Image(pkg.Buffer, project, pkg.OriginName())
+					imgFileName := ccdImage.FullImageName(project)
+					img := ccdImage.Image(pkg.Buffer)
 					pngBuffer := bytes.NewBuffer([]byte{})
 					png.Encode(pngBuffer, img)
 					upload(uploader, imgFileName, pngBuffer)

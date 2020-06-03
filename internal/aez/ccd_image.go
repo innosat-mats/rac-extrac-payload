@@ -6,17 +6,23 @@ import (
 	"fmt"
 	"image"
 	"io"
+	"path/filepath"
 	"time"
 )
 
 // CCDImage is a container for the invariant CCDImagePackData header and the variable BadColumns that follow
 type CCDImage struct {
-	PackData   *CCDImagePackData
-	BadColumns []uint16
+	PackData      *CCDImagePackData
+	BadColumns    []uint16
+	ImageFileName string
 }
 
 // NewCCDImage reads buf into a complete CCDImage
-func NewCCDImage(buf io.Reader) (*CCDImage, error) {
+func NewCCDImage(
+	buf io.Reader,
+	originName string,
+	rid RID,
+) (*CCDImage, error) {
 	packData, err := NewCCDImagePackData(buf)
 	if err != nil {
 		return nil, err
@@ -26,17 +32,18 @@ func NewCCDImage(buf io.Reader) (*CCDImage, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &CCDImage{packData, badColumns}, nil
+	imgFileName := getGrayscaleImageName(originName, packData, rid)
+	return &CCDImage{packData, badColumns, imgFileName}, nil
 }
 
 // Image returns the 16bit gray image and the name of the file/bucket object
-func (ccd *CCDImage) Image(buf []byte, prefix string, originName string) (*image.Gray16, string) {
-	imgFileName := getGrayscaleImageName(prefix, originName, ccd.PackData)
-
+func (ccd *CCDImage) Image(
+	buf []byte,
+) *image.Gray16 {
 	imgData := getImageData(
 		buf,
 		ccd.PackData,
-		imgFileName,
+		ccd.ImageFileName,
 	)
 	_, shift, _ := ccd.PackData.WDW.InputDataWindow()
 	return getGrayscaleImage(
@@ -44,9 +51,8 @@ func (ccd *CCDImage) Image(buf []byte, prefix string, originName string) (*image
 		int(ccd.PackData.NCOL+NCOLStartOffset),
 		int(ccd.PackData.NROW),
 		shift,
-		imgFileName,
-	), imgFileName
-
+		ccd.ImageFileName,
+	)
 }
 
 // CSVSpecifications returns the specs used in creating the struct
@@ -56,13 +62,13 @@ func (ccd *CCDImage) CSVSpecifications() []string {
 
 // CSVHeaders returns the exportable field names
 func (ccd *CCDImage) CSVHeaders() []string {
-	return append(ccd.PackData.CSVHeaders(), "BC")
+	return append(ccd.PackData.CSVHeaders(), "BC", "Image File Name")
 }
 
 // CSVRow returns the exportable field values
 func (ccd *CCDImage) CSVRow() []string {
 	row := ccd.PackData.CSVRow()
-	return append(row, fmt.Sprintf("%v", ccd.BadColumns))
+	return append(row, fmt.Sprintf("%v", ccd.BadColumns), ccd.ImageFileName)
 }
 
 // MarshalJSON jsonifies content
@@ -136,4 +142,12 @@ func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 		ccd.PackData.NBC,
 		ccd.BadColumns,
 	})
+}
+
+// FullImageName returns the full image filename for a given prefix
+func (ccd *CCDImage) FullImageName(prefix string) string {
+	if prefix == "" {
+		return ccd.ImageFileName
+	}
+	return filepath.Join(prefix, ccd.ImageFileName)
 }

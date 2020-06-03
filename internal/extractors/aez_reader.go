@@ -32,7 +32,7 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 			var rid aez.RID
 			binary.Read(buffer, binary.BigEndian, &rid)
 			sourcePacket.RID = rid
-			exportable, err = instrumentTransparentData(rid, buffer)
+			exportable, err = instrumentTransparentData(rid, buffer, &sourcePacket)
 		case sourcePacket.TMHeader.IsTCVerification():
 			exportable, err = instrumentVerification(sourcePacket.TMHeader.ServiceSubType, buffer)
 		default:

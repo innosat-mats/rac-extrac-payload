@@ -78,6 +78,28 @@ func (rid *RID) IsCCD() bool {
 	return *rid == CCD1 || *rid == CCD2 || *rid == CCD3 || *rid == CCD4 || *rid == CCD5 || *rid == CCD6 || *rid == CCD7
 }
 
+// CCDNumber returns the ccd number, not the rid value for ccds
+func (rid *RID) CCDNumber() int32 {
+	switch *rid {
+	case CCD1:
+		return 1
+	case CCD2:
+		return 2
+	case CCD3:
+		return 3
+	case CCD4:
+		return 4
+	case CCD5:
+		return 5
+	case CCD6:
+		return 6
+	case CCD7:
+		return 7
+	default:
+		return -1
+	}
+}
+
 func (rid *RID) String() string {
 	switch *rid {
 	case 0:
