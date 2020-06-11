@@ -59,7 +59,7 @@ CCDSEL, WDWOV, JPEGQ, FRAME, NROW, NRBIN, NRSKIP, NCOL, NCSKIP, NFLUSH
 TEXPMS, TEMP, FBINOV, LBLNK, TBLNK, ZERO, TIMING1, TIMING2, VERSION
 TIMING3, NBC, BC
 
-The following columns parses the values further:
+The following columns parse the values further:
 - EXP Nanoseconds
   Time of exposure (nanoseconds since epoch)
 - EXP Date
