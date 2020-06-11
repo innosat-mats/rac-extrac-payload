@@ -23,9 +23,10 @@ follows columns specific to each file
 - File
   The full path to the rac-file on the computer that produced the csv
 - ProcessingDate
-  The local time of when the file was processed
+  The local time when the file was processed
 - RamsesTime (Ramses Header)
-  The time of when the ramses file was created (UTC)
+  The time when the ramses file was created (UTC)
+
 - QualityIndicator (Ramses TM Header)
   Indicates whether the transported data is complete or partial
   (0 = Complete, 1 = partial).
