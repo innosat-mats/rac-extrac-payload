@@ -37,7 +37,13 @@ func myUsage() {
 	fmt.Println("Extracts information from Innosat-MATS rac-files")
 	fmt.Println()
 	fmt.Printf("Usage: %s [OPTIONS] rac-file ...\n", os.Args[0])
+	if len(os.Args) > 2 && os.Args[2] == "output" {
+		info()
+		return
+	}
 	flag.PrintDefaults()
+	fmt.Printf("\nFor extra information about the output CSV:s type \"%s -help output\"\n", os.Args[0])
+
 	fmt.Println(`
 The tool can be used to scan rac files for contents. Use the -stdout flag and
 use command line tools to scan for interesting information, e.g.:
