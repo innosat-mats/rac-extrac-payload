@@ -227,7 +227,8 @@ func (ccd *CCDImagePackData) CSVHeaders() []string {
 		"TEXPMS",
 		"GAIN Mode",
 		"GAIN Timing",
-		"GAIN Trunctation",
+		"GAIN Truncation",
+
 		"TEMP",
 		"FBINOV",
 		"LBLNK",
