@@ -47,7 +47,8 @@ follows columns specific to each file
 
 Note that each line should have a SID or a RID depending on packet type
 
-All files also has a final common column
+All files also have a final common column
+
 - Error
   If an error occurred it will be written here.
   If empty, then no error occurred extracting the data.
