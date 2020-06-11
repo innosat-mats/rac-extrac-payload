@@ -76,7 +76,8 @@ The following columns parse the values further:
   "15..4" (value in rac 0x4)
   "15..0" which is the full image (value in rac 0x7)
 - NCBIN FPGAColumns
-  The actual number of FPGA Columns (value in rac is the exponent in 2^x)
+  The actual number of FPGA Columns (value in rac is the exponent in 2^N)
+
 - NCBIN CCDColumns
   The number of CCD Columns
 - GAIN Mode
