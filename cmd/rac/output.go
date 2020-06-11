@@ -16,8 +16,9 @@ The first row:
 - "AEZ": Means the following column says what AEZ specification was used.
 - "AEZICD002:H": The AEZ version
 
-The header row starts with a couple of columns common for all output and then
+The header row starts with a couple of columns common to all output and then
 follows columns specific to each file
+
 
 - File
   The full path to the rac-file on the computer that produced the csv
