@@ -33,7 +33,8 @@ follows columns specific to each file
 - LossFlag (Ramses TM Header)
   Used to indicate that a sequence discontinuity has been detected
 - VCFrameCounter (Ramses TM Header)
-  Counter of the transfer fram the payload packet arrived in.
+  Counter of the transfer frame the payload packet arrived in.
+
 - SPSequenceCount (Innosat Source Header)
 - TMHeaderTime (Innosat TM Header)
   The time of the TM packet creation (UTC)
