@@ -98,6 +98,7 @@ func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 		TEXPMS             uint32
 		GAINMode           string
 		GAINTiming         string
+		GAINTruncation     uint8
 		TEMP               uint16
 		FBINOV             uint16
 		LBLNK              uint16
@@ -130,6 +131,7 @@ func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 		ccd.PackData.TEXPMS,
 		(&gainMode).String(),
 		(&gainTiming).String(),
+		ccd.PackData.GAIN.Truncation(),
 		ccd.PackData.TEMP,
 		ccd.PackData.FBINOV,
 		ccd.PackData.LBLNK,
