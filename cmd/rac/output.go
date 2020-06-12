@@ -1,8 +1,8 @@
 package main
 
-func info() {
+func infoGeneral() {
 	println(`
-### CSVs ###
+### All CSVs ###
 
 The first row:
 - "CODE": Means the following column says what version of the code produced
@@ -34,9 +34,11 @@ follows columns specific to each file
   Used to indicate that a sequence discontinuity has been detected
 - VCFrameCounter (Ramses TM Header)
   Counter of the transfer frame the payload packet arrived in.
+  Wraps at (2^16)-1 i.e.
 
 - SPSequenceCount (Innosat Source Header)
-  A counter that increases with each packet, may never short cycle and should wrap around to zeron after 2^14-1
+  A counter that increases with each packet, may never short cycle and should
+  wrap around to zeron after 2^14-1
 
 - TMHeaderTime (Innosat TM Header)
   The time of the TM packet creation (UTC)
@@ -55,7 +57,17 @@ All files also have a final common column
   If an error occurred it will be written here.
   If empty, then no error occurred extracting the data.
 
+For information about fields specific to a certain csv use any of these:
+
+-help CCD, -help CPRU, -help HTR, -help PWR, -help STAT, -help TCV,
+-help PM
+	`)
+}
+
+func infoCCD() {
+	println(`
 ### CCD.csv ###
+
 The following columns directly export the data in the rac:
 CCDSEL, WDWOV, JPEGQ, FRAME, NROW, NRBIN, NRSKIP, NCOL, NCSKIP, NFLUSH
 TEXPMS, TEMP, FBINOV, LBLNK, TBLNK, ZERO, TIMING1, TIMING2, VERSION
@@ -92,4 +104,138 @@ The following columns parse the values further:
 - Image File Name
   The name of the image file associated with these measurements
 	`)
+}
+
+func infoCPRU() {
+	println(`
+### CPRU.csv ###
+All voltages are the calculated float values of their respective type
+according to the specification and not the raw encoded integer of the rac.
+
+- VGATE0:       voltage
+- VSUBS0:       voltage
+- VRD0:         voltage
+- VOD0:         voltage
+- Overvoltage0: If over voltage fault registered (bool)
+- Power0:       If power is enabled (bool)
+- VGATE1:       voltage
+- VSUBS1:       voltage
+- VRD1:         voltage
+- VOD1:         voltage
+- Overvoltage1: If over voltage fault registered (bool)
+- Power1:       If power is enabled (bool)
+- VGATE2:       voltage
+- VSUBS2:       voltage
+- VRD2:         voltage
+- VOD2:         voltage
+- Overvoltage2: If over voltage fault registered (bool)
+- Power2:       If power is enabled (bool)
+- VGATE3:       voltage
+- VSUBS3:       voltage
+- VRD3:         voltage
+- VOD3:         voltage
+- Overvoltage3: If over voltage fault registered (bool)
+- Power3:       If power is enabled (bool)
+  `)
+}
+
+func infoHTR() {
+	println(`
+### HTR.csv ###
+All voltages are the calculated float values of their respective type
+according to the specification and not the raw encoded integer of the rac.
+
+All temperatures are calculated from the specification and given in degrees
+Celcius.
+
+- HTR1A:    temperature,
+- HTR1B:    temperature,
+- HTR1OD:   voltage
+- HTR2A:    temperature,
+- HTR2B:    temperature,
+- HTR2OD:   voltage
+- HTR7A:    temperature,
+- HTR7B:    temperature,
+- HTR7OD:   voltage,
+- HTR8A:    temperature,
+- HTR8B:    temperature,
+- HTR8OD:   voltage,
+- WARNINGS: A summary of warnings from the temperature calculations.
+  The warnings come from the interpolator and probably indicate the measured
+  resistance is out of range.
+  Each warning is separated by a '|' character.
+  `)
+}
+
+func infoPWR() {
+	println(`
+### PWR.csv ###
+All voltages are the calculated float values of their respective type
+according to the specification and not the raw encoded integer of the rac.
+
+All currents are calulated from the specification.
+
+All temperatures are calculated from the specification and given in degrees
+Celcius.
+
+- PWRT:     temperature,
+- PWRP32V:  voltage,
+- PWRP32C:  current,
+- PWRP16V:  voltage,
+- PWRP16C:  current,
+- PWRM16V:  voltage,
+- PWRM16C:  current,
+- PWRP3V3:  voltage,
+- PWRP3C3:  current,
+- WARNINGS: A summary of warnings from the temperature calculations.
+  The warnings come from the interpolator and probably indicate the measured
+  resistance is out of range.
+  Each warning is separated by a '|' character.
+  `)
+}
+
+func infoSTAT() {
+	println(`
+### STAT.csv ###
+
+The following fields are read out exactly as they are encoded in the rac:
+SPID, SPREV, FPID, FPREV, SVNA, SVNB, SVNC, MODE, EDACE, EDACCE, EDACN,
+SPWEOP, SPWEEP, ANOMALY
+
+The following fields are omitted TS and TSS but instead replaced by:
+- STATTIME: The time of the packet (UTC)
+- STATNANO: The time of the packet (nanoseconds since epoch)
+  `)
+}
+
+func infoTCV() {
+	println(`
+### TCV.csv ###
+
+This contains all the four telecommand verification types
+
+- TCV
+  "Accept" for both accept success and fail
+  "Exec" for both execute success and fail
+- TCPID
+  A copy of the Packet ID header field of the TC header
+- PSC
+  A copy of the Sequence Control Header field of the TC header
+- ErrorCode
+  Empty if success else the fail code
+  `)
+}
+
+func infoPM() {
+	println(`
+### PM.csv ###
+
+The following fields are read out exactly as they are encoded in the rac:
+PM1A, PM1ACNTR, PM1B, PM1BCNTR, PM1S, PM1SCNTR, PM2A, PM2ACNTR, PM2B,
+PM2BCNTR, PM2S, PM2SCNTR
+
+The following fields are omitted EXPTS and EXPTSS but instead replaced by:
+- PMTIME: The exposure time (UTC)
+- PMNANO: The exposure time (nanoseconds since epoch)
+  `)
 }
