@@ -315,6 +315,7 @@ func TestCCDImagePackData_CSVRow(t *testing.T) {
 		"21",
 		"Low",
 		"Full",
+		"0",
 		"22",
 		"23",
 		"24",
