@@ -99,7 +99,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			}},
 			map[string]int{
 				"myproj/MyRac_5000000000_5.png":  76,  // 8 + header
-				"myproj/MyRac_5000000000_5.json": 857, // length of the json
+				"myproj/MyRac_5000000000_5.json": 876, // length of the json
 			},
 		},
 		{
@@ -193,8 +193,8 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			map[string]int{
 				"myproj/ABOUT.json":              7,
 				"myproj/MyRac_5000000000_6.png":  76,  // 8 + header
-				"myproj/MyRac_5000000000_6.json": 857, // length of the json
-				"myproj/CCD.csv":                 708, // length of the first three lines csv (specs, header, datarow)
+				"myproj/MyRac_5000000000_6.json": 876, // length of the json
+				"myproj/CCD.csv":                 726, // length of the first three lines csv (specs, header, datarow)
 				"myproj/HTR.csv":                 1005,
 			},
 		},

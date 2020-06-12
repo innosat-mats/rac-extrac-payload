@@ -227,6 +227,8 @@ func (ccd *CCDImagePackData) CSVHeaders() []string {
 		"TEXPMS",
 		"GAIN Mode",
 		"GAIN Timing",
+		"GAIN Truncation",
+
 		"TEMP",
 		"FBINOV",
 		"LBLNK",
@@ -266,6 +268,7 @@ func (ccd *CCDImagePackData) CSVRow() []string {
 		strconv.Itoa(int(ccd.TEXPMS)),
 		(&gainMode).String(),
 		(&gainTiming).String(),
+		strconv.Itoa(int(ccd.GAIN.Truncation())),
 		strconv.Itoa(int(ccd.TEMP)),
 		strconv.Itoa(int(ccd.FBINOV)),
 		strconv.Itoa(int(ccd.LBLNK)),
