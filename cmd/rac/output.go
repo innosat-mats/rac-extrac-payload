@@ -204,7 +204,8 @@ The following fields are read out exactly as they are encoded in the rac:
 SPID, SPREV, FPID, FPREV, SVNA, SVNB, SVNC, MODE, EDACE, EDACCE, EDACN,
 SPWEOP, SPWEEP, ANOMALY
 
-The following fields are omitted TS and TSS but instead replaced by:
+The fields TS and TSS are replaced by:
+
 - STATTIME: The time of the packet (UTC)
 - STATNANO: The time of the packet (nanoseconds since epoch)
   `)
