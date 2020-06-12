@@ -34,11 +34,13 @@ follows columns specific to each file
   Used to indicate that a sequence discontinuity has been detected
 - VCFrameCounter (Ramses TM Header)
   Counter of the transfer frame the payload packet arrived in.
-  Wraps at (2^16)-1 i.e.
+  Wraps at (2^16)-1
+
 
 - SPSequenceCount (Innosat Source Header)
   A counter that increases with each packet, may never short cycle and should
-  wrap around to zeron after 2^14-1
+  wrap around to zero after 2^14-1
+
 
 - TMHeaderTime (Innosat TM Header)
   The time of the TM packet creation (UTC)
