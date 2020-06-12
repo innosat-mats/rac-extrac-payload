@@ -36,6 +36,8 @@ follows columns specific to each file
   Counter of the transfer frame the payload packet arrived in.
 
 - SPSequenceCount (Innosat Source Header)
+  A counter that increases with each packet, may never short cycle and should wrap around to zeron after 2^14-1
+
 - TMHeaderTime (Innosat TM Header)
   The time of the TM packet creation (UTC)
 - TMHeaderNanoseconds
@@ -77,15 +79,14 @@ The following columns parse the values further:
   "15..0" which is the full image (value in rac 0x7)
 - NCBIN FPGAColumns
   The actual number of FPGA Columns (value in rac is the exponent in 2^N)
-
 - NCBIN CCDColumns
   The number of CCD Columns
 - GAIN Mode
   "High" (value in rac 0b0)
   "Low" (value in rac 0b1)
 - GAIN Timing
-  "Faster" (value in rac 0b0)
-  "Full" (value in rac 0b1)
+  "Faster" used for binned and discarded (value in rac 0b0)
+  "Full" used even for pixels that are not read out (value in rac 0b1)
 - GAIN Trunctation
   The value of the truncation bits
 - Image File Name
