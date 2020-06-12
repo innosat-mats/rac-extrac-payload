@@ -239,3 +239,25 @@ The following fields are omitted EXPTS and EXPTSS but instead replaced by:
 - PMNANO: The exposure time (nanoseconds since epoch)
   `)
 }
+
+func infoSpace() {
+	println(`
+  .         _  .          .          .    +     .          .          .      .
+  .(_)         .            .            .            .       :
+  .   .      .    .     .     .    .      .   .      . .  .  -+-        .
+    .           .   .        .           .          /         :  .        .
+. .      .  .      /.   .      .    .     .     .  / .      . ' .               .
+  .  +       .    /     .          .          .   /      .             .   .
+ .            .  /         .            .        *   .         .     .
+.   .      .    *     .     .    .      .   .       .  .                     .
+    .           .           .           .           .         +  .
+. .        .  .       .   .      .    .     .     .    .      .   .    +
+
+.   +      .          ___/\_._/~~\_...__/\__.._._/~\        .         .   .
+ .               _.--'                              '--./\          .   .
+          /~~\/~\                                         '-/~\_            .
+.      .-'                                                      '-/\_
+_/\.-'                                                               \_/~\/\-.__
+                                                                                '.
+  `)
+}

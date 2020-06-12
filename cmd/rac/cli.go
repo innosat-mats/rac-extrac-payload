@@ -56,8 +56,10 @@ func myUsage() {
 			infoTCV()
 		case "PM":
 			infoPM()
+		case "MATS", "SPACE", "M.A.T.S.", "SATELLITE":
+			infoSpace()
 		default:
-			fmt.Printf("\nUnrecognized help section %s", helpSection)
+			fmt.Printf("\nUnrecognized help section %s\n", helpSection)
 		}
 		return
 	}
