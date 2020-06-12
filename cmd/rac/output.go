@@ -237,7 +237,7 @@ The following fields are read out exactly as they are encoded in the rac:
 PM1A, PM1ACNTR, PM1B, PM1BCNTR, PM1S, PM1SCNTR, PM2A, PM2ACNTR, PM2B,
 PM2BCNTR, PM2S, PM2SCNTR
 
-The following fields are omitted EXPTS and EXPTSS but instead replaced by:
+The fields EXPTS and EXPTSS are replaced by:
 - PMTIME: The exposure time (UTC)
 - PMNANO: The exposure time (nanoseconds since epoch)
   `)
