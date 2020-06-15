@@ -14,7 +14,7 @@ import (
 // TCAcceptSuccessData Telecommand Acceptance Report - Success
 type TCAcceptSuccessData struct {
 	TCPID uint16 // TCPID is a copy of the Packet ID header field of the TC
-	PSC   uint16 // PSC is a copy if the Sequence Control Header field of the TC
+	PSC   uint16 // PSC is a copy of the Sequence Control Header field of the TC
 }
 
 // NewTCAcceptSuccessData reads a TCAcceptSuccessData from buffer
@@ -55,7 +55,7 @@ func (tcv *TCAcceptSuccessData) CSVRow() []string {
 // TCAcceptFailureData Telecommand Acceptance Report - Failure
 type TCAcceptFailureData struct {
 	TCPID     uint16 // TCPID is a copy of the Packet ID header field of the TC
-	PSC       uint16 // PSC is a copy if the Sequence Control Header field of the TC
+	PSC       uint16 // PSC is a copy of the Sequence Control Header field of the TC
 	ErrorCode uint8  // Error code
 }
 
@@ -96,7 +96,7 @@ func (tcv *TCAcceptFailureData) CSVRow() []string {
 // TCExecSuccessData Telecommand Execution Report - Success
 type TCExecSuccessData struct {
 	TCPID uint16 // TCPID is a copy of the Packet ID header field of the TC
-	PSC   uint16 // PSC is a copy if the Sequence Control Header field of the TC
+	PSC   uint16 // PSC is a copy of the Sequence Control Header field of the TC
 }
 
 // NewTCExecSuccessData reads a TCExecSuccessData from buffer
@@ -137,7 +137,7 @@ func (tcv *TCExecSuccessData) CSVRow() []string {
 // TCExecFailureData Telecommand Execution Report - Failure
 type TCExecFailureData struct {
 	TCPID     uint16 // TCPID is a copy of the Packet ID header field of the TC
-	PSC       uint16 // PSC is a copy if the Sequence Control Header field of the TC
+	PSC       uint16 // PSC is a copy of the Sequence Control Header field of the TC
 	ErrorCode uint8  // Error code
 	// TODO? There is also an optional variable length data field
 }
