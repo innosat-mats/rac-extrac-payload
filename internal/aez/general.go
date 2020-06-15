@@ -7,7 +7,7 @@ import (
 )
 
 // Specification describes what version the current implementation follows
-var Specification string = "AEZICD002:H"
+var Specification string = "AEZICD002:I"
 
 var gpsTime time.Time = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
 
