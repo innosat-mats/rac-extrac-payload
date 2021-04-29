@@ -57,8 +57,8 @@ func DiskCallbackFactory(
 		recoverWrite := func(imageFileName string) {
 			if r := recover(); r != nil {
 				log.Printf(
-					"Could not process image %s (skipping...)",
-					imageFileName,
+					"Could not process image %s (%v)",
+					imageFileName, r,
 				)
 			}
 		}
@@ -75,24 +75,22 @@ func DiskCallbackFactory(
 				go func() {
 					defer wg.Done()
 					imgFileName := ccdImage.FullImageName(output)
-					// png.Encode is known to be able to panic, but recovery is
-					// defered here, in case something else also misbehave
 					defer recoverWrite(imgFileName)
 					img := ccdImage.Image(pkg.Buffer)
 					imgFile, err := os.Create(imgFileName)
 					if err != nil {
-						log.Fatalf("failed creating %s: %s", imgFileName, err)
+						log.Panicf("failed creating %s: %s", imgFileName, err)
 					}
 					defer imgFile.Close()
 					err = png.Encode(imgFile, img)
 					if err != nil {
-						log.Fatalf("failed encoding %s: %s", imgFileName, err)
+						log.Panicf("failed encoding %s: %s", imgFileName, err)
 					}
 					jsonFileName := GetJSONFilename(imgFileName)
 					jsonFile, err := os.Create(jsonFileName)
 					defer jsonFile.Close()
 					if err != nil {
-						log.Fatalf("failed creating %s: %s", jsonFileName, err)
+						log.Panicf("failed creating %s: %s", jsonFileName, err)
 					}
 					WriteJSON(jsonFile, &pkg, jsonFileName)
 				}()
