@@ -273,7 +273,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			},
 		},
 		{
-			"Continues on error",
+			"Continues on error due to wrong image shape",
 			args{writeImages: true},
 			[]common.DataRecord{
 				{
@@ -286,7 +286,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 							NROW:  42,
 							EXPTS: 5,
 						},
-						ImageFileName: "File1_5000000000_2.png",
+						ImageFileName: "File1_wrong_shape_2.png",
 					},
 					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
@@ -306,7 +306,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_5000000000_2.png", 0, true},
+				{"File1_wrong_shape_2.png", 0, true},
 				{"File1_6000000000_3.png", 0, true},
 				{"File1_6000000000_3.json", 0, true},
 			},
