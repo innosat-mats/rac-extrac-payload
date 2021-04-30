@@ -67,7 +67,7 @@ func AWSS3CallbackFactory(
 		recoverWrite := func(imageFileName string) {
 			if r := recover(); r != nil {
 				log.Printf(
-					"Could not process image %s (%v)",
+					"Processing incomplete for image %s, skipping (%v)",
 					imageFileName, r,
 				)
 			}
