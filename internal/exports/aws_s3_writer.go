@@ -64,6 +64,14 @@ func AWSS3CallbackFactory(
 			log.Println(pkg.Error)
 			return
 		}
+		recoverWrite := func(imageFileName string) {
+			if r := recover(); r != nil {
+				log.Printf(
+					"Processing incomplete for image %s, skipping (%v)",
+					imageFileName, r,
+				)
+			}
+		}
 		if writeImages {
 			switch pkg.Data.(type) {
 			case *aez.CCDImage:
@@ -77,11 +85,14 @@ func AWSS3CallbackFactory(
 				go func() {
 					defer wg.Done()
 					imgFileName := ccdImage.FullImageName(project)
+					defer recoverWrite(imgFileName)
 					img := ccdImage.Image(pkg.Buffer)
 					pngBuffer := bytes.NewBuffer([]byte{})
-					png.Encode(pngBuffer, img)
+					err := png.Encode(pngBuffer, img)
+					if err != nil {
+						log.Panicf("failed encoding %s: %s", imgFileName, err)
+					}
 					upload(uploader, imgFileName, pngBuffer)
-
 					jsonFileName := GetJSONFilename(imgFileName)
 					jsonBuffer := bytes.NewBuffer([]byte{})
 					WriteJSON(jsonBuffer, &pkg, jsonFileName)

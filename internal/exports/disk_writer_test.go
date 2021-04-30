@@ -273,6 +273,44 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			},
 		},
 		{
+			"Continues on error due to wrong image shape",
+			args{writeImages: true},
+			[]common.DataRecord{
+				{
+					RID:    aez.CCD2,
+					Origin: &common.OriginDescription{Name: "File1.rac"},
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  42,
+							NROW:  42,
+							EXPTS: 5,
+						},
+						ImageFileName: "File1_wrong_shape_2.png",
+					},
+					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+				{
+					RID:    aez.CCD3,
+					Origin: &common.OriginDescription{Name: "File1.rac"},
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  1,
+							NROW:  2,
+							EXPTS: 6,
+						},
+						ImageFileName: "File1_6000000000_3.png",
+					},
+					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+			},
+			[]wantFile{
+				{"File1_6000000000_3.png", 0, true},
+				{"File1_6000000000_3.json", 0, true},
+			},
+		},
+		{
 			"Doesn't creates images when asked not to",
 			args{writeImages: false},
 			[]common.DataRecord{
