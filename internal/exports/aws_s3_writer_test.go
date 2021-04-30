@@ -103,6 +103,55 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 			},
 		},
 		{
+			"Skips image with wrong image shape",
+			args{
+				project:     "myproj",
+				writeImages: true,
+			},
+			[]common.DataRecord{
+				{
+					Origin:         &common.OriginDescription{Name: "MyRac.rac"},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					RID:            aez.CCD5,
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
+							EXPTS: 5,
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  42,
+							NROW:  42,
+						},
+						ImageFileName: "MyRac_wrong_shape_5.png",
+					},
+					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
+				},
+				{
+					Origin:         &common.OriginDescription{Name: "MyRac.rac"},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					RID:            aez.CCD5,
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
+							EXPTS: 5,
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  1,
+							NROW:  2,
+						},
+						ImageFileName: "MyRac_5000000000_5.png",
+					},
+					Buffer: make([]byte, 2*2*2), // 2x2 pixels, 2 bytes per pix
+				},
+			},
+			map[string]int{
+				"myproj/MyRac_5000000000_5.png":  76,  // 8 + header
+				"myproj/MyRac_5000000000_5.json": 876, // length of the json
+			},
+		},
+		{
 			"Doesn't upload image when told not to",
 			args{
 				project:     "myproj",
