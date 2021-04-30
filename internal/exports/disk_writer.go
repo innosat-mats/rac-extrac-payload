@@ -60,6 +60,8 @@ func DiskCallbackFactory(
 					"Could not process image %s (%v)",
 					imageFileName, r,
 				)
+				os.Remove(imageFileName)
+				os.Remove(GetJSONFilename(imageFileName))
 			}
 		}
 		if writeImages {

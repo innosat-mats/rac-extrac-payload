@@ -306,7 +306,6 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1_wrong_shape_2.png", 0, true},
 				{"File1_6000000000_3.png", 0, true},
 				{"File1_6000000000_3.json", 0, true},
 			},
