@@ -46,6 +46,7 @@ func AWSS3CallbackFactory(
 	timeseriesCollection := timeseries.NewCollection(
 		csvAWSWriterFactoryCreator(upload, uploader, project),
 	)
+	errorStats := common.NewErrorStats()
 
 	if awsDescriptionPath != "" {
 		awsDescription, err := os.Open(awsDescriptionPath)
@@ -60,6 +61,7 @@ func AWSS3CallbackFactory(
 	}
 
 	callback := func(pkg common.DataRecord) {
+		errorStats.Register(pkg.Error)
 		if pkg.Error != nil {
 			pkg.Error = fmt.Errorf(
 				"%s %s",
@@ -118,6 +120,7 @@ func AWSS3CallbackFactory(
 	teardown := func() {
 		wg.Wait()
 		timeseriesCollection.CloseAll()
+		log.Println(errorStats.Summarize())
 	}
 
 	return callback, teardown
