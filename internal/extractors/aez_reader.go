@@ -3,7 +3,7 @@ package extractors
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
+	"fmt"
 	"io"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
@@ -36,7 +36,12 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 		case sourcePacket.TMHeader.IsTCVerification():
 			exportable, err = instrumentVerification(sourcePacket.TMHeader.ServiceSubType, buffer)
 		default:
-			err = errors.New("the TMHeader isn't recognized as either housekeeping, transparent or verification data")
+			err = fmt.Errorf(
+				"the TMHeader isn't recognized as either housekeeping, transparent or verification data (Service Type %v, Service Sub Type %v) %s",
+				sourcePacket.TMHeader.ServiceType,
+				sourcePacket.TMHeader.ServiceSubType,
+				makePackageInfo(&sourcePacket),
+			)
 			exportable = nil
 		}
 		if err != io.EOF {
