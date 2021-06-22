@@ -2,9 +2,9 @@ package extractors
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
@@ -53,9 +53,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		case innosat.SPCont:
 			// Report error missing start packet
 			if !multiPackStarted {
-				sourcePacket.Error = fmt.Errorf(
-					"got continuation packet without a start packet %s",
-					makePackageInfo(&sourcePacket),
+				sourcePacket.Error = errors.New(
+					"got continuation packet without a start packet",
 				)
 				multiPackStart = sourcePacket
 				multiPackStarted = true
@@ -74,9 +73,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			if !multiPackStarted {
 				// Report error
 				multiPackStart = sourcePacket
-				multiPackStart.Error = fmt.Errorf(
-					"got stop packet without a start packet %s",
-					makePackageInfo(&sourcePacket),
+				multiPackStart.Error = errors.New(
+					"got stop packet without a start packet",
 				)
 			}
 
@@ -96,9 +94,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		default:
 			// Report unknown grouping flag error
 			sourcePacket.Error = fmt.Errorf(
-				"unhandled grouping flag %v %v",
+				"unhandled grouping flag %v",
 				sourcePacket.SourceHeader.PacketSequenceControl.GroupingFlags(),
-				makePackageInfo(&sourcePacket),
 			)
 			sourcePacket.Buffer = multiPackBuffer.Bytes()
 			target <- sourcePacket
@@ -108,9 +105,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 	// Report attemmpt at parsing dangling multipack
 	if multiPackStarted {
 		err := fmt.Errorf(
-			"dangling final multipacket with %v bytes %s",
+			"dangling final multipacket with %v bytes",
 			multiPackBuffer.Len(),
-			makePackageInfo(&multiPackStart),
 		)
 		multiPackStart.Buffer = multiPackBuffer.Bytes()
 		multiPackStart.Error = err
@@ -120,41 +116,9 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 
 func makeUnfinishedMultiPackError(multiPackBuffer *bytes.Buffer, sourcePacket common.DataRecord) common.DataRecord {
 	errorPacket := sourcePacket
-	errorPacket.Error = fmt.Errorf(
-		"orphaned multi-package data without termination detected %s",
-		makePackageInfo(&sourcePacket),
+	errorPacket.Error = errors.New(
+		"orphaned multi-package data without termination detected",
 	)
 	errorPacket.Buffer = multiPackBuffer.Bytes()
 	return errorPacket
-}
-
-func makePackageInfo(sourcePacket *common.DataRecord) string {
-	infos := make([]string, 0)
-	infos = append(infos, sourcePacket.OriginName())
-	if sourcePacket.SourceHeader != nil {
-		infos = append(
-			infos,
-			fmt.Sprintf("Packet ID %v", sourcePacket.SourceHeader.PacketID),
-		)
-	}
-	if sourcePacket.RamsesTMHeader != nil {
-		infos = append(
-			infos,
-			fmt.Sprintf("VC Frame Counter %v", sourcePacket.RamsesTMHeader.VCFrameCounter),
-		)
-	}
-	if sourcePacket.RamsesHeader != nil {
-		infos = append(
-			infos,
-			fmt.Sprintf(
-				"Date %v, Time %v",
-				sourcePacket.RamsesHeader.Date,
-				sourcePacket.RamsesHeader.Time,
-			),
-		)
-	}
-	return fmt.Sprintf(
-		"[%s]",
-		strings.Join(infos[:], " / "),
-	)
 }

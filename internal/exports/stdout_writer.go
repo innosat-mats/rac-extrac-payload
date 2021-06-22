@@ -15,6 +15,13 @@ func StdoutCallbackFactory(
 
 	return func(pkg common.DataRecord) {
 		if writeTimeseries {
+			if pkg.Error != nil {
+				pkg.Error = fmt.Errorf(
+					"%s %s",
+					pkg.Error,
+					common.MakePackageInfo(&pkg),
+				)
+			}
 			fmt.Fprintf(out, "%+v\n", pkg)
 		}
 	}, func() {}

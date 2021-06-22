@@ -52,6 +52,11 @@ func DiskCallbackFactory(
 
 	callback := func(pkg common.DataRecord) {
 		if pkg.Error != nil {
+			pkg.Error = fmt.Errorf(
+				"%s %s",
+				pkg.Error,
+				common.MakePackageInfo(&pkg),
+			)
 			log.Println(pkg.Error)
 		}
 		recoverWrite := func(imageFileName string) {

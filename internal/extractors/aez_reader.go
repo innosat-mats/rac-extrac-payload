@@ -44,13 +44,6 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 			exportable = nil
 		}
 		if err != io.EOF {
-			if err != nil {
-				err = fmt.Errorf(
-					"%s %s",
-					err,
-					makePackageInfo(&sourcePacket),
-				)
-			}
 			sourcePacket.Error = err
 		}
 		sourcePacket.Data = exportable
