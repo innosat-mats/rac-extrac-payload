@@ -104,12 +104,12 @@ func Example() {
 	)
 
 	// Output:
-	// got stop packet without a start packet (Set1)
+	// got stop packet without a start packet
 	//  STAT <nil>
 	//   checksum bad 62691
 	//  STAT <nil>
 	//   checksum bad 32488
-	//   got stop packet without a start packet (Set2)
+	//   got stop packet without a start packet
 	//  STAT <nil>
 	//   checksum bad 62691
 	//  STAT <nil>

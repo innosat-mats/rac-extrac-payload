@@ -34,7 +34,7 @@ func Test_makeUnfinishedMultiPackError(t *testing.T) {
 					RID:    aez.CCD4,
 				},
 			},
-			"orphaned multi-package data without termination detected (myname)",
+			"orphaned multi-package data without termination detected",
 			[]byte("Hello"),
 		},
 	}

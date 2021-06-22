@@ -53,7 +53,9 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		case innosat.SPCont:
 			// Report error missing start packet
 			if !multiPackStarted {
-				sourcePacket.Error = errors.New("got continuation packet without a start packet")
+				sourcePacket.Error = errors.New(
+					"got continuation packet without a start packet",
+				)
 				multiPackStart = sourcePacket
 				multiPackStarted = true
 			}
@@ -71,9 +73,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 			if !multiPackStarted {
 				// Report error
 				multiPackStart = sourcePacket
-				multiPackStart.Error = fmt.Errorf(
-					"got stop packet without a start packet (%s)",
-					sourcePacket.OriginName(),
+				multiPackStart.Error = errors.New(
+					"got stop packet without a start packet",
 				)
 			}
 
@@ -93,9 +94,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		default:
 			// Report unknown grouping flag error
 			sourcePacket.Error = fmt.Errorf(
-				"unhandled grouping flag %v (%s)",
+				"unhandled grouping flag %v",
 				sourcePacket.SourceHeader.PacketSequenceControl.GroupingFlags(),
-				sourcePacket.OriginName(),
 			)
 			sourcePacket.Buffer = multiPackBuffer.Bytes()
 			target <- sourcePacket
@@ -105,9 +105,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 	// Report attemmpt at parsing dangling multipack
 	if multiPackStarted {
 		err := fmt.Errorf(
-			"dangling final multipacket with %v bytes (%s)",
+			"dangling final multipacket with %v bytes",
 			multiPackBuffer.Len(),
-			multiPackStart.OriginName(),
 		)
 		multiPackStart.Buffer = multiPackBuffer.Bytes()
 		multiPackStart.Error = err
@@ -117,9 +116,8 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 
 func makeUnfinishedMultiPackError(multiPackBuffer *bytes.Buffer, sourcePacket common.DataRecord) common.DataRecord {
 	errorPacket := sourcePacket
-	errorPacket.Error = fmt.Errorf(
-		"orphaned multi-package data without termination detected (%s)",
-		sourcePacket.OriginName(),
+	errorPacket.Error = errors.New(
+		"orphaned multi-package data without termination detected",
 	)
 	errorPacket.Buffer = multiPackBuffer.Bytes()
 	return errorPacket
