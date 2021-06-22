@@ -11,6 +11,7 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
 func Test_makeUnfinishedMultiPackError(t *testing.T) {
@@ -34,7 +35,7 @@ func Test_makeUnfinishedMultiPackError(t *testing.T) {
 					RID:    aez.CCD4,
 				},
 			},
-			"orphaned multi-package data without termination detected (myname)",
+			"orphaned multi-package data without termination detected [myname]",
 			[]byte("Hello"),
 		},
 	}
@@ -237,6 +238,82 @@ func TestAggregator(t *testing.T) {
 			}(targetChan)
 
 			wg.Wait()
+		})
+	}
+}
+
+func Test_makePackageInfo(t *testing.T) {
+	tests := []struct {
+		name         string
+		sourcePacket *common.DataRecord
+		want         string
+	}{
+		{
+			"Empty",
+			&common.DataRecord{},
+			"[]",
+		},
+		{
+			"With name",
+			&common.DataRecord{
+				Origin: &common.OriginDescription{
+					Name: "test.rac",
+				},
+			},
+			"[test.rac]",
+		},
+		{
+			"With name & SourceHeader",
+			&common.DataRecord{
+				Origin: &common.OriginDescription{
+					Name: "test.rac",
+				},
+				SourceHeader: &innosat.SourcePacketHeader{
+					PacketID: 42,
+				},
+			},
+			"[test.rac / Packet ID 42]",
+		},
+		{
+			"With name & SourceHeader & RamsesTHHeader",
+			&common.DataRecord{
+				Origin: &common.OriginDescription{
+					Name: "test.rac",
+				},
+				SourceHeader: &innosat.SourcePacketHeader{
+					PacketID: 42,
+				},
+				RamsesTMHeader: &ramses.TMHeader{
+					VCFrameCounter: 12,
+				},
+			},
+			"[test.rac / Packet ID 42 / VC Frame Counter 12]",
+		},
+		{
+			"With name & SourceHeader & RamsesTHHeader & RamsesHeader",
+			&common.DataRecord{
+				Origin: &common.OriginDescription{
+					Name: "test.rac",
+				},
+				SourceHeader: &innosat.SourcePacketHeader{
+					PacketID: 42,
+				},
+				RamsesTMHeader: &ramses.TMHeader{
+					VCFrameCounter: 12,
+				},
+				RamsesHeader: &ramses.Ramses{
+					Date: 666,
+					Time: 420,
+				},
+			},
+			"[test.rac / Packet ID 42 / VC Frame Counter 12 / Date 666, Time 420]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := makePackageInfo(tt.sourcePacket); got != tt.want {
+				t.Errorf("makePackageInfo() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }
