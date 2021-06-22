@@ -37,14 +37,20 @@ func DecodeAEZ(target chan<- common.DataRecord, source <-chan common.DataRecord)
 			exportable, err = instrumentVerification(sourcePacket.TMHeader.ServiceSubType, buffer)
 		default:
 			err = fmt.Errorf(
-				"the TMHeader isn't recognized as either housekeeping, transparent or verification data (Service Type %v, Service Sub Type %v) %s",
+				"the TMHeader isn't recognized as either housekeeping, transparent or verification data (Service Type %v, Service Sub Type %v)",
 				sourcePacket.TMHeader.ServiceType,
 				sourcePacket.TMHeader.ServiceSubType,
-				makePackageInfo(&sourcePacket),
 			)
 			exportable = nil
 		}
 		if err != io.EOF {
+			if err != nil {
+				err = fmt.Errorf(
+					"%s %s",
+					err,
+					makePackageInfo(&sourcePacket),
+				)
+			}
 			sourcePacket.Error = err
 		}
 		sourcePacket.Data = exportable
