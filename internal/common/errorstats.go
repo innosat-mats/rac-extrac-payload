@@ -29,7 +29,7 @@ func (stats *ErrorStats) Register(err error) {
 
 }
 
-func Max(x, y uint) uint {
+func max(x, y uint) uint {
 	if x < y {
 		return y
 	}
@@ -51,7 +51,7 @@ func (stats *ErrorStats) Summarize() string {
 	}
 	var indent uint = 5 // "Count" is 5 characters
 	for key, value := range stats.errors {
-		indent = Max(indent, uint(len(strconv.Itoa(int(value)))))
+		indent = max(indent, uint(len(strconv.Itoa(int(value)))))
 		errs = append(errs, struct {
 			string
 			uint
