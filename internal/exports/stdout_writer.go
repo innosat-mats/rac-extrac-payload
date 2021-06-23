@@ -12,17 +12,21 @@ func StdoutCallbackFactory(
 	out io.Writer,
 	writeTimeseries bool,
 ) (common.Callback, common.CallbackTeardown) {
+	errorStats := common.NewErrorStats()
 
 	return func(pkg common.DataRecord) {
-		if writeTimeseries {
-			if pkg.Error != nil {
-				pkg.Error = fmt.Errorf(
-					"%s %s",
-					pkg.Error,
-					common.MakePackageInfo(&pkg),
-				)
+			errorStats.Register(pkg.Error)
+			if writeTimeseries {
+				if pkg.Error != nil {
+					pkg.Error = fmt.Errorf(
+						"%s %s",
+						pkg.Error,
+						common.MakePackageInfo(&pkg),
+					)
+				}
+				fmt.Fprintf(out, "%+v\n", pkg)
 			}
-			fmt.Fprintf(out, "%+v\n", pkg)
+		}, func() {
+			fmt.Fprintf(out, errorStats.Summarize())
 		}
-	}, func() {}
 }

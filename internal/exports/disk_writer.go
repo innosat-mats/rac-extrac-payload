@@ -41,6 +41,7 @@ func DiskCallbackFactory(
 ) (common.Callback, common.CallbackTeardown) {
 	var err error
 	timeseriesCollection := timeseries.NewCollection(csvFileWriterFactoryCreator(output))
+	errorStats := common.NewErrorStats()
 
 	if writeImages || writeTimeseries {
 		// Create Directory and File
@@ -51,6 +52,7 @@ func DiskCallbackFactory(
 	}
 
 	callback := func(pkg common.DataRecord) {
+		errorStats.Register(pkg.Error)
 		if pkg.Error != nil {
 			pkg.Error = fmt.Errorf(
 				"%s %s",
@@ -117,6 +119,7 @@ func DiskCallbackFactory(
 	teardown := func() {
 		timeseriesCollection.CloseAll()
 		wg.Wait()
+		log.Println(errorStats.Summarize())
 	}
 
 	return callback, teardown
