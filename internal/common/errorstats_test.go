@@ -35,8 +35,8 @@ func TestErrorStats_Register_and_Summarize(t *testing.T) {
 			5,
 			3,
 			[]string{
-				"2\tunexpected EOF",
-				"1\ttest",
+				"2       unexpected EOF",
+				"1       test",
 			},
 		},
 	}
@@ -46,12 +46,21 @@ func TestErrorStats_Register_and_Summarize(t *testing.T) {
 			for _, err := range tt.errs {
 				stats.Register(err)
 			}
-			want := fmt.Sprintf(
-				"\nStatistics\n\nCount\tError Message\n%s\n\nTotal Errors:\t%v\nTotal Packages:\t%v\n",
-				strings.Join(tt.wantErrors, "\n"),
-				tt.wantTotalErrors,
-				tt.wantTotal,
-			)
+			var want string
+			if len(tt.errs) == 0 {
+				want = fmt.Sprintf(
+					"\nStatistics\n\nTotal Errors:\t%v\nTotal Packages:\t%v\n",
+					tt.wantTotalErrors,
+					tt.wantTotal,
+				)
+			} else {
+				want = fmt.Sprintf(
+					"\nStatistics\n\nCount   Error Message\n%s\n\nTotal Errors:\t%v\nTotal Packages:\t%v\n",
+					strings.Join(tt.wantErrors, "\n"),
+					tt.wantTotalErrors,
+					tt.wantTotal,
+				)
+			}
 			if got := stats.Summarize(); got != want {
 				t.Errorf("ErrorStats.Summarize() = %v, want %v", got, want)
 			}
