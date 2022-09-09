@@ -92,17 +92,25 @@ The following columns parse the values further:
   "15..4" (value in rac 0x4)
   "15..0" which is the full image (value in rac 0x7)
 - NCBIN FPGAColumns
-  The actual number of FPGA Columns (value in rac is the exponent in 2^N)
+  The actual number of FPGA Columns (value in rac is the exponent in 2^N) 
+  (Old naming CCDitem["NCBIN FPGAColumns”]=2**CCDitem["NColBinFPGA"] )
 - NCBIN CCDColumns
   The number of CCD Columns
+  (Old naming CCDitem["NColBinCCD"] = CCDitem["NCBIN CCDColumns"] )
 - GAIN Mode
   "High" (value in rac 0b0)
   "Low" (value in rac 0b1)
+   (Old naming:
+   In the OUTPUT from RAMSES/image viewer:	
+   CCDitem["GAIN Mode"] == 'High' is the same as CCDitem["SigMode"] = 0
+   CCDitem["GAIN Mode"] == 'Low' is the same as CDitem["SigMode"] = 1
+   Note that in the INPUT to RAMSES SigMode 0 and 1 is reversed. )
 - GAIN Timing
   "Faster" used for binned and discarded (value in rac 0b0)
   "Full" used even for pixels that are not read out (value in rac 0b1)
 - GAIN Trunctation
   The value of the truncation bits
+  (Old naming CCDitem["GAIN Truncation"] = CCDitem["DigGain"] = CCDitem["GAIN"] & 0b1111)
 - Image File Name
   The name of the image file associated with these measurements
 	`)
