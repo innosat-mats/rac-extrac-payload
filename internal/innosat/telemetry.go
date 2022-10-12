@@ -70,7 +70,7 @@ func (header *TMHeader) CSVHeaders() []string {
 	}
 }
 
-const gpsTimeCorrection = -18
+const gpsTimeCorrection = -18 // Seconds
 
 var gpsTime = time.Date(1980, time.January, 6, 0, 0, gpsTimeCorrection, 0, time.UTC)
 

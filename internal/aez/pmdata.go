@@ -61,7 +61,7 @@ func (pm *PMData) CSVHeaders() []string {
 
 // CSVRow returns the data row
 func (pm *PMData) CSVRow() []string {
-	const gpsTimeCorrection = -18
+	const gpsTimeCorrection = -18 // Seconds
 	var row []string
 	gpsTime := time.Date(1980, time.January, 6, 0, 0, gpsTimeCorrection, 0, time.UTC)
 	pmTime := pm.Time(gpsTime)
