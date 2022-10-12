@@ -38,10 +38,6 @@ jobs:
       run: make install
       shell: bash
 
-    - name: Lint
-      run: make lint
-      shell: bash
-
     - name: Test
       run: make test
 
