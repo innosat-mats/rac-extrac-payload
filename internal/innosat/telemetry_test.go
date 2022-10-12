@@ -225,7 +225,7 @@ func TestTMHeader_CSVRow(t *testing.T) {
 		{
 			"Generates a data row",
 			fields{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
-			[]string{"1980-01-06T00:00:42.75Z", "42750000000"},
+			[]string{"1980-01-06T00:00:24.75Z", "42750000000"},
 		},
 	}
 	for _, tt := range tests {
@@ -261,7 +261,7 @@ func TestTMHeader_MarshalJSON(t *testing.T) {
 		{
 			"Marshals into expected json",
 			fields{CUCTimeSeconds: 4},
-			[]byte("{\"tmHeaderTime\":\"1980-01-06T00:00:04Z\",\"tmHeaderNanoseconds\":4000000000}"),
+			[]byte("{\"tmHeaderTime\":\"1980-01-05T23:59:46Z\",\"tmHeaderNanoseconds\":4000000000}"),
 			false,
 		},
 	}
