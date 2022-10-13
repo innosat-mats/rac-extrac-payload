@@ -2,6 +2,7 @@ package exports
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image/png"
 	"log"
@@ -9,9 +10,9 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
@@ -22,7 +23,7 @@ const awsS3Region = "eu-north-1"
 
 func csvAWSWriterFactoryCreator(
 	upload awstools.AWSUploadFunc,
-	uploader *s3manager.Uploader,
+	uploader *manager.Uploader,
 	project string,
 ) timeseries.CSVFactory {
 	return func(pkg *common.DataRecord, stream timeseries.OutStream) (timeseries.CSVWriter, error) {
@@ -40,9 +41,12 @@ func AWSS3CallbackFactory(
 	writeTimeseries bool,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown) {
-
-	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String(awsS3Region)}))
-	uploader := s3manager.NewUploader(sess)
+	config, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(awsS3Region))
+	if err != nil {
+		log.Fatal(err)
+	}
+	s3Client := s3.NewFromConfig(config)
+	uploader := manager.NewUploader(s3Client)
 	timeseriesCollection := timeseries.NewCollection(
 		csvAWSWriterFactoryCreator(upload, uploader, project),
 	)
