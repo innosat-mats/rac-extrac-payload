@@ -9,7 +9,7 @@ import (
 // Specification describes what version the current implementation follows
 var Specification string = "AEZICD002:I"
 
-var gpsTime time.Time = time.Date(1980, time.January, 6, 0, 0, 0, 0, time.UTC)
+var gpsTime time.Time = time.Date(1980, time.January, 6, 0, 0, -18, 0, time.UTC)
 
 // SID is the id of a single housekeeping parameter
 type SID uint16

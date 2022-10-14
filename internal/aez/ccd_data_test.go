@@ -298,7 +298,7 @@ func TestCCDImagePackData_CSVRow(t *testing.T) {
 	want := []string{
 		"5",
 		"10750000000",
-		"1980-01-06T00:00:10.75Z",
+		"1980-01-05T23:59:52.75Z",
 		"Automatic",
 		"14..3",
 		"13",

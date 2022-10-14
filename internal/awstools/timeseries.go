@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 )
 
 // Timeseries holds csv-buffer and upload features
@@ -13,7 +13,7 @@ type Timeseries struct {
 	reader   io.Reader
 	writer   io.Writer
 	upload   AWSUploadFunc
-	uploader *s3manager.Uploader
+	uploader *manager.Uploader
 	key      string
 }
 
@@ -31,7 +31,7 @@ func (ts *Timeseries) Close() {
 }
 
 // NewTimeseries returns a timeseries that will invoke upload upon close
-func NewTimeseries(upload AWSUploadFunc, uploader *s3manager.Uploader, key string) *Timeseries {
+func NewTimeseries(upload AWSUploadFunc, uploader *manager.Uploader, key string) *Timeseries {
 	buf := bytes.NewBuffer([]byte{})
 	return &Timeseries{buf, buf, upload, uploader, key}
 }

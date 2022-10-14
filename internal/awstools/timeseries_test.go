@@ -1,22 +1,28 @@
 package awstools
 
 import (
+	"context"
 	"io"
 	"io/ioutil"
+	"log"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func TestNewTimeseries(t *testing.T) {
-	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("localhost")}))
-	upload := s3manager.NewUploader(sess)
+	config, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("localhost"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	s3Client := s3.NewFromConfig(config)
+	upload := manager.NewUploader(s3Client)
 	var idxUp = 0
 	uploads := make(map[string]int)
 
-	var uploader = func(uploader *s3manager.Uploader, key string, bodyBuffer io.Reader) {
+	var uploader = func(uploader *manager.Uploader, key string, bodyBuffer io.Reader) {
 		buf, _ := ioutil.ReadAll(bodyBuffer)
 		uploads[key] = len(buf)
 		idxUp++
@@ -31,7 +37,7 @@ func TestNewTimeseries(t *testing.T) {
 			return
 		}
 		if idxUp != 0 {
-			t.Errorf("Timesereis.Write() initiated an unexpected upload %v", uploads)
+			t.Errorf("Timeseries.Write() initiated an unexpected upload %v", uploads)
 			return
 		}
 	}

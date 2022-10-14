@@ -1,16 +1,18 @@
 package timeseries
 
 import (
+	"context"
 	"encoding/csv"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 )
 
@@ -37,10 +39,14 @@ func Test_CSV_Close_WithFile(t *testing.T) {
 	}
 }
 func Test_CSV_Close_Timeseries(t *testing.T) {
-	sess := session.Must(session.NewSession(&aws.Config{Region: aws.String("localhost")}))
-	upload := s3manager.NewUploader(sess)
+	config, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("localhost"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	s3Client := s3.NewFromConfig(config)
+	upload := manager.NewUploader(s3Client)
 	var idxUp = 0
-	var uploader = func(uploader *s3manager.Uploader, key string, bodyBuffer io.Reader) {
+	var uploader = func(uploader *manager.Uploader, key string, bodyBuffer io.Reader) {
 		idxUp++
 	}
 	key := "test"
