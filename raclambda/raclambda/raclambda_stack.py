@@ -13,7 +13,7 @@ from constructs import Construct
 
 INPUT_BUCKET = "mats-l0-rac"
 OUTPUT_BUCKET = "mats-l0-artifacts"
-RAC_QUEUE_ARN = "arn:for:rac:queue"
+RAC_QUEUE_ARN = "arn:aws:sqs:for:eu-north-1:12345:racqueue1"
 
 
 class RacLambdaStack(Stack):
@@ -30,6 +30,11 @@ class RacLambdaStack(Stack):
             self,
             "RacOutputBucket",
             OUTPUT_BUCKET,
+        )
+        rac_queue = sqs.Queue.from_queue_arn(
+            self,
+            "RacQueue",
+            RAC_QUEUE_ARN,
         )
 
         rac_lambda = lambda_.Function(
@@ -56,3 +61,4 @@ class RacLambdaStack(Stack):
 
         input_bucket.grant_read(rac_lambda)
         output_bucket.grant_put(rac_lambda)
+        rac_queue.grant_consume_messages(rac_lambda)
