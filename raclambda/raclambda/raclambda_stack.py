@@ -1,19 +1,18 @@
+import os
 from aws_cdk import (
     Duration,
     Stack,
-    # aws_sqs as sqs,
     aws_events as events,
     aws_events_targets as targets,
     aws_lambda as lambda_,
     aws_s3 as s3,
-    aws_sqs as sqs,
 )
 from constructs import Construct
 
 
-INPUT_BUCKET = "mats-l0-rac"
-OUTPUT_BUCKET = "mats-l0-artifacts"
-RAC_QUEUE_ARN = "arn:aws:sqs:for:eu-north-1:12345:racqueue1"
+RAC_INPUT_BUCKET = "mats-l0-rac"
+RAC_OUTPUT_BUCKET = "mats-l0-artifacts"
+RETENTION_PERIOD = 14 * 24 * 3600  # 14 days [s]
 
 
 class RacLambdaStack(Stack):
@@ -24,17 +23,12 @@ class RacLambdaStack(Stack):
         input_bucket = s3.Bucket.from_bucket_name(
             self,
             "RacInputBucket",
-            INPUT_BUCKET,
+            RAC_INPUT_BUCKET,
         )
         output_bucket = s3.Bucket.from_bucket_name(
             self,
             "RacOutputBucket",
-            OUTPUT_BUCKET,
-        )
-        rac_queue = sqs.Queue.from_queue_arn(
-            self,
-            "RacQueue",
-            RAC_QUEUE_ARN,
+            RAC_OUTPUT_BUCKET,
         )
 
         rac_lambda = lambda_.Function(
@@ -45,20 +39,19 @@ class RacLambdaStack(Stack):
             timeout=Duration.seconds(900),
             runtime=lambda_.Runtime.PYTHON_3_9,
             environment={
-                "INPUT_BUCKET": INPUT_BUCKET,
-                "OUTPUT_BUCKET": OUTPUT_BUCKET,
-                "RAC_QUEUE_ARN": RAC_QUEUE_ARN,
+                "RAC_OUTPUT_BUCKET": RAC_OUTPUT_BUCKET,
             },
         )
+
+        input_bucket.add_event_notification()
 
         rule = events.Rule(
             self,
             "RacLambdaRule",
-            schedule=events.Schedule.rate(Duration.hours(2)),
+            schedule=events.Schedule.rate(Duration.hours(6)),
         )
         
         rule.add_target(targets.LambdaFunction(rac_lambda))
 
         input_bucket.grant_read(rac_lambda)
         output_bucket.grant_put(rac_lambda)
-        rac_queue.grant_consume_messages(rac_lambda)
