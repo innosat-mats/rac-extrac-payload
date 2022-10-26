@@ -1,51 +1,26 @@
+# RAC Lambda
+RAC Lamda is a lambda function that regularly checks for file updates from a
+specified bucket. The bucket should be the one used by
+[L0-fetcher][https://github.com/innosat-mats/L0-fetcher]. Files are downloaded
+locally to the lambda and processed by the `rac` binary. The delivery
+destination is decided by the `rac` binary. The stack sets up lambda permissions
+for the bucket used for outputting artifacts so it is important that these are
+the same in both the stack and the binary.
 
-# Welcome to your CDK Python project!
+## RAC binary dependency
+The lambda requires an up to date `rac` binary. The synth-step will
+automatically download a rac binary of the version specified in `app.py`.
 
-This is a blank project for CDK development with Python.
+## Deploy
+1. Make sure your aws credentials are set up properly
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+2. Make sure deployment parameters in `app.py` and arguments to the
+   `RacLambdaStack` are what you want.
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+3. Run `cdk deploy`
 
-To manually create a virtualenv on MacOS and Linux:
-
-```
-$ python3 -m venv .venv
-```
-
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
-
-```
-$ source .venv/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
-```
-
-Once the virtualenv is activated, you can install the required dependencies.
-
-```
-$ pip install -r requirements.txt
-```
-
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
-```
-
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
+## Test
+Tests are run by running `tox`.
 
 ## Useful commands
 
