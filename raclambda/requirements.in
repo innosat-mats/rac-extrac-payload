@@ -1,0 +1,7 @@
+aws-cdk-lib
+boto3
+constructs
+requests
+types-boto3
+types-botocore
+types-requests
