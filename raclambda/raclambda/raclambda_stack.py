@@ -1,14 +1,13 @@
 import os
 from aws_cdk import (
     Duration,
+    Fn,
     Stack,
-    aws_events_targets as targets,
+    aws_lambda_event_sources as sources,
     aws_lambda as lambda_,
     aws_s3 as s3,
-    aws_s3_notifications as s3n,
     aws_sqs as sqs,
 )
-from aws_cdk.aws_events import Rule, Schedule
 from constructs import Construct
 
 
@@ -25,9 +24,8 @@ class RacLambdaStack(Stack):
         input_bucket_name: str,
         output_bucket_name: str,
         project_name: str,
+        queue_arn_export_name: str,
         lambda_timeout: Duration = Duration.seconds(300),
-        lambda_schedule: Schedule = Schedule.rate(Duration.hours(6)),
-        queue_retention: Duration = Duration.days(14),
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -42,10 +40,10 @@ class RacLambdaStack(Stack):
             "RacOutputBucket",
             output_bucket_name,
         )
-        rac_queue = sqs.Queue(
+        rac_queue = sqs.Queue.from_queue_arn(
             self,
             "RacQueue",
-            retention_period=queue_retention,
+            Fn.import_value(queue_arn_export_name)
         )
 
         rac_lambda = lambda_.Function(
@@ -56,24 +54,14 @@ class RacLambdaStack(Stack):
             timeout=lambda_timeout,
             runtime=lambda_.Runtime.PYTHON_3_9,
             environment={
-                "RAC_INPUT_BUCKET": input_bucket_name,
-                "RAC_QUEUE": rac_queue.queue_name,
                 "RAC_PROJECT": project_name,
             },
         )
 
-        rule = Rule(
-            self,
-            "RacLambdaRule",
-            schedule=lambda_schedule,
-        )
-        rule.add_target(targets.LambdaFunction(rac_lambda))
+        rac_lambda.add_event_source(sources.SqsEventSource(
+            rac_queue,
+            batch_size=1,
+        ))
 
         input_bucket.grant_read(rac_lambda)
         output_bucket.grant_put(rac_lambda)
-        rac_queue.grant_consume_messages(rac_lambda)
-
-        input_bucket.add_event_notification(
-            s3.EventType.OBJECT_CREATED,
-            s3n.SqsDestination(rac_queue),
-        )

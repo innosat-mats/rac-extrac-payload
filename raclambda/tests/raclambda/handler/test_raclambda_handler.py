@@ -1,10 +1,11 @@
-import pytest  # type: ignore
-from unittest.mock import Mock, patch
+import json
+from unittest.mock import call, patch
 
+import pytest  # type: ignore
 from raclambda.handler.raclambda_handler import (
-    NoNewFiles,
     get_env_or_raise,
     handler,
+    parse_event_message,
 )
 
 
@@ -18,67 +19,49 @@ def test_get_env_or_raise(monkeypatch):
         get_env_or_raise(envvar) == "envar"
 
 
-def test_handle(monkeypatch):
-    monkeypatch.setenv("RAC_INPUT_BUCKET", "rac-bucket")
-    monkeypatch.setenv("RAC_PROJECT", "rac-project")
-    monkeypatch.setenv("RAC_QUEUE", "rac-queue")
-    mocked_message = Mock()
-    mocked_message.body = """{
-        "Records": [{
-            "s3": {
-                "object": {
-                    "key": "path/to/file.rac"
-                }
+def test_parse_event_message():
+    event = {
+        "Records": [
+            {
+                "body": '{"bucket": "rac-bucket", "objects": ["path/to/file.rac"]}'  # noqa: E501
             }
+        ]
+    }
+    assert parse_event_message(event) == (["path/to/file.rac"], "rac-bucket")
+
+
+def test_handle(monkeypatch):
+    monkeypatch.setenv("RAC_PROJECT", "rac-project")
+    event = {
+        "Records": [{
+            "body": json.dumps({
+                "objects": ["path/to/file.rac", "path/to/other-file.rac"],
+                "bucket": "rac-bucket",
+            })
         }]
-    }"""
+    }
 
     with patch(
-        'raclambda.handler.raclambda_handler.boto3.resource',
-    ) as patched_resource, patch(
         'raclambda.handler.raclambda_handler.boto3.client',
     ) as patched_client, patch(
-        'raclambda.handler.raclambda_handler.get_messages',
-        return_value=[mocked_message],
-    ) as patched_get_messages, patch(
         'raclambda.handler.raclambda_handler.subprocess.call',
     ) as patched_call:
-        patched_queue = patched_resource.return_value
-        patched_queue.get_queue_by_name.return_value = "queue"
         patched_s3 = patched_client.return_value
-        handler(None, None)
-    patched_resource.assert_called_once_with("sqs")
-    patched_queue.get_queue_by_name.assert_called_once_with(
-        QueueName="rac-queue",
-    )
-    patched_get_messages.assert_called_once_with("queue")
+        handler(event, None)
     patched_client.assert_called_once_with("s3")
-    patched_s3.download_file.assert_called_once_with(
-        Bucket="rac-bucket",
-        Key="path/to/file.rac",
-        Filename="/tmp/file.rac",
-    )
+    patched_s3.download_file.assert_has_calls([
+        call(
+            Bucket="rac-bucket",
+            Key="path/to/file.rac",
+            Filename="/tmp/file.rac",
+        ),
+        call(
+            Bucket="rac-bucket",
+            Key="path/to/other-file.rac",
+            Filename="/tmp/other-file.rac",
+        ),
+    ])
+
     patched_call.assert_called_once_with([
         "./rac", "-aws", "-project", "rac-project", "/tmp/*.rac",
     ])
-    mocked_message.delete.assert_called_once()
-
-
-def test_handler_raises_no_files(monkeypatch):
-    monkeypatch.setenv("RAC_INPUT_BUCKET", "rac-bucket")
-    monkeypatch.setenv("RAC_PROJECT", "rac-project")
-    monkeypatch.setenv("RAC_QUEUE", "rac-queue")
-
-    with patch(
-        'raclambda.handler.raclambda_handler.boto3.resource',
-    ) as patched_resource, patch(
-        'raclambda.handler.raclambda_handler.get_messages',
-        return_value=[],
-    ):
-        patched_queue = patched_resource.return_value
-        patched_queue.get_queue_by_name.return_value = "queue"
-        with pytest.raises(
-            NoNewFiles,
-            match="Got no new files from rac-queue",
-        ):
-            handler(None, None)

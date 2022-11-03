@@ -16,6 +16,7 @@ def template():
         "input-bucket",
         "output-bucket",
         "test-project",
+        "queue-arn",
     )
 
     return Template.from_stack(stack)
@@ -29,6 +30,19 @@ class TestRacLambdaStack:
             {
                 "PolicyDocument": {
                     "Statement": [
+                        {
+                            "Action": [
+                                "sqs:ReceiveMessage",
+                                "sqs:ChangeMessageVisibility",
+                                "sqs:GetQueueUrl",
+                                "sqs:DeleteMessage",
+                                "sqs:GetQueueAttributes"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::ImportValue": "queue-arn"
+                            }
+                        },
                         {
                             "Action": [
                                 "s3:GetObject*",
@@ -86,22 +100,6 @@ class TestRacLambdaStack:
                                 ]
                             }
                         },
-                        {
-                            "Action": [
-                                "sqs:ReceiveMessage",
-                                "sqs:ChangeMessageVisibility",
-                                "sqs:GetQueueUrl",
-                                "sqs:DeleteMessage",
-                                "sqs:GetQueueAttributes"
-                            ],
-                            "Effect": "Allow",
-                            "Resource": {
-                                "Fn::GetAtt": [
-                                    "RacQueue12CAA348",
-                                    "Arn"
-                                ]
-                            }
-                        }
                     ],
                     "Version": "2012-10-17"
                 },
@@ -132,13 +130,6 @@ class TestRacLambdaStack:
                 },
                 "Environment": {
                     "Variables": {
-                        "RAC_INPUT_BUCKET": "input-bucket",
-                        "RAC_QUEUE": {
-                            "Fn::GetAtt": [
-                                "RacQueue12CAA348",
-                                "QueueName"
-                            ]
-                        },
                         "RAC_PROJECT": "test-project"
                     }
                 },
@@ -146,32 +137,4 @@ class TestRacLambdaStack:
                 "Runtime": "python3.9",
                 "Timeout": 300
             },
-        )
-
-    def test_has_lambda_event(self, template: Template):
-        template.has_resource_properties(
-            "AWS::Events::Rule",
-            {
-                "ScheduleExpression": "rate(6 hours)",
-                "State": "ENABLED",
-                "Targets": [
-                    {
-                        "Arn": {
-                            "Fn::GetAtt": [
-                                "raclambda99ECE2E1",
-                                "Arn"
-                            ]
-                        },
-                        "Id": "Target0"
-                    }
-                ]
-            }
-        )
-
-        template.has_resource_properties(
-            "AWS::Lambda::Permission",
-            {
-                "Action": "lambda:InvokeFunction",
-                "Principal": "events.amazonaws.com"
-            }
         )
