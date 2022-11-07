@@ -132,13 +132,13 @@ func TestSlask_GetSlask(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"Returns error if no path set",
+			"Reads the right file",
 			fields{
 				Path:    "./slask",
 				MaxDiff: 10,
 			},
 			args{50},
-			[]byte("This is the right file.\n"),
+			[]byte("This is the right file."),
 			false,
 		},
 		{
