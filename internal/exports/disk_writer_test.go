@@ -1,7 +1,6 @@
 package exports
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -334,7 +333,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.args.wg = &sync.WaitGroup{}
 			// Setup and cleanup of output directory
-			dir, err := ioutil.TempDir("", "innosat-mats")
+			dir, err := os.MkdirTemp("", "innosat-mats")
 			if err != nil {
 				t.Errorf("DiskCallbackFactory() could not setup output directory '%v'", err)
 			}
@@ -352,7 +351,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			for _, want := range tt.wantFiles {
 				// Test each output for file name and expected number of lines
 				path := filepath.Join(dir, want.base)
-				content, err := ioutil.ReadFile(path)
+				content, err := os.ReadFile(path)
 				if err != nil {
 					t.Errorf("DiskCallbackFactory() expected to produce file '%v', but got error reading it: %v", path, err)
 				}
@@ -364,7 +363,7 @@ func TestDiskCallbackFactoryCreator(t *testing.T) {
 			}
 
 			// Test that number of output files equals expected
-			files, err := ioutil.ReadDir(dir)
+			files, err := os.ReadDir(dir)
 			if err != nil {
 				t.Errorf("DiskCallbackFactory() could not read directory: %v", err)
 			}

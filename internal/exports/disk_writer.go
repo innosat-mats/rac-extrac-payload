@@ -26,7 +26,7 @@ func csvFileWriterFactoryCreator(
 
 		out, err := os.Create(outPath)
 		if err != nil {
-			return nil, fmt.Errorf("Could not create output file '%v'", outPath)
+			return nil, fmt.Errorf("could not create output file '%v'", outPath)
 		}
 		return timeseries.NewCSV(out, outPath), nil
 	}
@@ -97,10 +97,10 @@ func DiskCallbackFactory(
 					}
 					jsonFileName := GetJSONFilename(imgFileName)
 					jsonFile, err := os.Create(jsonFileName)
-					defer jsonFile.Close()
 					if err != nil {
 						log.Panicf("failed creating %s: %s", jsonFileName, err)
 					}
+					defer jsonFile.Close()
 					WriteJSON(jsonFile, &pkg, jsonFileName)
 				}()
 

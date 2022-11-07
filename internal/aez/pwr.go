@@ -114,7 +114,7 @@ func (data *pwrt) temperature() (float64, error) {
 	)
 }
 
-//PWR structure 18 octext
+// PWR structure 18 octext
 type PWR struct {
 	PWRT    pwrt    // Temp. sense 0..4095
 	PWRP32V pwrp32v // +32V voltage sense 0..4095
@@ -127,7 +127,7 @@ type PWR struct {
 	PWRP3C3 pwrp3c3 // +3V3 current sense 0..4095
 }
 
-//PWRReport structure in useful units
+// PWRReport structure in useful units
 type PWRReport struct {
 	PWRT     float64 // Temp. sense ⁰C
 	PWRP32V  float64 // +32V voltage sense voltage
@@ -148,6 +148,7 @@ func NewPWR(buf io.Reader) (*PWR, error) {
 	return &pwr, err
 }
 
+//lint:ignore U1000 unused but important for documentation
 func pwrVoltageADC(data uint16) float64 {
 	return voltageConstant * float64(data)
 }
@@ -174,17 +175,17 @@ func (pwr *PWR) Report() PWRReport {
 	}
 }
 
-//CSVSpecifications returns the specs used in creating the struct
+// CSVSpecifications returns the specs used in creating the struct
 func (pwr *PWR) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
-//CSVHeaders returns the field names
+// CSVHeaders returns the field names
 func (pwr *PWR) CSVHeaders() []string {
 	return csvHeader(pwr.Report())
 }
 
-//CSVRow returns the field values
+// CSVRow returns the field values
 func (pwr *PWR) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(pwr.Report()))
 	values := make([]string, val.NumField())

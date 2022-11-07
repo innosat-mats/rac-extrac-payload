@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
@@ -126,7 +125,7 @@ func TestGetRecord_FromFile(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		file, err := ioutil.TempFile("", "test-file")
+		file, err := os.CreateTemp("", "test-file")
 		defer os.Remove(file.Name())
 		if err != nil {
 			t.Errorf("Could not create testfile %v", err)

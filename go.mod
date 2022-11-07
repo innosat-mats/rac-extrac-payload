@@ -9,7 +9,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.11
 	github.com/howeyc/crc16 v0.0.0-20171223171357-2b2a61e366a6
 	github.com/jbuchbinder/gopnm v0.0.0-20220507095634-e31f54490ce0
-	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 )
 
 require (
@@ -29,5 +28,4 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.19 // indirect
 	github.com/aws/smithy-go v1.13.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	golang.org/x/tools v0.1.12 // indirect
 )

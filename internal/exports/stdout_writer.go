@@ -27,6 +27,6 @@ func StdoutCallbackFactory(
 				fmt.Fprintf(out, "%+v\n", pkg)
 			}
 		}, func() {
-			fmt.Fprintf(out, errorStats.Summarize())
+			fmt.Fprint(out, errorStats.Summarize())
 		}
 }
