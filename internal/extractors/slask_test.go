@@ -41,7 +41,7 @@ func TestSlask_getSlaskFileName(t *testing.T) {
 				Path:    tt.fields.Path,
 				MaxDiff: tt.fields.MaxDiff,
 			}
-			if got := slask.getSlaskFileName(tt.args.data); got != tt.want {
+			if got := slask.getSlaskFileName(tt.args.data); string(got) != string(tt.want) {
 				t.Errorf("Slask.getSlaskFileName() = %v, want %v", got, tt.want)
 			}
 		})
