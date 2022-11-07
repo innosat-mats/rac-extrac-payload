@@ -5,13 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
 // Aggregator sorts and accumulates standalone and multi-packets
-func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord) {
+func Aggregator(
+	target chan<- common.DataRecord,
+	source <-chan common.DataRecord,
+	slask Slask,
+) {
 	defer close(target)
 	multiPackBuffer := bytes.NewBuffer([]byte{})
 	var multiPackStarted bool
@@ -53,9 +58,26 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		case innosat.SPCont:
 			// Report error missing start packet
 			if !multiPackStarted {
-				sourcePacket.Error = errors.New(
-					"got continuation packet without a start packet",
-				)
+				// Try getting an appropriate slask
+				var data []byte
+				var err error
+				if sourcePacket.TMHeader == nil {
+					err = fmt.Errorf("source packet lacks TMHeader")
+				} else {
+					data, err = slask.GetSlask(sourcePacket.TMHeader.Nanoseconds())
+				}
+				if err != nil {
+					if err != ErrNoSlaskPath {
+						log.Println(err)
+					}
+					// Report error
+					sourcePacket.Error = errors.New(
+						"got continuation packet without a start packet",
+					)
+				} else {
+					// Write slask data to buffer
+					multiPackBuffer.Write(data)
+				}
 				multiPackStart = sourcePacket
 				multiPackStarted = true
 			}
@@ -71,11 +93,27 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 		case innosat.SPStop:
 			// Report error missing start pack
 			if !multiPackStarted {
-				// Report error
+				var data []byte
+				var err error
+				if sourcePacket.TMHeader == nil {
+					err = fmt.Errorf("source packet lacks TMHeader")
+				} else {
+					data, err = slask.GetSlask(sourcePacket.TMHeader.Nanoseconds())
+				}
+				// Try getting an appropriate slask. If that fails
+				if err != nil {
+					if err != ErrNoSlaskPath {
+						log.Println(err)
+					}
+					// Report error
+					sourcePacket.Error = errors.New(
+						"got stop packet without a start packet",
+					)
+				} else {
+					// Write slask data to buffer
+					multiPackBuffer.Write(data)
+				}
 				multiPackStart = sourcePacket
-				multiPackStart.Error = errors.New(
-					"got stop packet without a start packet",
-				)
 			}
 
 			// Concat SPStop and report parsed packet
@@ -104,11 +142,15 @@ func Aggregator(target chan<- common.DataRecord, source <-chan common.DataRecord
 
 	// Report attemmpt at parsing dangling multipack
 	if multiPackStarted {
-		err := fmt.Errorf(
+		multiPackStart.Buffer = multiPackBuffer.Bytes()
+		err := slask.DumpSlask(multiPackStart)
+		if err != nil && err != ErrNoSlaskPath {
+			log.Println(err)
+		}
+		err = fmt.Errorf(
 			"dangling final multipacket with %v bytes",
 			multiPackBuffer.Len(),
 		)
-		multiPackStart.Buffer = multiPackBuffer.Bytes()
 		multiPackStart.Error = err
 		target <- multiPackStart
 	}

@@ -18,6 +18,7 @@ func Test_makeUnfinishedMultiPackError(t *testing.T) {
 	type args struct {
 		multiPackBuffer *bytes.Buffer
 		sourcePacket    common.DataRecord
+		slask           Slask
 	}
 	tests := []struct {
 		name       string
@@ -33,6 +34,7 @@ func Test_makeUnfinishedMultiPackError(t *testing.T) {
 					Origin: &common.OriginDescription{Name: "myname"},
 					RID:    aez.CCD4,
 				},
+				slask: Slask{},
 			},
 			"orphaned multi-package data without termination detected",
 			[]byte("Hello"),
@@ -180,9 +182,10 @@ func TestAggregator(t *testing.T) {
 			var wg sync.WaitGroup
 			sourceChan := make(chan common.DataRecord)
 			targetChan := make(chan common.DataRecord)
+			slask := Slask{}
 
 			// Run aggregator
-			go Aggregator(targetChan, sourceChan)
+			go Aggregator(targetChan, sourceChan, slask)
 
 			// Fill up queue
 			go func(source chan<- common.DataRecord) {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -90,7 +89,7 @@ func Test_processFiles(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dir, err := ioutil.TempDir("", "mats-testing")
+			dir, err := os.MkdirTemp("", "mats-testing")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -104,7 +103,11 @@ func Test_processFiles(t *testing.T) {
 				file.Close()
 			}
 			updatedFilenames := mapFilenamesToDirectory(dir, tt.args.inputFiles)
-			extractor := func(callback common.Callback, streamBatch ...extractors.StreamBatch) {
+			extractor := func(
+				callback common.Callback,
+				slask extractors.Slask,
+				streamBatch ...extractors.StreamBatch,
+			) {
 				ptCallback := reflect.ValueOf(callback).Pointer()
 				ptArgsCallback := reflect.ValueOf(tt.args.callback).Pointer()
 				if ptCallback != ptArgsCallback {
@@ -126,7 +129,7 @@ func Test_processFiles(t *testing.T) {
 							stream.Origin.Name,
 						)
 					}
-					elapsed := time.Now().Sub(stream.Origin.ProcessingDate)
+					elapsed := time.Since(stream.Origin.ProcessingDate)
 					if elapsed < 0 || elapsed > time.Second {
 						t.Errorf("Processing time %v seems not to be now", stream.Origin.ProcessingDate)
 					}
@@ -136,6 +139,7 @@ func Test_processFiles(t *testing.T) {
 			err = processFiles(
 				extractor,
 				updatedFilenames,
+				extractors.Slask{},
 				tt.args.callback,
 			)
 			if (err != nil) != tt.wantErr {
