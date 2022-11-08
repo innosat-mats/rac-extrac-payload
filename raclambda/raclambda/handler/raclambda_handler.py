@@ -21,9 +21,14 @@ def parse_event_message(event: Dict[str, Any]) -> Tuple[List[str], str]:
 
 def handler(event, context):
     project = get_env_or_raise("RAC_PROJECT")
+    # TODO: make temporary dir for rac
     rac_dir = "/tmp"
+    # TODO: make temporary dir for slask
+    slask_dir = "/tmp"
 
     objects, bucket = parse_event_message(event)
+
+    # TODO: download slask
 
     s3_client = boto3.client('s3')
     for key in objects:
@@ -35,8 +40,14 @@ def handler(event, context):
         )
 
     subprocess.call([
-        "./rac", "-aws", "-project", project, f"{rac_dir}/*.rac",
+        "./rac",
+        "-aws",
+        "-project", project,
+        "-slask", slask_dir,
+        f"{rac_dir}/*.rac",
     ])
+
+    # TODO: upload slask
 
 
 if __name__ == "__main__":
