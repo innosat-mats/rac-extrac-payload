@@ -15,7 +15,7 @@ import (
 func Aggregator(
 	target chan<- common.DataRecord,
 	source <-chan common.DataRecord,
-	slask Slask,
+	dregs Dregs,
 ) {
 	defer close(target)
 	multiPackBuffer := bytes.NewBuffer([]byte{})
@@ -58,16 +58,16 @@ func Aggregator(
 		case innosat.SPCont:
 			// Report error missing start packet
 			if !multiPackStarted {
-				// Try getting an appropriate slask
+				// Try getting appropriate dregs
 				var data []byte
 				var err error
 				if sourcePacket.TMHeader == nil {
 					err = fmt.Errorf("source packet lacks TMHeader")
 				} else {
-					data, err = slask.GetSlask(sourcePacket.TMHeader.Nanoseconds())
+					data, err = dregs.GetDregs(sourcePacket.TMHeader.Nanoseconds())
 				}
 				if err != nil {
-					if err != ErrNoSlaskPath {
+					if err != ErrNoDregsPath {
 						log.Println(err)
 					}
 					// Report error
@@ -75,7 +75,7 @@ func Aggregator(
 						"got continuation packet without a start packet",
 					)
 				} else {
-					// Write slask data to buffer
+					// Write dregs data to buffer
 					multiPackBuffer.Write(data)
 				}
 				multiPackStart = sourcePacket
@@ -95,14 +95,14 @@ func Aggregator(
 			if !multiPackStarted {
 				var data []byte
 				var err error
+				// Try getting appropriate dregs
 				if sourcePacket.TMHeader == nil {
 					err = fmt.Errorf("source packet lacks TMHeader")
 				} else {
-					data, err = slask.GetSlask(sourcePacket.TMHeader.Nanoseconds())
+					data, err = dregs.GetDregs(sourcePacket.TMHeader.Nanoseconds())
 				}
-				// Try getting an appropriate slask. If that fails
 				if err != nil {
-					if err != ErrNoSlaskPath {
+					if err != ErrNoDregsPath {
 						log.Println(err)
 					}
 					// Report error
@@ -110,7 +110,7 @@ func Aggregator(
 						"got stop packet without a start packet",
 					)
 				} else {
-					// Write slask data to buffer
+					// Write dregs data to buffer
 					multiPackBuffer.Write(data)
 				}
 				multiPackStart = sourcePacket
@@ -143,8 +143,8 @@ func Aggregator(
 	// Report attemmpt at parsing dangling multipack
 	if multiPackStarted {
 		multiPackStart.Buffer = multiPackBuffer.Bytes()
-		err := slask.DumpSlask(multiPackStart)
-		if err != nil && err != ErrNoSlaskPath {
+		err := dregs.DumpDregs(multiPackStart)
+		if err != nil && err != ErrNoDregsPath {
 			log.Println(err)
 		}
 		err = fmt.Errorf(

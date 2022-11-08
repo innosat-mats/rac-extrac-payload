@@ -99,7 +99,7 @@ func Example() {
 	reader2 := bytes.NewReader(data)
 	ExtractData(
 		simpleOutput,
-		Slask{},
+		Dregs{},
 		StreamBatch{reader1, &common.OriginDescription{Name: "Set1", ProcessingDate: innosat.Epoch}},
 		StreamBatch{reader2, &common.OriginDescription{Name: "Set2", ProcessingDate: innosat.Epoch}},
 	)

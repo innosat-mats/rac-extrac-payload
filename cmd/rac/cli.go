@@ -31,7 +31,7 @@ var project *string
 var stdout *bool
 var aws *bool
 var awsDescription *string
-var slaskDir *string
+var dregsDir *string
 var version *bool
 
 // myUsage replaces default usage since it doesn't include information on non-flags
@@ -127,7 +127,7 @@ func getCallback(
 func processFiles(
 	extractor extractors.ExtractFunction,
 	inputFiles []string,
-	slask extractors.Slask,
+	dregs extractors.Dregs,
 	callback common.Callback,
 ) error {
 	batch := make([]extractors.StreamBatch, len(inputFiles))
@@ -146,7 +146,7 @@ func processFiles(
 		}
 
 	}
-	extractor(callback, slask, batch...)
+	extractor(callback, dregs, batch...)
 	return nil
 }
 
@@ -181,10 +181,10 @@ func init() {
 		"",
 		"Path to a file containing a project description to be uploaded to AWS",
 	)
-	slaskDir = flag.String(
-		"slask",
+	dregsDir = flag.String(
+		"dregs",
 		"",
-		"Path to directory where to find and write slask files. Directory will be created if non-existent. If empty slask will be skipped.",
+		"Path to directory where to find and write dregs files for multi packet continuation. Directory will be created if non-existent. If empty dregs will be skipped.",
 	)
 	version = flag.Bool(
 		"version",
@@ -220,11 +220,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	slask := extractors.Slask{
-		Path:    *slaskDir,
+	dregs := extractors.Dregs{
+		Path:    *dregsDir,
 		MaxDiff: extractors.MaxDeviationNanos,
 	}
-	err = processFiles(extractors.ExtractData, inputFiles, slask, callback)
+	err = processFiles(extractors.ExtractData, inputFiles, dregs, callback)
 	if err != nil {
 		log.Fatal(err)
 	}
