@@ -38,7 +38,6 @@ RacLambdaStack(
     "RacLambdaStack",
     input_bucket_name="mats-l0-raw",
     output_bucket_name="mats-l0-artifacts",
-    slask_bucket_name="mats-l0-slask",
     project_name=os.environ.get("RAC_PROJECT", "mats-test-project"),
     queue_arn_export_name="L0RACFetcherStackOutputQueue"
 )
