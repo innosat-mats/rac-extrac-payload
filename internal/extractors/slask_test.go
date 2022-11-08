@@ -9,7 +9,7 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 )
 
-func TestSlask_getSlaskFileName(t *testing.T) {
+func TestDregs_getDregsFileName(t *testing.T) {
 	type fields struct {
 		Path    string
 		MaxDiff int64
@@ -32,23 +32,23 @@ func TestSlask_getSlaskFileName(t *testing.T) {
 					CUCTimeFraction: 0,
 				},
 			}},
-			"/some/path/42000000000.slask",
+			"/some/path/42000000000.dregs",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			slask := &Slask{
+			dregs := &Dregs{
 				Path:    tt.fields.Path,
 				MaxDiff: tt.fields.MaxDiff,
 			}
-			if got := slask.getSlaskFileName(tt.args.data); string(got) != string(tt.want) {
-				t.Errorf("Slask.getSlaskFileName() = %v, want %v", got, tt.want)
+			if got := dregs.getDregsFileName(tt.args.data); string(got) != string(tt.want) {
+				t.Errorf("Dregs.getDregsFileName() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestSlask_DumpSlask(t *testing.T) {
+func TestDregs_DumpDregs(t *testing.T) {
 	type fields struct {
 		Path    string
 		MaxDiff int64
@@ -56,9 +56,9 @@ func TestSlask_DumpSlask(t *testing.T) {
 	type args struct {
 		data common.DataRecord
 	}
-	dir, err := os.MkdirTemp("", "innosat-mats-slask-dir")
+	dir, err := os.MkdirTemp("", "innosat-mats-dregs-dir")
 	if err != nil {
-		t.Errorf("TestSlask_DumpSlask() could not setup output directory '%v'", err)
+		t.Errorf("TestDregs_DumpDregs() could not setup output directory '%v'", err)
 	}
 	tests := []struct {
 		name    string
@@ -86,29 +86,29 @@ func TestSlask_DumpSlask(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			slask := &Slask{
+			dregs := &Dregs{
 				Path:    tt.fields.Path,
 				MaxDiff: tt.fields.MaxDiff,
 			}
-			err := slask.DumpSlask(tt.args.data)
+			err := dregs.DumpDregs(tt.args.data)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Slask.DumpSlask() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Dregs.DumpDregs() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr {
-				slaskFile := slask.getSlaskFileName(tt.args.data)
-				_, err = os.ReadFile(slaskFile)
+				dregsFile := dregs.getDregsFileName(tt.args.data)
+				_, err = os.ReadFile(dregsFile)
 				if err != nil {
 					t.Errorf(
-						"Slask.DumpSlask() expected to produce file '%v', but got error reading it: %v",
-						slaskFile,
+						"Dregs.DumpDregs() expected to produce file '%v', but got error reading it: %v",
+						dregsFile,
 						err,
 					)
 				}
 			}
-			if tt.wantErr && err != ErrNoSlaskPath {
+			if tt.wantErr && err != ErrNoDregsPath {
 				t.Errorf(
-					"Slask.DumpSlask() was expected to return %v but got %v",
-					ErrNoSlaskPath,
+					"Dregs.DumpDregs() was expected to return %v but got %v",
+					ErrNoDregsPath,
 					err,
 				)
 			}
@@ -116,7 +116,7 @@ func TestSlask_DumpSlask(t *testing.T) {
 	}
 }
 
-func TestSlask_GetSlask(t *testing.T) {
+func TestDregs_GetDregs(t *testing.T) {
 	type fields struct {
 		Path    string
 		MaxDiff int64
@@ -134,7 +134,7 @@ func TestSlask_GetSlask(t *testing.T) {
 		{
 			"Reads the right file",
 			fields{
-				Path:    "./slask",
+				Path:    "./dregs",
 				MaxDiff: 10,
 			},
 			args{50},
@@ -151,22 +151,22 @@ func TestSlask_GetSlask(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			slask := &Slask{
+			dregs := &Dregs{
 				Path:    tt.fields.Path,
 				MaxDiff: tt.fields.MaxDiff,
 			}
-			got, err := slask.GetSlask(tt.args.timestamp)
+			got, err := dregs.GetDregs(tt.args.timestamp)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Slask.GetSlask() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Dregs.GetDregs() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Slask.GetSlask() = '%v', want '%v'", string(got), string(tt.want))
+				t.Errorf("Dregs.GetDregs() = '%v', want '%v'", string(got), string(tt.want))
 			}
-			if tt.wantErr && err != ErrNoSlaskPath {
+			if tt.wantErr && err != ErrNoDregsPath {
 				t.Errorf(
-					"Slask.GetSlask() was expected to return %v but got %v",
-					ErrNoSlaskPath,
+					"Dregs.GetDregs() was expected to return %v but got %v",
+					ErrNoDregsPath,
 					err,
 				)
 			}

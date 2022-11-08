@@ -105,7 +105,7 @@ func Test_processFiles(t *testing.T) {
 			updatedFilenames := mapFilenamesToDirectory(dir, tt.args.inputFiles)
 			extractor := func(
 				callback common.Callback,
-				slask extractors.Slask,
+				dregs extractors.Dregs,
 				streamBatch ...extractors.StreamBatch,
 			) {
 				ptCallback := reflect.ValueOf(callback).Pointer()
@@ -139,7 +139,7 @@ func Test_processFiles(t *testing.T) {
 			err = processFiles(
 				extractor,
 				updatedFilenames,
-				extractors.Slask{},
+				extractors.Dregs{},
 				tt.args.callback,
 			)
 			if (err != nil) != tt.wantErr {

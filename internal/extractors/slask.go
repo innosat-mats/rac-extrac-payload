@@ -13,58 +13,61 @@ import (
 )
 
 const secondsToNano int64 = 1e9
-const MaxDeviationNanos int64 = 30 * secondsToNano               // maximum deviation in ns between slask and packet
-var ErrNoSlaskPath error = errors.New("no slask path specified") // error returned when slask path is unset
+const MaxDeviationNanos int64 = 30 * secondsToNano               // maximum deviation in ns between dregs and packet
+var ErrNoDregsPath error = errors.New("no dregs path specified") // error returned when dregs path is unset
 
-// Slask The Slask struct is used for reading and writing incomplete multi
-// packet data to help repairing split multi packets between batch runs
-type Slask struct {
-	Path    string // Path to slask directory
+// Dregs The Dregs struct is used for reading and writing incomplete multi
+//
+//	packet data from .dregs files in order to repair split multi packets
+//	between batch runs. Dregs is short for "Data Remaining after Extracting
+//	Group of Source packets"
+type Dregs struct {
+	Path    string // Path to dregs directory
 	MaxDiff int64  // Maximum deviation allowed for match [ns]
 }
 
-func (slask *Slask) getSlaskFileName(data common.DataRecord) string {
+func (dregs *Dregs) getDregsFileName(data common.DataRecord) string {
 	return fmt.Sprintf(
-		"%v/%v.slask",
-		slask.Path,
+		"%v/%v.dregs",
+		dregs.Path,
 		data.TMHeader.Nanoseconds(),
 	)
 }
 
-// DumpSlask Write buffer slask file to specified directory
-func (slask *Slask) DumpSlask(data common.DataRecord) error {
-	if slask.Path == "" {
-		return ErrNoSlaskPath
+// DumpDregs Write buffer dregs file to specified directory
+func (dregs *Dregs) DumpDregs(data common.DataRecord) error {
+	if dregs.Path == "" {
+		return ErrNoDregsPath
 	}
 
-	err := os.MkdirAll(slask.Path, 0755)
+	err := os.MkdirAll(dregs.Path, 0755)
 	if err != nil {
-		return fmt.Errorf("failed creating %v: %v", slask.Path, err)
+		return fmt.Errorf("failed creating %v: %v", dregs.Path, err)
 	}
 
-	slaskName := slask.getSlaskFileName(data)
-	err = os.WriteFile(slaskName, data.Buffer, 0644)
+	dregsName := dregs.getDregsFileName(data)
+	err = os.WriteFile(dregsName, data.Buffer, 0644)
 	if err != nil {
-		return fmt.Errorf("failed writing %v: %v", slaskName, err)
+		return fmt.Errorf("failed writing %v: %v", dregsName, err)
 	}
 	return nil
 }
 
-// GetSlask Read buffer slask and return best match (if any)
-func (slask *Slask) GetSlask(timestamp int64) ([]byte, error) {
-	if slask.Path == "" {
-		return nil, ErrNoSlaskPath
+// GetDregs Read buffer dregs and return best match (if any)
+func (dregs *Dregs) GetDregs(timestamp int64) ([]byte, error) {
+	if dregs.Path == "" {
+		return nil, ErrNoDregsPath
 	}
 
-	dir := os.DirFS(slask.Path)
-	slaskFiles, err := fs.Glob(dir, "*.slask")
+	dir := os.DirFS(dregs.Path)
+	dregsFiles, err := fs.Glob(dir, "*.dregs")
 	if err != nil {
-		return nil, fmt.Errorf("failed getting slask files: %v", err)
+		return nil, fmt.Errorf("failed getting dregs files: %v", err)
 	}
 
-	var bestSlask string
+	var bestDregs string
 	var bestDiff int64 = MaxDeviationNanos
-	for _, name := range slaskFiles {
+	for _, name := range dregsFiles {
 		t, err := strconv.ParseInt(
 			strings.TrimSuffix(name, path.Ext(name)),
 			10,
@@ -77,15 +80,15 @@ func (slask *Slask) GetSlask(timestamp int64) ([]byte, error) {
 		diff := timestamp - t
 		if diff > 0 && diff < bestDiff {
 			bestDiff = diff
-			bestSlask = name
+			bestDregs = name
 		}
 	}
 
-	if bestSlask == "" {
+	if bestDregs == "" {
 		return nil, fmt.Errorf(
-			"found no matching slask for timestamp %v",
+			"found no matching dregs for timestamp %v",
 			timestamp,
 		)
 	}
-	return os.ReadFile(fmt.Sprintf("%v/%v", slask.Path, bestSlask))
+	return os.ReadFile(fmt.Sprintf("%v/%v", dregs.Path, bestDregs))
 }

@@ -9,7 +9,7 @@ import (
 // ExtractFunction is the type of the ExtractData function
 type ExtractFunction func(
 	callback common.Callback,
-	slask Slask,
+	dregs Dregs,
 	streamBatch ...StreamBatch,
 )
 
@@ -18,7 +18,7 @@ const channelBufferSize int = 1024
 // ExtractData reads Ramses data packages and extract the instrument data.
 func ExtractData(
 	callback common.Callback,
-	slask Slask,
+	dregs Dregs,
 	streamBatch ...StreamBatch,
 ) {
 	var waitGroup sync.WaitGroup
@@ -28,7 +28,7 @@ func ExtractData(
 	aezChannel := make(chan common.DataRecord, channelBufferSize)
 
 	go DecodeRamses(ramsesChannel, streamBatch...)
-	go Aggregator(aggregatorChannel, innosatChannel, slask)
+	go Aggregator(aggregatorChannel, innosatChannel, dregs)
 	go DecodeAEZ(aezChannel, aggregatorChannel)
 
 	waitGroup.Add(1)
