@@ -16,6 +16,8 @@ const secondsToNano int64 = 1e9
 const MaxDeviationNanos int64 = 30 * secondsToNano               // maximum deviation in ns between slask and packet
 var ErrNoSlaskPath error = errors.New("no slask path specified") // error returned when slask path is unset
 
+// Slask The Slask struct is used for reading and writing incomplete multi
+// packet data to help repairing split multi packets between batch runs
 type Slask struct {
 	Path    string // Path to slask directory
 	MaxDiff int64  // Maximum deviation allowed for match [ns]
