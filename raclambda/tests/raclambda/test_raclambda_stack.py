@@ -100,6 +100,44 @@ class TestRacLambdaStack:
                                 ]
                             }
                         },
+                        {
+                           "Action": [
+                                "s3:GetObject*",
+                                "s3:GetBucket*",
+                                "s3:List*",
+                                "s3:DeleteObject*",
+                                "s3:PutObject",
+                                "s3:PutObjectLegalHold",
+                                "s3:PutObjectRetention",
+                                "s3:PutObjectTagging",
+                                "s3:PutObjectVersionTagging",
+                                "s3:Abort*"
+                           ],
+                           "Effect": "Allow",
+                           "Resource": [
+                                {
+                                    "Fn::GetAtt": [
+                                        "RacDregsBucketA4722043",
+                                        "Arn"
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "RacDregsBucketA4722043",
+                                                    "Arn"
+                                                ]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+
                     ],
                     "Version": "2012-10-17"
                 },
