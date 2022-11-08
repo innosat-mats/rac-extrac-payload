@@ -6,8 +6,8 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"image"
-	"io/ioutil"
 	"log"
+	"os"
 	"reflect"
 	"testing"
 
@@ -15,11 +15,11 @@ import (
 )
 
 func TestJpegImage(t *testing.T) {
-	fileContents, err := ioutil.ReadFile("testdata/lava.jpg")
+	fileContents, err := os.ReadFile("testdata/lava.jpg")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	raw, width, height, err := JpegImageData(fileContents)
+	raw, width, height, _ := JpegImageData(fileContents)
 	bufArray := []byte{}
 	buf := bytes.NewBuffer(bufArray)
 	err = binary.Write(buf, binary.BigEndian, raw)
@@ -29,7 +29,7 @@ func TestJpegImage(t *testing.T) {
 	img := image.NewGray16(image.Rect(0, 0, width, height))
 	img.Pix = buf.Bytes()
 
-	ReferenceData, err := ioutil.ReadFile("testdata/lava.pnm")
+	ReferenceData, err := os.ReadFile("testdata/lava.pnm")
 	if err != nil {
 		log.Fatalln(err)
 	}

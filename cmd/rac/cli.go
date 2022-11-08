@@ -31,9 +31,10 @@ var project *string
 var stdout *bool
 var aws *bool
 var awsDescription *string
+var dregsDir *string
 var version *bool
 
-//myUsage replaces default usage since it doesn't include information on non-flags
+// myUsage replaces default usage since it doesn't include information on non-flags
 func myUsage() {
 	fmt.Println("Extracts information from Innosat-MATS rac-files")
 	fmt.Println()
@@ -94,7 +95,7 @@ func getCallback(
 	if project == "" && !toStdout {
 		flag.Usage()
 		fmt.Println("\nExpected a project")
-		return nil, nil, errors.New("Invalid arguments")
+		return nil, nil, errors.New("invalid arguments")
 	}
 	if skipTimeseries && (skipImages || toStdout) {
 		fmt.Println("Nothing will be extracted, only validating integrity of rac-file(s)")
@@ -126,15 +127,16 @@ func getCallback(
 func processFiles(
 	extractor extractors.ExtractFunction,
 	inputFiles []string,
+	dregs extractors.Dregs,
 	callback common.Callback,
 ) error {
 	batch := make([]extractors.StreamBatch, len(inputFiles))
 	for n, filename := range inputFiles {
 		f, err := os.Open(filename)
-		defer f.Close()
 		if err != nil {
 			return err
 		}
+		defer f.Close()
 		batch[n] = extractors.StreamBatch{
 			Buf: f,
 			Origin: &common.OriginDescription{
@@ -144,7 +146,7 @@ func processFiles(
 		}
 
 	}
-	extractor(callback, batch...)
+	extractor(callback, dregs, batch...)
 	return nil
 }
 
@@ -178,6 +180,11 @@ func init() {
 		"description",
 		"",
 		"Path to a file containing a project description to be uploaded to AWS",
+	)
+	dregsDir = flag.String(
+		"dregs",
+		"",
+		"Path to directory where to find and write dregs files for multi packet continuation. Directory will be created if non-existent. If empty dregs will be skipped.",
 	)
 	version = flag.Bool(
 		"version",
@@ -213,7 +220,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = processFiles(extractors.ExtractData, inputFiles, callback)
+	dregs := extractors.Dregs{
+		Path:    *dregsDir,
+		MaxDiff: extractors.MaxDeviationNanos,
+	}
+	err = processFiles(extractors.ExtractData, inputFiles, dregs, callback)
 	if err != nil {
 		log.Fatal(err)
 	}

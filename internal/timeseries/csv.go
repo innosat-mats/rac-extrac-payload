@@ -9,7 +9,7 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 )
 
-//CSV gives easy access for csv writing
+// CSV gives easy access for csv writing
 type CSV struct {
 	writer    io.Writer
 	csvWriter *csv.Writer
@@ -52,7 +52,7 @@ func (csv *CSV) Close() {
 // SetSpecifications writes specifications, only allows once
 func (csv *CSV) SetSpecifications(specs []string) error {
 	if csv.HasSpec {
-		return fmt.Errorf("Specifications already set for csv output %v", csv.Name)
+		return fmt.Errorf("specifications already set for csv output %v", csv.Name)
 	}
 	csv.csvWriter.Write(specs)
 	csv.HasSpec = true
@@ -62,10 +62,10 @@ func (csv *CSV) SetSpecifications(specs []string) error {
 // SetHeaderRow writes header, only allows once and if specifications previously written
 func (csv *CSV) SetHeaderRow(columns []string) error {
 	if !csv.HasSpec {
-		return fmt.Errorf("Must first supply specifications for csv output %v", csv.Name)
+		return fmt.Errorf("must first supply specifications for csv output %v", csv.Name)
 	}
 	if csv.HasHead {
-		return fmt.Errorf("Header row already set for csv output %v", csv.Name)
+		return fmt.Errorf("header row already set for csv output %v", csv.Name)
 	}
 	csv.csvWriter.Write(columns)
 	csv.HasHead = true
@@ -77,13 +77,13 @@ func (csv *CSV) SetHeaderRow(columns []string) error {
 func (csv *CSV) WriteData(data []string) error {
 	if !csv.HasSpec || !csv.HasHead {
 		return fmt.Errorf(
-			"Specifications and/or Headers missing for csv output %v",
+			"specifications and/or Headers missing for csv output %v",
 			csv.Name,
 		)
 	}
 	if csv.NHeaders != len(data) {
 		return fmt.Errorf(
-			"Irregular column width, expected %v columns but got %v for csv output %v",
+			"irregular column width, expected %v columns but got %v for csv output %v",
 			csv.NHeaders,
 			len(data),
 			csv.Name,

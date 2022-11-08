@@ -2,8 +2,8 @@ package aez
 
 import (
 	"image"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -38,7 +38,7 @@ func Test_getGrayscaleImageName(t *testing.T) {
 }
 
 func getTestImage() []byte {
-	fileContents, err := ioutil.ReadFile(filepath.Join("testdata", "3166_4052_5.jpg"))
+	fileContents, err := os.ReadFile(filepath.Join("testdata", "3166_4052_5.jpg"))
 	if err != nil {
 		log.Fatalln(err)
 	}

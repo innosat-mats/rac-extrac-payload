@@ -3,7 +3,6 @@ package awstools
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"log"
 	"testing"
 
@@ -23,7 +22,7 @@ func TestNewTimeseries(t *testing.T) {
 	uploads := make(map[string]int)
 
 	var uploader = func(uploader *manager.Uploader, key string, bodyBuffer io.Reader) {
-		buf, _ := ioutil.ReadAll(bodyBuffer)
+		buf, _ := io.ReadAll(bodyBuffer)
 		uploads[key] = len(buf)
 		idxUp++
 	}

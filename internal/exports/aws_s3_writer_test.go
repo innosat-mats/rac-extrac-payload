@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -257,7 +256,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 
 			var uploader = func(uploader *manager.Uploader, key string, bodyBuffer io.Reader) {
 				key = strings.ReplaceAll(key, "\\", "/")
-				buf, _ := ioutil.ReadAll(bodyBuffer)
+				buf, _ := io.ReadAll(bodyBuffer)
 				if idxUp >= len(tt.uploads) {
 					t.Errorf(
 						"Got unexpected upload #%v, key '%v', body %v",
@@ -279,7 +278,7 @@ func TestAWSS3CallbackFactory(t *testing.T) {
 
 			awsDescriptionPath := ""
 			if tt.args.descriptionFileName != "" {
-				dir, err := ioutil.TempDir("", "innosat-mats")
+				dir, err := os.MkdirTemp("", "innosat-mats")
 				if err != nil {
 					t.Errorf(
 						"AWSS3CallbackFactory() could not setup test directory '%v': %v",
@@ -339,7 +338,7 @@ func Test_csvAWSWriterFactoryCreator(t *testing.T) {
 	uploads := make(map[string]int)
 
 	var uploader = func(uploader *manager.Uploader, key string, bodyBuffer io.Reader) {
-		buf, _ := ioutil.ReadAll(bodyBuffer)
+		buf, _ := io.ReadAll(bodyBuffer)
 		uploads[key] = len(buf)
 	}
 	factory := csvAWSWriterFactoryCreator(uploader, upload, "myproject")

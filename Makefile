@@ -16,19 +16,19 @@ GOFLAGS = -ldflags "$(GOLDFLAGS)"
 
 GOBUILD := $(GOCMD) build $(GOFLAGS)
 GOVET := ${GOCMD} vet
-GOLINT := $(GOBIN)/golint
 GOTEST := $(GOCMD) test
 GOINSTALL := $(GOCMD) install $(GOFLAGS)
 GOCLEAN := $(GOCMD) clean
 GOGET := $(GOCMD) get
-TOOLS := golang.org/x/lint/golint
+GOSTATIC := staticcheck
+TOOLS := honnef.co/go/tools/cmd/staticcheck@latest
 
 all: build lint test install
 build:
 	$(GOBUILD) ./...
 lint: tools
 	${GOVET} ./...
-	${GOLINT} -set_exit_status ./...
+	${GOSTATIC} ./...
 test:
 	$(GOTEST) -race ./...
 install:
@@ -36,4 +36,4 @@ install:
 clean:
 	$(GOCLEAN) -cache ./...
 tools:
-	$(GOGET) $(TOOLS)
+	$(GOCMD) install $(TOOLS)

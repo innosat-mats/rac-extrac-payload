@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/csv"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -17,7 +16,7 @@ import (
 )
 
 func getTestFile() (*CSV, *os.File, error) {
-	file, err := ioutil.TempFile("", "innosat-mats-test")
+	file, err := os.CreateTemp("", "innosat-mats-test")
 	if err != nil {
 		return nil, file, err
 	}
@@ -75,7 +74,7 @@ func Test_CSV_SetSpecifications(t *testing.T) {
 		t.Errorf("CSV.SetSpecifications() resulted in CSV.HasSpec = %v, wanted %v", csv.HasSpec, true)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.SetSpecifications() output file could not be located %v", err)
 	}
@@ -103,7 +102,7 @@ func Test_CSV_SetSpecifications_no_run_twice(t *testing.T) {
 		t.Errorf("Second CSV.SetSpecifications() = %v, wanted an error", err)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.SetSpecifications() output file could not be located %v", err)
 	}
@@ -124,7 +123,7 @@ func Test_CSV_SetHeaderRow_requires_SetSpecifications(t *testing.T) {
 		t.Errorf("CSV.SetHeaderRow() = %v, wanted an error", err)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.SetHeaderRow() output file could not be located %v", err)
 	}
@@ -147,7 +146,7 @@ func Test_CSV_SetHeaderRow(t *testing.T) {
 		t.Errorf("CSV.SetHeaderRow() = %v, wanted %v", err, nil)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.SetHeaderRow() output file could not be located %v", err)
 	}
@@ -176,7 +175,7 @@ func Test_CSV_SetHeaderRow_only_one_header(t *testing.T) {
 		t.Errorf("CSV.SetHeaderRow() = %v, wanted an error", err)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.SetHeaderRow() output file could not be located %v", err)
 	}
@@ -195,11 +194,11 @@ func Test_TimeserisCSV_WriteData_requires_spec_and_head(t *testing.T) {
 	err = csv.WriteData([]string{"Test", "1"})
 	if err == nil {
 		t.Errorf("CSV.WriteData() = %v, wanted an error", err)
-	} else if !strings.HasPrefix(err.Error(), "Specifications and/or") {
-		t.Errorf("CSV.WriteData() = %v, wanted error to start with 'Specifications and/or'", err)
+	} else if !strings.HasPrefix(err.Error(), "specifications and/or") {
+		t.Errorf("CSV.WriteData() = %v, wanted error to start with 'specifications and/or'", err)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.WriteData() output file could not be located %v", err)
 	}
@@ -222,7 +221,7 @@ func Test_CSV_WriteData(t *testing.T) {
 		t.Errorf("CSV.WriteData() = %v, wanted %v", err, nil)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.WriteData() output file could not be located %v", err)
 	}
@@ -249,8 +248,8 @@ func Test_CSV_WriteData_rejects_bad_columned_row(t *testing.T) {
 	err = csv.WriteData([]string{"Test", "1", "2"})
 	if err == nil {
 		t.Errorf("CSV.WriteData() = %v, wanted an error", err)
-	} else if !strings.HasPrefix(err.Error(), "Irregular column") {
-		t.Errorf("CSV.WriteData() = %v, wanted error starting with 'Irregular column'", err)
+	} else if !strings.HasPrefix(err.Error(), "irregular column") {
+		t.Errorf("CSV.WriteData() = %v, wanted error starting with 'irregular column'", err)
 	}
 	// Good again
 	err = csv.WriteData([]string{"Test", "2"})
@@ -258,7 +257,7 @@ func Test_CSV_WriteData_rejects_bad_columned_row(t *testing.T) {
 		t.Errorf("CSV.WriteData() = %v, wanted %v", err, nil)
 	}
 	csv.Close()
-	content, err := ioutil.ReadFile(file.Name())
+	content, err := os.ReadFile(file.Name())
 	if err != nil {
 		t.Errorf("CSV.WriteData() output file could not be located %v", err)
 	}

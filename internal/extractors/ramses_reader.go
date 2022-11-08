@@ -31,7 +31,7 @@ func (stream *StreamBatch) OriginName() string {
 	return ""
 }
 
-//DecodeRamses reads Ramses packages from buffer
+// DecodeRamses reads Ramses packages from buffer
 func DecodeRamses(recordChannel chan<- common.DataRecord, streamBatch ...StreamBatch) {
 	defer close(recordChannel)
 	var records []common.DataRecord
@@ -91,7 +91,7 @@ func getRecord(stream StreamBatch) (common.DataRecord, bool) {
 	}
 
 	if !header.Valid() {
-		err := fmt.Errorf("Not a valid RAC-record %v (%s)", header, stream.Origin.Name)
+		err := fmt.Errorf("not a valid RAC-record %v (%s)", header, stream.Origin.Name)
 		return common.DataRecord{Origin: stream.Origin, Error: err, Buffer: []byte{}}, false
 	}
 

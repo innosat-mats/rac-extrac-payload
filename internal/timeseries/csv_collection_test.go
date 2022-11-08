@@ -145,7 +145,7 @@ func TestCSVCollection_Write(t *testing.T) {
 				t.Errorf("CSVCollection has %v streams open, want %v", openStreams, tt.openStreams)
 			}
 			col.CloseAll()
-			if lines := strings.Count(string(buf.Bytes()), "\n"); lines != tt.wantLines {
+			if lines := strings.Count(buf.String(), "\n"); lines != tt.wantLines {
 				t.Errorf(
 					"CSVCollection.Write() added %v lines to output, want %v",
 					lines,
