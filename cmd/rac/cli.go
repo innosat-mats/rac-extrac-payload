@@ -29,6 +29,7 @@ var skipImages *bool
 var skipTimeseries *bool
 var project *string
 var stdout *bool
+var parquet *bool
 var aws *bool
 var awsDescription *string
 var dregsDir *string
@@ -85,6 +86,7 @@ or if you want the Buffer contents which can be rather large if you are unlucky:
 
 func getCallback(
 	toStdout bool,
+	toParquet bool,
 	toAws bool,
 	project string,
 	skipImages bool,
@@ -104,6 +106,8 @@ func getCallback(
 	if toStdout {
 		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
 		return callback, teardown, nil
+	} else if toParquet {
+		panic("Not implemented!")
 	} else if toAws {
 		callback, teardown := exports.AWSS3CallbackFactory(
 			awstools.AWSUpload,
@@ -171,10 +175,15 @@ func init() {
 		false,
 		"Output to standard out instead of to disk (only timeseries)\n(Default: false)",
 	)
+	parquet = flag.Bool(
+		"parquet",
+		false,
+		"Output to disk as parquet",
+	)
 	aws = flag.Bool(
 		"aws",
 		false,
-		"Output to aws instead of disk (requires credentials and permissions)",
+		"Output to aws instead of disk (requires credentials and permissions; ignored if -parquet is used)",
 	)
 	awsDescription = flag.String(
 		"description",
@@ -210,6 +219,7 @@ func main() {
 	}
 	callback, teardown, err := getCallback(
 		*stdout,
+		*parquet,
 		*aws,
 		*project,
 		*skipImages,

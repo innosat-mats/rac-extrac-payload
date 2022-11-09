@@ -12,6 +12,10 @@ Run the binary (if you are on windows `rac.exe`):
 
 The `-project` sets output directory in this case.
 
+The `-stdout` print output instead of writing to disk, ignoring images. This overrides other writer arguments.
+
+The `-parquet` sets output format to Parquet.
+
 The `-description` just copies the file into the output directory and renames it to `ABOUT.txt`.
 
 For more information run `rac --help`
@@ -38,6 +42,8 @@ Run the binary (if you are on windows `rac.exe`):
 The `-project` should be something concise like "binning2002". Avoid using something that start with "test" if it's something that should be kept since we use "test*" while developing and may remove or overwrite such projects.
 
 The `-description` includes a description file to be sent and will appear as `ABOUT.txt`.
+
+**Note:** If `-stdout` or `-parquet` is used, the `-aws` flag is ignored.
 
 For more information run `rac --help`
 
