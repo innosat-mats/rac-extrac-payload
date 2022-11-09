@@ -13,6 +13,10 @@ Event = Dict[str, Any]
 Context = Any
 
 
+class NothingToDo(Exception):
+    pass
+
+
 def get_env_or_raise(envvar: str) -> str:
     if (val := os.environ.get(envvar)) is None:
         raise ValueError(f"'{envvar}' not found in env")
@@ -27,33 +31,10 @@ def parse_event_message(event: Event) -> Tuple[List[str], str]:
 
 
 def get_all_files(
-    s3_client: S3Client,
     bucket_name: str,
-    prefix: str = "",
 ) -> List[str]:
-    file_names = []
-
-    default_kwargs = {
-        "Bucket": bucket_name,
-        "Prefix": prefix
-    }
-    next_token = ""
-
-    while next_token is not None:
-        updated_kwargs = default_kwargs.copy()
-        if next_token != "":
-            updated_kwargs["ContinuationToken"] = next_token
-
-        response = s3_client.list_objects_v2(**default_kwargs)
-        contents = response.get("Contents")
-
-        for result in contents:
-            key = result.get("Key")
-            file_names.append(key)
-
-        next_token = response.get("NextContinuationToken")
-
-    return file_names
+    bucket = boto3.resource("s3").Bucket(bucket_name)
+    return [obj.key for obj in bucket.objects.all()]
 
 
 def download_files(
@@ -74,7 +55,7 @@ def download_files(
         )
 
 
-def get_updated_files(
+def get_new_files(
     path_name: str,
     old_file_names: List[str],
 ) -> List[str]:
@@ -90,6 +71,7 @@ def upload_files(
     file_names: List[str],
 ) -> None:
     local_path = Path(path_name)
+
     for file_name in file_names:
         file_path = Path.joinpath(local_path, file_name)
         s3_client.upload_file(
@@ -114,10 +96,12 @@ def handler(event: Event, context: Context):
 
         # Download RAC files
         objects, rac_bucket = parse_event_message(event)
+        if objects == []:
+            raise NothingToDo
         download_files(s3_client, rac_bucket, rac_dir, objects)
 
         # Download Dregs
-        dregs = get_all_files(s3_client, dregs_bucket)
+        dregs = get_all_files(dregs_bucket)
         download_files(s3_client, dregs_bucket, dregs_dir, dregs)
 
         # Process RAC files
@@ -130,7 +114,7 @@ def handler(event: Event, context: Context):
         ])
 
         # Upload new Dregs
-        new_dregs = get_updated_files(dregs_dir, dregs)
+        new_dregs = get_new_files(dregs_dir, dregs)
         upload_files(s3_client, dregs_bucket, dregs_dir, new_dregs)
 
 
