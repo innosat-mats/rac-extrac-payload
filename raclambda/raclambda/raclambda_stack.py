@@ -26,6 +26,7 @@ class RacLambdaStack(Stack):
         project_name: str,
         queue_arn_export_name: str,
         lambda_timeout: Duration = Duration.seconds(300),
+        dregs_expiration: Duration = Duration.days(7),
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -40,6 +41,13 @@ class RacLambdaStack(Stack):
             "RacOutputBucket",
             output_bucket_name,
         )
+
+        dregs_bucket = s3.Bucket(
+            self,
+            "RacDregsBucket",
+        )
+        dregs_bucket.add_lifecycle_rule(expiration=dregs_expiration)
+
         rac_queue = sqs.Queue.from_queue_arn(
             self,
             "RacQueue",
@@ -55,6 +63,7 @@ class RacLambdaStack(Stack):
             runtime=lambda_.Runtime.PYTHON_3_9,
             environment={
                 "RAC_PROJECT": project_name,
+                "RAC_DREGS": dregs_bucket.bucket_name,
             },
         )
 
@@ -65,3 +74,4 @@ class RacLambdaStack(Stack):
 
         input_bucket.grant_read(rac_lambda)
         output_bucket.grant_put(rac_lambda)
+        dregs_bucket.grant_read_write(rac_lambda)
