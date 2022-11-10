@@ -12,6 +12,8 @@ Run the binary (if you are on windows `rac.exe`):
 
 The `-project` sets output directory in this case.
 
+The `-dregs` option specifies a directory to use for temporary files written when an unfinished multi-packet is found, in order to continue processing it later.
+
 For more information run `rac --help`
 
 # Design
