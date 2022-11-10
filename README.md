@@ -14,6 +14,8 @@ The `-project` sets output directory in this case.
 
 The `-description` just copies the file into the output directory and renames it to `ABOUT.txt`.
 
+The `-dregs` option specifies a directory to use for temporary files written when an unfinished multi-packet is found, in order to continue processing it later.
+
 For more information run `rac --help`
 
 ## Sending to AWS (avialable from v0.2.0)
@@ -38,6 +40,8 @@ Run the binary (if you are on windows `rac.exe`):
 The `-project` should be something concise like "binning2002". Avoid using something that start with "test" if it's something that should be kept since we use "test*" while developing and may remove or overwrite such projects.
 
 The `-description` includes a description file to be sent and will appear as `ABOUT.txt`.
+
+The `-dregs` option specifies a local directory to use for temporary files written when an unfinished multi-packet is found, in order to continue processing it later.
 
 For more information run `rac --help`
 
