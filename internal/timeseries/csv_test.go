@@ -1,18 +1,10 @@
 package timeseries
 
 import (
-	"context"
 	"encoding/csv"
-	"io"
-	"log"
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 )
 
 func getTestFile() (*CSV, *os.File, error) {
@@ -37,29 +29,6 @@ func Test_CSV_Close_WithFile(t *testing.T) {
 		t.Error("CSV.Close(), didn't Close file")
 	}
 }
-func Test_CSV_Close_Timeseries(t *testing.T) {
-	config, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("localhost"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	s3Client := s3.NewFromConfig(config)
-	upload := manager.NewUploader(s3Client)
-	var idxUp = 0
-	var uploader = func(uploader *manager.Uploader, key string, bodyBuffer io.Reader) {
-		idxUp++
-	}
-	key := "test"
-	ts := awstools.NewTimeseries(uploader, upload, key)
-	csv := NewCSV(ts, key)
-	if idxUp != 0 {
-		t.Errorf("Expected 0 uploads before CSV.Close(), found %v", idxUp)
-	}
-	csv.Close()
-	if idxUp != 1 {
-		t.Errorf("Expected 1 upload after CSV.Close(), found %v", idxUp)
-	}
-}
-
 func Test_CSV_SetSpecifications(t *testing.T) {
 	csv, file, err := getTestFile()
 	defer os.Remove(file.Name())

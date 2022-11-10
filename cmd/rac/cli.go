@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 	"github.com/innosat-mats/rac-extract-payload/internal/extractors"
@@ -30,8 +29,6 @@ var skipTimeseries *bool
 var project *string
 var stdout *bool
 var parquet *bool
-var aws *bool
-var awsDescription *string
 var dregsDir *string
 var version *bool
 
@@ -87,11 +84,9 @@ or if you want the Buffer contents which can be rather large if you are unlucky:
 func getCallback(
 	toStdout bool,
 	toParquet bool,
-	toAws bool,
 	project string,
 	skipImages bool,
 	skipTimeseries bool,
-	awsDescription string,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown, error) {
 	if project == "" && !toStdout {
@@ -109,16 +104,6 @@ func getCallback(
 	} else if toParquet {
 		callback, teardown := exports.ParquetCallbackFactory(
 			project,
-			!skipImages,
-			!skipTimeseries,
-			wg,
-		)
-		return callback, teardown, nil
-	} else if toAws {
-		callback, teardown := exports.AWSS3CallbackFactory(
-			awstools.AWSUpload,
-			project,
-			awsDescription,
 			!skipImages,
 			!skipTimeseries,
 			wg,
@@ -174,7 +159,7 @@ func init() {
 	project = flag.String(
 		"project",
 		"",
-		"Name for experiments, when outputting to disk a directory will be created with this name, when sending to AWS files will have this as a prefix",
+		"Name for experiments, when outputting to disk a directory will be created with this name.",
 	)
 	stdout = flag.Bool(
 		"stdout",
@@ -185,16 +170,6 @@ func init() {
 		"parquet",
 		false,
 		"Output to disk as parquet",
-	)
-	aws = flag.Bool(
-		"aws",
-		false,
-		"Output to aws instead of disk (requires credentials and permissions; ignored if -parquet is used)",
-	)
-	awsDescription = flag.String(
-		"description",
-		"",
-		"Path to a file containing a project description to be uploaded to AWS",
 	)
 	dregsDir = flag.String(
 		"dregs",
@@ -226,11 +201,9 @@ func main() {
 	callback, teardown, err := getCallback(
 		*stdout,
 		*parquet,
-		*aws,
 		*project,
 		*skipImages,
 		*skipTimeseries,
-		*awsDescription,
 		&wg,
 	)
 	if err != nil {

@@ -17,7 +17,6 @@ func Test_getCallback(t *testing.T) {
 	type args struct {
 		toStdout       bool
 		toParquet      bool
-		toAws          bool
 		project        string
 		skipImages     bool
 		skipTimeseries bool
@@ -29,8 +28,6 @@ func Test_getCallback(t *testing.T) {
 		wantErr bool
 	}{
 		{"Returns stdout callback", args{toStdout: true}, false},
-		{"Returns aws callback", args{toAws: true, project: "test"}, false},
-		{"Returns aws callback requires project", args{toAws: true}, true},
 		{"Returns disk callback", args{project: "somewhere"}, false},
 		{"Returns error if no output directory", args{}, true},
 	}
@@ -39,11 +36,9 @@ func Test_getCallback(t *testing.T) {
 			_, _, err := getCallback(
 				tt.args.toStdout,
 				tt.args.toParquet,
-				tt.args.toAws,
 				tt.args.project,
 				tt.args.skipImages,
 				tt.args.skipTimeseries,
-				"",
 				tt.args.wg,
 			)
 			if (err != nil) != tt.wantErr {
