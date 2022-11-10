@@ -107,7 +107,13 @@ func getCallback(
 		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
 		return callback, teardown, nil
 	} else if toParquet {
-		panic("Not implemented!")
+		callback, teardown := exports.ParquetCallbackFactory(
+			project,
+			!skipImages,
+			!skipTimeseries,
+			wg,
+		)
+		return callback, teardown, nil
 	} else if toAws {
 		callback, teardown := exports.AWSS3CallbackFactory(
 			awstools.AWSUpload,
