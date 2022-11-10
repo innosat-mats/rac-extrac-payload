@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/exports"
 	"github.com/innosat-mats/rac-extract-payload/internal/extractors"
@@ -29,8 +28,6 @@ var skipImages *bool
 var skipTimeseries *bool
 var project *string
 var stdout *bool
-var aws *bool
-var awsDescription *string
 var dregsDir *string
 var version *bool
 
@@ -85,11 +82,9 @@ or if you want the Buffer contents which can be rather large if you are unlucky:
 
 func getCallback(
 	toStdout bool,
-	toAws bool,
 	project string,
 	skipImages bool,
 	skipTimeseries bool,
-	awsDescription string,
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown, error) {
 	if project == "" && !toStdout {
@@ -103,16 +98,6 @@ func getCallback(
 
 	if toStdout {
 		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
-		return callback, teardown, nil
-	} else if toAws {
-		callback, teardown := exports.AWSS3CallbackFactory(
-			awstools.AWSUpload,
-			project,
-			awsDescription,
-			!skipImages,
-			!skipTimeseries,
-			wg,
-		)
 		return callback, teardown, nil
 	}
 	callback, teardown := exports.DiskCallbackFactory(
@@ -164,22 +149,12 @@ func init() {
 	project = flag.String(
 		"project",
 		"",
-		"Name for experiments, when outputting to disk a directory will be created with this name, when sending to AWS files will have this as a prefix",
+		"Name for experiments, when outputting to disk a directory will be created with this name.",
 	)
 	stdout = flag.Bool(
 		"stdout",
 		false,
 		"Output to standard out instead of to disk (only timeseries)\n(Default: false)",
-	)
-	aws = flag.Bool(
-		"aws",
-		false,
-		"Output to aws instead of disk (requires credentials and permissions)",
-	)
-	awsDescription = flag.String(
-		"description",
-		"",
-		"Path to a file containing a project description to be uploaded to AWS",
 	)
 	dregsDir = flag.String(
 		"dregs",
@@ -210,11 +185,9 @@ func main() {
 	}
 	callback, teardown, err := getCallback(
 		*stdout,
-		*aws,
 		*project,
 		*skipImages,
 		*skipTimeseries,
-		*awsDescription,
 		&wg,
 	)
 	if err != nil {

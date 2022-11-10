@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/innosat-mats/rac-extract-payload/internal/awstools"
 )
 
 // CSV gives easy access for csv writing
@@ -35,17 +33,9 @@ type CSVWriter interface {
 // Close flushes and closes underlying file if any
 func (csv *CSV) Close() {
 	csv.csvWriter.Flush()
-	switch csv.writer.(type) {
-	case *os.File:
-		f, ok := csv.writer.(*os.File)
-		if ok {
-			f.Close()
-		}
-	case *awstools.Timeseries:
-		writer, ok := csv.writer.(*awstools.Timeseries)
-		if ok {
-			writer.Close()
-		}
+	f, ok := csv.writer.(*os.File)
+	if ok {
+		f.Close()
 	}
 }
 
