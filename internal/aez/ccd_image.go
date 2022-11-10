@@ -57,7 +57,7 @@ func (ccd *CCDImage) Image(
 
 // CSVSpecifications returns the specs used in creating the struct
 func (ccd *CCDImage) CSVSpecifications() []string {
-	return []string{"Specification", Specification}
+	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the exportable field names

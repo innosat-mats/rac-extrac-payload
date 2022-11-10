@@ -11,7 +11,7 @@ import (
 
 func TestCCDImage_CSVSpecifications(t *testing.T) {
 	ccd := CCDImage{}
-	want := []string{"Specification", Specification}
+	want := []string{"AEZ", Specification}
 	if got := ccd.CSVSpecifications(); !reflect.DeepEqual(got, want) {
 		t.Errorf("CCDImage.CSVSpecifications() = %v, want %v", got, want)
 	}
