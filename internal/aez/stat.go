@@ -10,7 +10,7 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
-//STAT General status housekeeping report of the payload instrument.
+// STAT General status housekeeping report of the payload instrument.
 type STAT struct { //(34 octets)
 	SPID    uint16 // Software Part ID
 	SPREV   uint8  // Software Part Revision
@@ -39,6 +39,9 @@ func NewSTAT(buf io.Reader) (*STAT, error) {
 
 // Time returns the measurement time in UTC
 func (stat *STAT) Time(epoch time.Time) time.Time {
+	if (epoch == time.Time{}) {
+		epoch = GpsTime
+	}
 	return ccsds.UnsegmentedTimeDate(stat.TS, stat.TSS, epoch)
 }
 
@@ -63,7 +66,7 @@ func (stat *STAT) CSVHeaders() []string {
 // CSVRow returns the data row
 func (stat *STAT) CSVRow() []string {
 	var row []string
-	statTime := stat.Time(gpsTime)
+	statTime := stat.Time(GpsTime)
 	row = append(row, statTime.Format(time.RFC3339Nano), fmt.Sprintf("%v", stat.Nanoseconds()))
 	val := reflect.Indirect(reflect.ValueOf(stat))
 	t := val.Type()
@@ -76,4 +79,46 @@ func (stat *STAT) CSVRow() []string {
 		}
 	}
 	return row
+}
+
+// STATParquet holds the parquet representation of the STAT
+type STATParquet struct { //(34 octets)
+	STATTime        time.Time `parquet:"STATTime"`
+	STATNanoseconds int64     `parquet:"STATNanoseconds"`
+	SPID            uint16    `parquet:"SPID"`
+	SPREV           uint8     `parquet:"SPREV"`
+	FPID            uint16    `parquet:"FPID"`
+	FPREV           uint8     `parquet:"FPREV"`
+	SVNA            uint8     `parquet:"SVNA"`
+	SVNB            uint8     `parquet:"SVNB"`
+	SVNC            uint8     `parquet:"SVNC"`
+	MODE            uint8     `parquet:"MODE"`
+	EDACE           uint32    `parquet:"EDACE"`
+	EDACCE          uint32    `parquet:"EDACCE"`
+	EDACN           uint32    `parquet:"EDACN"`
+	SPWEOP          uint32    `parquet:"SPWEOP"`
+	SPWEEP          uint32    `parquet:"SPWEEP"`
+	ANOMALY         uint8     `parquet:"ANOMALY"`
+}
+
+// GetParquet returns the parquet representation of the STAT
+func (stat *STAT) GetParquet() STATParquet {
+	return STATParquet{
+		stat.Time(GpsTime),
+		stat.Nanoseconds(),
+		stat.SPID,
+		stat.SPREV,
+		stat.FPID,
+		stat.FPREV,
+		stat.SVNA,
+		stat.SVNB,
+		stat.SVNC,
+		stat.MODE,
+		stat.EDACE,
+		stat.EDACCE,
+		stat.EDACN,
+		stat.SPWEOP,
+		stat.SPWEEP,
+		stat.ANOMALY,
+	}
 }

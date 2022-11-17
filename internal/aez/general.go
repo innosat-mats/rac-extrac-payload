@@ -9,7 +9,10 @@ import (
 // Specification describes what version the current implementation follows
 var Specification string = "AEZICD002:I"
 
-var gpsTime time.Time = time.Date(1980, time.January, 6, 0, 0, -18, 0, time.UTC)
+const gpsTimeCorrection = -18 // Seconds
+
+// GpsTime is the start of GPS Epoch
+var GpsTime time.Time = time.Date(1980, time.January, 6, 0, 0, gpsTimeCorrection, 0, time.UTC)
 
 // SID is the id of a single housekeeping parameter
 type SID uint16
@@ -49,6 +52,16 @@ func (sid *SID) String() string {
 // MarshalJSON makes a custom json of what is of interest in the struct
 func (sid *SID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(sid.String())
+}
+
+// SIDParquet holds the parquet representation of the SID
+type SIDParquet struct {
+	SID string `parquet:"SID"`
+}
+
+// GetParquet returns the parquet representation of the SID
+func (sid *SID) GetParquet() SIDParquet {
+	return SIDParquet{sid.String()}
 }
 
 // RID is Report Identification
@@ -128,4 +141,14 @@ func (rid *RID) String() string {
 // MarshalJSON makes a custom json of what is of interest in the struct
 func (rid *RID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(rid.String())
+}
+
+// RIDParquet holds the parquet representation of the RID
+type RIDParquet struct {
+	RID string `parquet:"RID"`
+}
+
+// GetParquet returns the parquet representation of the RID
+func (rid *RID) GetParquet() RIDParquet {
+	return RIDParquet{rid.String()}
 }

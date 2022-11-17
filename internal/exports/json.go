@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"path/filepath"
+	"strings"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 )
@@ -15,7 +16,7 @@ func GetJSONFilename(templateName string) string {
 	ext := filepath.Ext(templateName)
 	return fmt.Sprintf(
 		"%v.json",
-		templateName[0:len(templateName)-len(ext)],
+		strings.TrimSuffix(templateName, ext),
 	)
 }
 

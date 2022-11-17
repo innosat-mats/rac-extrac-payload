@@ -53,7 +53,7 @@ func (stat *cpruStat) powerEnabled(ccd uint8) bool {
 	return uint8(*stat)&mask != 0
 }
 
-//CPRU structure
+// CPRU structure
 type CPRU struct {
 	STAT cpruStat // CPRU/CRB power status
 	// CCD overvoltage fault, one bit per CCD. Bit [7..4]
@@ -76,33 +76,32 @@ type CPRU struct {
 	VOD3   od   // CCD3 Output Drain Voltage 0..4095
 }
 
-//CPRUReport structure
+// CPRUReport structure
 type CPRUReport struct {
-	VGATE0       float64 // CCD0 Gate Voltage
-	VSUBS0       float64 // CCD0 Substrate Voltage
-	VRD0         float64 // CCD0 Reset transistor Drain Voltage
-	VOD0         float64 // CCD0 Output Drain Voltage
-	Overvoltage0 bool    // CCD0 overvoltage fault
-	Power0       bool    // CCD0 overvoltage fault
-	VGATE1       float64 // CCD1 Gate Voltage
-	VSUBS1       float64 // CCD1 Substrate Voltage
-	VRD1         float64 // CCD1 Reset transistor Drain Voltage
-	VOD1         float64 // CCD1 Output Drain Voltage
-	Overvoltage1 bool    // CCD1 overvoltage fault
-	Power1       bool    // CCD1 overvoltage fault
-	VGATE2       float64 // CCD2 Gate Voltage
-	VSUBS2       float64 // CCD2 Substrate Voltage
-	VRD2         float64 // CCD2 Reset transistor Drain Voltage
-	VOD2         float64 // CCD2 Output Drain Voltage
-	Overvoltage2 bool    // CCD2 overvoltage fault
-	Power2       bool    // CCD2 overvoltage fault
-	VGATE3       float64 // CCD3 Gate Voltage
-	VSUBS3       float64 // CCD3 Substrate Voltage
-	VRD3         float64 // CCD3 Reset transistor Drain Voltage
-	VOD3         float64 // CCD3 Output Drain Voltage
-	Overvoltage3 bool    // CCD3 overvoltage fault
-	Power3       bool    // CCD3 overvoltage fault
-
+	VGATE0       float64 `parquet:"VGATE0"`       // CCD0 Gate Voltage
+	VSUBS0       float64 `parquet:"VSUBS0"`       // CCD0 Substrate Voltage
+	VRD0         float64 `parquet:"VRD0"`         // CCD0 Reset transistor Drain Voltage
+	VOD0         float64 `parquet:"VOD0"`         // CCD0 Output Drain Voltage
+	Overvoltage0 bool    `parquet:"Overvoltage0"` // CCD0 overvoltage fault
+	Power0       bool    `parquet:"Power0"`       // CCD0 overvoltage fault
+	VGATE1       float64 `parquet:"VGATE1"`       // CCD1 Gate Voltage
+	VSUBS1       float64 `parquet:"VSUBS1"`       // CCD1 Substrate Voltage
+	VRD1         float64 `parquet:"VRD1"`         // CCD1 Reset transistor Drain Voltage
+	VOD1         float64 `parquet:"VOD1"`         // CCD1 Output Drain Voltage
+	Overvoltage1 bool    `parquet:"Overvoltage1"` // CCD1 overvoltage fault
+	Power1       bool    `parquet:"Power1"`       // CCD1 overvoltage fault
+	VGATE2       float64 `parquet:"VGATE2"`       // CCD2 Gate Voltage
+	VSUBS2       float64 `parquet:"VSUBS2"`       // CCD2 Substrate Voltage
+	VRD2         float64 `parquet:"VRD2"`         // CCD2 Reset transistor Drain Voltage
+	VOD2         float64 `parquet:"VOD2"`         // CCD2 Output Drain Voltage
+	Overvoltage2 bool    `parquet:"Overvoltage2"` // CCD2 overvoltage fault
+	Power2       bool    `parquet:"Power2"`       // CCD2 overvoltage fault
+	VGATE3       float64 `parquet:"VGATE3"`       // CCD3 Gate Voltage
+	VSUBS3       float64 `parquet:"VSUBS3"`       // CCD3 Substrate Voltage
+	VRD3         float64 `parquet:"VRD3"`         // CCD3 Reset transistor Drain Voltage
+	VOD3         float64 `parquet:"VOD3"`         // CCD3 Output Drain Voltage
+	Overvoltage3 bool    `parquet:"Overvoltage3"` // CCD3 overvoltage fault
+	Power3       bool    `parquet:"Power3"`       // CCD3 overvoltage fault
 }
 
 // NewCPRU reads buffer into a new CPRU
@@ -142,17 +141,17 @@ func (cpru *CPRU) Report() CPRUReport {
 	}
 }
 
-//CSVSpecifications returns the specs used in creating the struct
+// CSVSpecifications returns the specs used in creating the struct
 func (cpru *CPRU) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
-//CSVHeaders returns the field names
+// CSVHeaders returns the field names
 func (cpru *CPRU) CSVHeaders() []string {
 	return csvHeader(cpru.Report())
 }
 
-//CSVRow returns the field values
+// CSVRow returns the field values
 func (cpru *CPRU) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(cpru.Report()))
 	values := make([]string, val.NumField())
@@ -166,4 +165,12 @@ func (cpru *CPRU) CSVRow() []string {
 		}
 	}
 	return values
+}
+
+// CPRUParquet holds the parquet representation of the CPRU
+type CPRUParquet CPRUReport
+
+// GetParquet returns the parquet representation of the CPRU
+func (cpru *CPRU) GetParquet() CPRUParquet {
+	return CPRUParquet(cpru.Report())
 }

@@ -1,9 +1,10 @@
-# Binaries for programs and plugins
+# Binaries and settings for programs and plugins
 *.exe
 *.exe~
 *.dll
 .vscode
 *.orig
+dregs
 
 # Test binary, built with `go test -c`
 *.test

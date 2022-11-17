@@ -16,7 +16,7 @@ func TestOriginDescription_CSVHeaders(t *testing.T) {
 		fields fields
 		want   []string
 	}{
-		{"Returns headers", fields{}, []string{"File", "ProcessingDate"}},
+		{"Returns headers", fields{}, []string{"OriginFile", "ProcessingDate"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

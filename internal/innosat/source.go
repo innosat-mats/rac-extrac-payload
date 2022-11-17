@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-//SourcePacketHeaderType is the type of the source packet (TM/TC)
+// SourcePacketHeaderType is the type of the source packet (TM/TC)
 type SourcePacketHeaderType uint
 
 const (
@@ -134,4 +134,16 @@ func (sph *SourcePacketHeader) MarshalJSON() ([]byte, error) {
 		Specification:   Specification,
 		SPSequenceCount: sph.PacketSequenceControl.SequenceCount(),
 	})
+}
+
+// SourcePackedHeaderParquet holds the parquet representation of the SourcePacketHeader
+type SourcePacketHeaderParquet struct {
+	SPSequenceCount uint16 `parquet:"SPSequenceCount"`
+}
+
+// GetParquet returns the parquet representation of the SourcePacketHeader
+func (sph *SourcePacketHeader) GetParquet() SourcePacketHeaderParquet {
+	return SourcePacketHeaderParquet{
+		sph.PacketSequenceControl.SequenceCount(),
+	}
 }

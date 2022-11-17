@@ -42,7 +42,7 @@ func NewTMHeader(buf io.Reader) (*TMHeader, error) {
 	return &header, err
 }
 
-//CSVHeaders returns the field names
+// CSVHeaders returns the field names
 func (header *TMHeader) CSVHeaders() []string {
 	return []string{
 		"QualityIndicator",
@@ -51,11 +51,27 @@ func (header *TMHeader) CSVHeaders() []string {
 	}
 }
 
-//CSVRow returns the field values
+// CSVRow returns the field values
 func (header *TMHeader) CSVRow() []string {
 	return []string{
 		strconv.Itoa(int(header.QualityIndicator)),
 		strconv.Itoa(int(header.LossFlag)),
 		strconv.Itoa(int(header.VCFrameCounter)),
+	}
+}
+
+// RamsesTMHeaderParquet holds the parquet representation of the TMHeader
+type RamsesTMHeaderParquet struct {
+	QualityIndicator uint8 `parquet:"QualityIndicator"`
+	LossFlag         uint8 `parquet:"LossFlag"`
+	VCFrameCounter   uint8 `parquet:"VCFrameCounter"`
+}
+
+// GetParquet returns the parquet representation of the TMHeader
+func (header *TMHeader) GetParquet() RamsesTMHeaderParquet {
+	return RamsesTMHeaderParquet{
+		uint8(header.QualityIndicator),
+		uint8(header.LossFlag),
+		header.VCFrameCounter,
 	}
 }

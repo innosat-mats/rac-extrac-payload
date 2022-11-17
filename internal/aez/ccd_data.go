@@ -74,7 +74,8 @@ func (wdw *Wdw) InputDataWindow() (int, int, error) {
 type NCBin uint16
 
 // FPGAColumns returns number FPGA columns to bin, Bit[11..8]
-//  the value is encoded as 2^x
+//
+//	the value is encoded as 2^x
 func (ncBin *NCBin) FPGAColumns() int {
 	return 1 << ((*ncBin >> 8) & 0x0f)
 }
@@ -197,6 +198,9 @@ func NewCCDImagePackData(buf io.Reader) (*CCDImagePackData, error) {
 
 // Time returns the measurement time in UTC
 func (ccd *CCDImagePackData) Time(epoch time.Time) time.Time {
+	if (epoch == time.Time{}) {
+		epoch = GpsTime
+	}
 	return ccsds.UnsegmentedTimeDate(ccd.EXPTS, ccd.EXPTSS, epoch)
 }
 
@@ -209,10 +213,10 @@ func (ccd *CCDImagePackData) Nanoseconds() int64 {
 func (ccd *CCDImagePackData) CSVHeaders() []string {
 	return []string{
 		"CCDSEL",
-		"EXP Nanoseconds",
-		"EXP Date",
-		"WDW Mode",
-		"WDW InputDataWindow",
+		"EXPNanoseconds",
+		"EXPDate",
+		"WDWMode",
+		"WDWInputDataWindow",
 		"WDWOV",
 		"JPEGQ",
 		"FRAME",
@@ -220,14 +224,14 @@ func (ccd *CCDImagePackData) CSVHeaders() []string {
 		"NRBIN",
 		"NRSKIP",
 		"NCOL",
-		"NCBIN FPGAColumns",
-		"NCBIN CCDColumns",
+		"NCBINFPGAColumns",
+		"NCBINCCDColumns",
 		"NCSKIP",
 		"NFLUSH",
 		"TEXPMS",
-		"GAIN Mode",
-		"GAIN Timing",
-		"GAIN Truncation",
+		"GAINMode",
+		"GAINTiming",
+		"GAINTruncation",
 
 		"TEMP",
 		"FBINOV",
@@ -251,7 +255,7 @@ func (ccd *CCDImagePackData) CSVRow() []string {
 	return []string{
 		strconv.Itoa(int(ccd.CCDSEL)),
 		strconv.FormatInt(ccd.Nanoseconds(), 10),
-		ccd.Time(gpsTime).Format(time.RFC3339Nano),
+		ccd.Time(GpsTime).Format(time.RFC3339Nano),
 		(&wdwMode).String(),
 		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
 		strconv.Itoa(int(ccd.WDWOV)),
@@ -279,5 +283,79 @@ func (ccd *CCDImagePackData) CSVRow() []string {
 		strconv.Itoa(int(ccd.VERSION)),
 		strconv.Itoa(int(ccd.TIMING3)),
 		strconv.Itoa(int(ccd.NBC)),
+	}
+}
+
+// CCDImagePackDataParquet holds the parquet representation of the CCDImagePackData
+type CCDImagePackDataParquet struct {
+	CCDSEL             uint8     `parquet:"CCDSEL"`
+	EXPNanoseconds     int64     `parquet:"EXPNanoseconds"`
+	EXPDate            time.Time `parquet:"EXPDate"`
+	WDWMode            string    `parquet:"WDWMode"`
+	WDWInputDataWindow string    `parquet:"WDWInputDataWindow"`
+	WDWOV              uint16    `parquet:"WDWOV"`
+	JPEGQ              uint8     `parquet:"JPEGQ"`
+	FRAME              uint16    `parquet:"FRAME"`
+	NROW               uint16    `parquet:"NROW"`
+	NRBIN              uint16    `parquet:"NRBIN"`
+	NRSKIP             uint16    `parquet:"NRSKIP"`
+	NCOL               uint16    `parquet:"NCOL"`
+	NCBINFPGAColumns   int       `parquet:"NCBINFPGAColumns"`
+	NCBINCCDColumns    int       `parquet:"NCBINCCDColumns"`
+	NCSKIP             uint16    `parquet:"NCSKIP"`
+	NFLUSH             uint16    `parquet:"NFLUSH"`
+	TEXPMS             uint32    `parquet:"TEXPMS"`
+	GAINMode           string    `parquet:"GAINMode"`
+	GAINTiming         string    `parquet:"GAINTiming"`
+	GAINTruncation     uint8     `parquet:"GAINTruncation"`
+	TEMP               uint16    `parquet:"TEMP"`
+	FBINOV             uint16    `parquet:"FBINOV"`
+	LBLNK              uint16    `parquet:"LBLNK"`
+	TBLNK              uint16    `parquet:"TBLNK"`
+	ZERO               uint16    `parquet:"ZERO"`
+	TIMING1            uint16    `parquet:"TIMING1"`
+	TIMING2            uint16    `parquet:"TIMING2"`
+	VERSION            uint16    `parquet:"VERSION"`
+	TIMING3            uint16    `parquet:"TIMING3"`
+	NBC                uint16    `parquet:"NBC"`
+}
+
+// GetParquet returns the parquet representation of the CCDImagePackData
+func (ccd *CCDImagePackData) GetParquet() CCDImagePackDataParquet {
+	wdwhigh, wdwlow, _ := ccd.WDW.InputDataWindow()
+	wdwMode := ccd.WDW.Mode()
+	gainMode := ccd.GAIN.Mode()
+	gainTiming := ccd.GAIN.Timing()
+	return CCDImagePackDataParquet{
+		ccd.CCDSEL,
+		ccd.Nanoseconds(),
+		ccd.Time(GpsTime),
+		(&wdwMode).String(),
+		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
+		ccd.WDWOV,
+		ccd.JPEGQ,
+		ccd.FRAME,
+		ccd.NROW,
+		ccd.NRBIN,
+		ccd.NRSKIP,
+		ccd.NCOL,
+		ccd.NCBIN.FPGAColumns(),
+		ccd.NCBIN.CCDColumns(),
+		ccd.NCSKIP,
+		ccd.NFLUSH,
+		ccd.TEXPMS,
+		(&gainMode).String(),
+		(&gainTiming).String(),
+		ccd.GAIN.Truncation(),
+		ccd.TEMP,
+		ccd.FBINOV,
+		ccd.LBLNK,
+		ccd.TBLNK,
+		ccd.ZERO,
+		ccd.TIMING1,
+		ccd.TIMING2,
+		ccd.VERSION,
+		ccd.TIMING3,
+		ccd.NBC,
 	}
 }

@@ -71,14 +71,14 @@ func (ramses *Ramses) CSVSpecifications() []string {
 	return []string{"RAMSES", Specification}
 }
 
-//CSVHeaders returns the field names
+// CSVHeaders returns the field names
 func (ramses *Ramses) CSVHeaders() []string {
 	return []string{
 		"RamsesTime",
 	}
 }
 
-//CSVRow returns the field values
+// CSVRow returns the field values
 func (ramses *Ramses) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", ramses.Created().Format(time.RFC3339Nano)),
@@ -94,4 +94,13 @@ func (ramses *Ramses) MarshalJSON() ([]byte, error) {
 		Specification: Specification,
 		RamsesTime:    ramses.Created().Format(time.RFC3339Nano),
 	})
+}
+
+// RamsesParquet holds the parquet representation of the Ramses header
+type RamsesParquet struct {
+	RamsesTime time.Time `parquet:"RamsesTime"`
+}
+
+func (ramses *Ramses) GetParquet() RamsesParquet {
+	return RamsesParquet{ramses.Created()}
 }

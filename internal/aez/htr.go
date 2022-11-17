@@ -45,7 +45,7 @@ func (data *htr) temperature() (float64, error) {
 	)
 }
 
-//HTR housekeeping report returns data on all heater regulators.
+// HTR housekeeping report returns data on all heater regulators.
 type HTR struct {
 	HTR1A  htr // Heater 1 Temperature sense A 0..4095
 	HTR1B  htr // Heater 1 Temperature sense B 0..4095
@@ -61,21 +61,21 @@ type HTR struct {
 	HTR8OD htr
 }
 
-//HTRReport housekeeping report returns data on all heater regulators in useful units.
+// HTRReport housekeeping report returns data on all heater regulators in useful units.
 type HTRReport struct {
-	HTR1A    float64 // Heater 1 Temperature sense A ⁰C
-	HTR1B    float64 // Heater 1 Temperature sense B ⁰C
-	HTR1OD   float64 // Heater 1 Output Drive setting voltage
-	HTR2A    float64
-	HTR2B    float64
-	HTR2OD   float64
-	HTR7A    float64
-	HTR7B    float64
-	HTR7OD   float64
-	HTR8A    float64
-	HTR8B    float64
-	HTR8OD   float64
-	WARNINGS []error
+	HTR1A    float64 `parquet:"HTR1A"`  // Heater 1 Temperature sense A ⁰C
+	HTR1B    float64 `parquet:"HTR1B"`  // Heater 1 Temperature sense B ⁰C
+	HTR1OD   float64 `parquet:"HTR1OD"` // Heater 1 Output Drive setting voltage
+	HTR2A    float64 `parquet:"HTR2A"`
+	HTR2B    float64 `parquet:"HTR2B"`
+	HTR2OD   float64 `parquet:"HTR2OD"`
+	HTR7A    float64 `parquet:"HTR7A"`
+	HTR7B    float64 `parquet:"HTR7B"`
+	HTR7OD   float64 `parquet:"HTR7OD"`
+	HTR8A    float64 `parquet:"HTR8A"`
+	HTR8B    float64 `parquet:"HTR8B"`
+	HTR8OD   float64 `parquet:"HTR8OD"`
+	WARNINGS []error `parquet:"Warnings"`
 }
 
 // NewHTR reads an HTR from buffer
@@ -145,12 +145,12 @@ func (htr *HTR) Report() HTRReport {
 	}
 }
 
-//CSVHeaders returns the field names
+// CSVHeaders returns the field names
 func (htr *HTR) CSVHeaders() []string {
 	return csvHeader(htr.Report())
 }
 
-//CSVRow returns the field values
+// CSVRow returns the field values
 func (htr *HTR) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(htr.Report()))
 	values := make([]string, val.NumField())
@@ -175,7 +175,15 @@ func (htr *HTR) CSVRow() []string {
 	return values
 }
 
-//CSVSpecifications returns the specs used in creating the struct
+// CSVSpecifications returns the specs used in creating the struct
 func (htr *HTR) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
+}
+
+// HTRParquet holds the parquet representation of the HTR
+type HTRParquet HTRReport
+
+// GetParquet returns the parquet representation of the HTR
+func (htr *HTR) GetParquet() HTRParquet {
+	return HTRParquet(htr.Report())
 }

@@ -7,8 +7,15 @@ import (
 	"reflect"
 )
 
+type TCVParquet struct {
+	TCV       string `parquet:"TCV"`
+	TCPID     uint16 `parquet:"TCPID"`
+	PSC       uint16 `parquet:"PSC"`
+	ErrorCode uint8  `parquet:"ErrorCode"`
+}
+
 /*
-	TCAcceptSuccess:
+TCAcceptSuccess:
 */
 
 // TCAcceptSuccessData Telecommand Acceptance Report - Success
@@ -46,6 +53,15 @@ func (tcv *TCAcceptSuccessData) CSVRow() []string {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
 	return append(row, "")
+}
+
+// GetParquet returns the parquet representation of the TCV
+func (tcv *TCAcceptSuccessData) GetParquet() TCVParquet {
+	return TCVParquet{
+		TCV:   "Accept",
+		PSC:   tcv.PSC,
+		TCPID: tcv.TCPID,
+	}
 }
 
 /*
@@ -89,6 +105,16 @@ func (tcv *TCAcceptFailureData) CSVRow() []string {
 	return row
 }
 
+// GetParquet returns the parquet representation of the TCV
+func (tcv *TCAcceptFailureData) GetParquet() TCVParquet {
+	return TCVParquet{
+		TCV:       "Accept",
+		PSC:       tcv.PSC,
+		TCPID:     tcv.TCPID,
+		ErrorCode: tcv.ErrorCode,
+	}
+}
+
 /*
 	TCExecSuccess:
 */
@@ -128,6 +154,15 @@ func (tcv *TCExecSuccessData) CSVRow() []string {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
 	return append(row, "")
+}
+
+// GetParquet returns the parquet representation of the TCV
+func (tcv *TCExecSuccessData) GetParquet() TCVParquet {
+	return TCVParquet{
+		TCV:   "Accept",
+		PSC:   tcv.PSC,
+		TCPID: tcv.TCPID,
+	}
 }
 
 /*
@@ -170,4 +205,14 @@ func (tcv *TCExecFailureData) CSVRow() []string {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
 	return row
+}
+
+// GetParquet returns the parquet representation of the TCV
+func (tcv *TCExecFailureData) GetParquet() TCVParquet {
+	return TCVParquet{
+		TCV:       "Exec",
+		PSC:       tcv.PSC,
+		TCPID:     tcv.TCPID,
+		ErrorCode: tcv.ErrorCode,
+	}
 }

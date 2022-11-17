@@ -100,7 +100,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 			"Handles missing pointers",
 			fields{},
 			[]string{
-				"File",
+				"OriginFile",
 				"ProcessingDate",
 				"RamsesTime",
 				"QualityIndicator",
@@ -125,7 +125,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 				Data:           &aez.STAT{},
 			},
 			[]string{
-				"File",
+				"OriginFile",
 				"ProcessingDate",
 				"RamsesTime",
 				"QualityIndicator",

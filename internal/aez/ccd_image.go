@@ -62,7 +62,7 @@ func (ccd *CCDImage) CSVSpecifications() []string {
 
 // CSVHeaders returns the exportable field names
 func (ccd *CCDImage) CSVHeaders() []string {
-	return append(ccd.PackData.CSVHeaders(), "BC", "Image File Name")
+	return append(ccd.PackData.CSVHeaders(), "BC", "ImageFileName")
 }
 
 // CSVRow returns the exportable field values
@@ -114,7 +114,7 @@ func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 		Specification,
 		ccd.PackData.CCDSEL,
 		ccd.PackData.Nanoseconds(),
-		ccd.PackData.Time(gpsTime).Format(time.RFC3339Nano),
+		ccd.PackData.Time(GpsTime).Format(time.RFC3339Nano),
 		(&wdwMode).String(),
 		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
 		ccd.PackData.WDWOV,
@@ -152,4 +152,23 @@ func (ccd *CCDImage) FullImageName(prefix string) string {
 		return ccd.ImageFileName
 	}
 	return filepath.Join(prefix, ccd.ImageFileName)
+}
+
+// CCDImageParquet holds the parquet representation of the CCDImage
+type CCDImageParquet struct {
+	CCDImagePackDataParquet
+	BC            []uint16 `parquet:"BadColumns"`
+	ImageFileName string   `parquet:"ImageFileName"`
+	ImageData     []byte   `parquet:"ImageData"`
+}
+
+// GetParquet returns the parquet representation of the CCDImage
+func (ccd *CCDImage) GetParquet() CCDImageParquet {
+	ccdPack := ccd.PackData.GetParquet()
+	return CCDImageParquet{
+		ccdPack,
+		ccd.BadColumns,
+		ccd.ImageFileName,
+		[]byte{}, // TODO: get png
+	}
 }

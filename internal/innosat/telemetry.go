@@ -7,6 +7,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
 )
 
@@ -17,7 +18,7 @@ func (pus *pus) Version() uint8 {
 	return uint8((*pus << 1) >> 5)
 }
 
-//TMHeader (9 octets)
+// TMHeader (9 octets)
 type TMHeader struct {
 	PUS             pus
 	ServiceType     SourcePackageServiceType
@@ -35,6 +36,9 @@ func NewTMHeader(buf io.Reader) (*TMHeader, error) {
 
 // Time returns the telemetry data time in UTC
 func (header *TMHeader) Time(epoch time.Time) time.Time {
+	if (epoch == time.Time{}) {
+		epoch = aez.GpsTime
+	}
 	return ccsds.UnsegmentedTimeDate(header.CUCTimeSeconds, header.CUCTimeFraction, epoch)
 }
 
@@ -70,13 +74,9 @@ func (header *TMHeader) CSVHeaders() []string {
 	}
 }
 
-const gpsTimeCorrection = -18 // Seconds
-
-var gpsTime = time.Date(1980, time.January, 6, 0, 0, gpsTimeCorrection, 0, time.UTC)
-
 // CSVRow returns the data row
 func (header *TMHeader) CSVRow() []string {
-	tmTime := header.Time(gpsTime)
+	tmTime := header.Time(aez.GpsTime)
 	return []string{
 		tmTime.Format(time.RFC3339Nano),
 		fmt.Sprintf("%v", header.Nanoseconds()),
@@ -89,7 +89,21 @@ func (header *TMHeader) MarshalJSON() ([]byte, error) {
 		TMHeaderTime        string `json:"tmHeaderTime"`
 		TMHeaderNanoseconds int64  `json:"tmHeaderNanoseconds"`
 	}{
-		TMHeaderTime:        header.Time(gpsTime).Format(time.RFC3339Nano),
+		TMHeaderTime:        header.Time(aez.GpsTime).Format(time.RFC3339Nano),
 		TMHeaderNanoseconds: header.Nanoseconds(),
 	})
+}
+
+// TMHeaderParquet holds the parquet representation of the TMHeader
+type TMHeaderParquet struct {
+	TMHeaderTime        time.Time `parquet:"TMHeaderTime"`
+	TMHeaderNanoseconds int64     `parquet:"TMHeaderNanoseconds"`
+}
+
+// GetParquet returns the parquet representation of the TMHeader
+func (header *TMHeader) GetParquet() TMHeaderParquet {
+	return TMHeaderParquet{
+		header.Time(aez.GpsTime),
+		header.Nanoseconds(),
+	}
 }

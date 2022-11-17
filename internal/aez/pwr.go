@@ -129,16 +129,16 @@ type PWR struct {
 
 // PWRReport structure in useful units
 type PWRReport struct {
-	PWRT     float64 // Temp. sense ⁰C
-	PWRP32V  float64 // +32V voltage sense voltage
-	PWRP32C  float64 // +32V current sense current
-	PWRP16V  float64 // +16V voltage sense voltage
-	PWRP16C  float64 // +16V current sense current
-	PWRM16V  float64 // -16V voltage sense voltage
-	PWRM16C  float64 // -16V current sense current
-	PWRP3V3  float64 // +3V3 voltage sense voltage
-	PWRP3C3  float64 // +3V3 current sense current
-	WARNINGS []error
+	PWRT     float64 `parquet:"PWRT"`    // Temp. sense ⁰C
+	PWRP32V  float64 `parquet:"PWRP32V"` // +32V voltage sense voltage
+	PWRP32C  float64 `parquet:"PWRP32C"` // +32V current sense current
+	PWRP16V  float64 `parquet:"PWRP16V"` // +16V voltage sense voltage
+	PWRP16C  float64 `parquet:"PWRP16C"` // +16V current sense current
+	PWRM16V  float64 `parquet:"PWRM16V"` // -16V voltage sense voltage
+	PWRM16C  float64 `parquet:"PWRM16C"` // -16V current sense current
+	PWRP3V3  float64 `parquet:"PWRP3V3"` // +3V3 voltage sense voltage
+	PWRP3C3  float64 `parquet:"PWRP3C3"` // +3V3 current sense current
+	WARNINGS []error `parquet:"Warnings"`
 }
 
 // NewPWR reads a PWR from buffer
@@ -208,4 +208,12 @@ func (pwr *PWR) CSVRow() []string {
 		}
 	}
 	return values
+}
+
+// PWRParquet holds the parquet representation of the PWR
+type PWRParquet PWRReport
+
+// GetParquet returns the parquet representation of the PWR
+func (pwr *PWR) GetParquet() PWRParquet {
+	return PWRParquet(pwr.Report())
 }

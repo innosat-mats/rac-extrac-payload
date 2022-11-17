@@ -104,6 +104,33 @@ func (record *DataRecord) CSVSpecifications() []string {
 	return specifications
 }
 
+func (record *DataRecord) ParquetSpecifications() map[string]string {
+	specifications := map[string]string{}
+
+	if record.RamsesHeader != nil {
+		spec := record.RamsesHeader.CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	} else {
+		spec := (&ramses.Ramses{}).CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	}
+
+	if record.SourceHeader != nil {
+		spec := record.SourceHeader.CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	} else {
+		spec := (&innosat.SourcePacketHeader{}).CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	}
+
+	if record.Data != nil {
+		spec := record.Data.CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	}
+
+	return specifications
+}
+
 // CSVHeaders returns a header row for the data record
 func (record *DataRecord) CSVHeaders() []string {
 	var headers []string
@@ -186,4 +213,64 @@ func (record *DataRecord) OriginName() string {
 		return record.Origin.Name
 	}
 	return ""
+}
+
+// DataRecordParquet holds the parquet representation of the DataRecord
+type DataRecordParquet struct {
+	OriginDescriptionParquet
+	ramses.RamsesParquet
+	ramses.RamsesTMHeaderParquet
+	innosat.SourcePacketHeaderParquet
+	innosat.TMHeaderParquet
+	aez.SIDParquet
+	aez.RIDParquet
+	Errors []string `parquet:"Errors"`
+}
+
+// GetParquet returns the parquet representation of the DataRecord
+func (record *DataRecord) GetParquet() DataRecordParquet {
+	origin := OriginDescriptionParquet{}
+	if record.Origin != nil {
+		origin = record.Origin.GetParquet()
+	}
+
+	ramsesHeader := ramses.RamsesParquet{}
+	if record.RamsesHeader != nil {
+		ramsesHeader = record.RamsesHeader.GetParquet()
+	}
+
+	ramsesTMHeader := ramses.RamsesTMHeaderParquet{}
+	if record.RamsesHeader != nil {
+		ramsesTMHeader = record.RamsesTMHeader.GetParquet()
+	}
+
+	sourceHeader := innosat.SourcePacketHeaderParquet{}
+	if record.SourceHeader != nil {
+		sourceHeader = record.SourceHeader.GetParquet()
+	}
+
+	sourceTMHeader := innosat.TMHeaderParquet{}
+	if record.TMHeader != nil {
+		sourceTMHeader = record.TMHeader.GetParquet()
+	}
+
+	sid := record.SID.GetParquet()
+
+	rid := record.RID.GetParquet()
+
+	errors := []string{}
+	if record.Error != nil {
+		errors = append(errors, record.Error.Error())
+	}
+
+	return DataRecordParquet{
+		origin,
+		ramsesHeader,
+		ramsesTMHeader,
+		sourceHeader,
+		sourceTMHeader,
+		sid,
+		rid,
+		errors,
+	}
 }

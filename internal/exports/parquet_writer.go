@@ -13,22 +13,26 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/timeseries"
 )
 
-func parquetName(dir string, packetType string) string {
-	name := fmt.Sprintf("%v.parquet", packetType)
+func parquetName(dir string, pkg *common.DataRecord) string {
+	name := timeseries.ParquetName(pkg)
 	return filepath.Join(dir, name)
 }
 
 func parquetFileWriterFactoryCreator(
 	dir string,
-) timeseries.CSVFactory {
-	return func(pkg *common.DataRecord, stream timeseries.OutStream) (timeseries.CSVWriter, error) {
-		outPath := parquetName(dir, stream.String())
+) timeseries.ParquetFactory {
+	return func(pkg *common.DataRecord, stream timeseries.OutStream) (timeseries.ParquetWriter, error) {
+		outPath := parquetName(dir, pkg)
 
+		err := os.MkdirAll(filepath.Dir(outPath), os.ModePerm)
+		if err != nil {
+			return nil, fmt.Errorf("could not create output prefix '%v'", outPath)
+		}
 		out, err := os.Create(outPath)
 		if err != nil {
 			return nil, fmt.Errorf("could not create output file '%v'", outPath)
 		}
-		return timeseries.NewCSV(out, outPath), nil
+		return timeseries.NewParquet(out, outPath, pkg), nil
 	}
 }
 
@@ -40,7 +44,7 @@ func ParquetCallbackFactory(
 	wg *sync.WaitGroup,
 ) (common.Callback, common.CallbackTeardown) {
 	var err error
-	timeseriesCollection := timeseries.NewCollection(parquetFileWriterFactoryCreator(output))
+	timeseriesCollection := timeseries.NewParquetCollection(parquetFileWriterFactoryCreator(output))
 	errorStats := common.NewErrorStats()
 
 	if writeImages || writeTimeseries {
