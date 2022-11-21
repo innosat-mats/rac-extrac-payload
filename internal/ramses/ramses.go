@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // Ramses data header
@@ -96,11 +98,7 @@ func (ramses *Ramses) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// RamsesParquet holds the parquet representation of the Ramses header
-type RamsesParquet struct {
-	RamsesTime time.Time `parquet:"RamsesTime"`
-}
-
-func (ramses *Ramses) GetParquet() RamsesParquet {
-	return RamsesParquet{ramses.Created()}
+// SetParquet sets the parquet representation of the Ramses header
+func (ramses *Ramses) SetParquet(row *parquetrow.ParquetRow) {
+	row.RamsesTime = ramses.Created()
 }

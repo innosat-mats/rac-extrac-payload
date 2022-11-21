@@ -97,7 +97,7 @@ func TestPWR_CSVHeaders(t *testing.T) {
 				"PWRP16V", "PWRP16C",
 				"PWRM16V", "PWRM16C",
 				"PWRP3V3", "PWRP3C3",
-				"WARNINGS",
+				"Warnings",
 			},
 		},
 	}

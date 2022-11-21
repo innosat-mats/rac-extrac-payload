@@ -9,6 +9,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 type pus uint8
@@ -94,16 +95,8 @@ func (header *TMHeader) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// TMHeaderParquet holds the parquet representation of the TMHeader
-type TMHeaderParquet struct {
-	TMHeaderTime        time.Time `parquet:"TMHeaderTime"`
-	TMHeaderNanoseconds int64     `parquet:"TMHeaderNanoseconds"`
-}
-
-// GetParquet returns the parquet representation of the TMHeader
-func (header *TMHeader) GetParquet() TMHeaderParquet {
-	return TMHeaderParquet{
-		header.Time(aez.GpsTime),
-		header.Nanoseconds(),
-	}
+// SetParquet returns the parquet representation of the TMHeader
+func (header *TMHeader) SetParquet(row *parquetrow.ParquetRow) {
+	row.TMHeaderTime = header.Time(aez.GpsTime)
+	row.TMHeaderNanoseconds = header.Nanoseconds()
 }

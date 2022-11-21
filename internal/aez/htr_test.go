@@ -96,7 +96,7 @@ func TestHTR_CSVHeaders(t *testing.T) {
 				"HTR2A", "HTR2B", "HTR2OD",
 				"HTR7A", "HTR7B", "HTR7OD",
 				"HTR8A", "HTR8B", "HTR8OD",
-				"WARNINGS",
+				"Warnings",
 			},
 		},
 	}

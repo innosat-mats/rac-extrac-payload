@@ -6,6 +6,8 @@ import (
 	"io"
 	"reflect"
 	"strings"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 type pwr uint16
@@ -129,16 +131,16 @@ type PWR struct {
 
 // PWRReport structure in useful units
 type PWRReport struct {
-	PWRT     float64 `parquet:"PWRT"`    // Temp. sense ⁰C
-	PWRP32V  float64 `parquet:"PWRP32V"` // +32V voltage sense voltage
-	PWRP32C  float64 `parquet:"PWRP32C"` // +32V current sense current
-	PWRP16V  float64 `parquet:"PWRP16V"` // +16V voltage sense voltage
-	PWRP16C  float64 `parquet:"PWRP16C"` // +16V current sense current
-	PWRM16V  float64 `parquet:"PWRM16V"` // -16V voltage sense voltage
-	PWRM16C  float64 `parquet:"PWRM16C"` // -16V current sense current
-	PWRP3V3  float64 `parquet:"PWRP3V3"` // +3V3 voltage sense voltage
-	PWRP3C3  float64 `parquet:"PWRP3C3"` // +3V3 current sense current
-	WARNINGS []error `parquet:"Warnings"`
+	PWRT     float64 // Temp. sense ⁰C
+	PWRP32V  float64 // +32V voltage sense voltage
+	PWRP32C  float64 // +32V current sense current
+	PWRP16V  float64 // +16V voltage sense voltage
+	PWRP16C  float64 // +16V current sense current
+	PWRM16V  float64 // -16V voltage sense voltage
+	PWRM16C  float64 // -16V current sense current
+	PWRP3V3  float64 // +3V3 voltage sense voltage
+	PWRP3C3  float64 // +3V3 current sense current
+	Warnings []error
 }
 
 // NewPWR reads a PWR from buffer
@@ -171,7 +173,7 @@ func (pwr *PWR) Report() PWRReport {
 		PWRM16C:  pwr.PWRM16C.current(),
 		PWRP3V3:  pwr.PWRP3V3.voltage(),
 		PWRP3C3:  pwr.PWRP3C3.current(),
-		WARNINGS: warnings,
+		Warnings: warnings,
 	}
 }
 
@@ -192,7 +194,7 @@ func (pwr *PWR) CSVRow() []string {
 	t := val.Type()
 	for i := range values {
 		valueField := val.Field(i)
-		if t.Field(i).Name == "WARNINGS" {
+		if t.Field(i).Name == "Warnings" {
 			if valueField.Len() == 0 {
 				values[i] = ""
 			} else {
@@ -210,10 +212,23 @@ func (pwr *PWR) CSVRow() []string {
 	return values
 }
 
-// PWRParquet holds the parquet representation of the PWR
-type PWRParquet PWRReport
-
-// GetParquet returns the parquet representation of the PWR
-func (pwr *PWR) GetParquet() PWRParquet {
-	return PWRParquet(pwr.Report())
+// SetParquet setsthe parquet representation of the PWR
+func (pwr *PWR) SetParquet(row *parquetrow.ParquetRow) {
+	report := pwr.Report()
+	var warnings []string
+	if report.Warnings != nil {
+		for err := range report.Warnings {
+			warnings = append(warnings, report.Warnings[err].Error())
+		}
+	}
+	row.PWRT = report.PWRT
+	row.PWRP32V = report.PWRP32V
+	row.PWRP32C = report.PWRP32C
+	row.PWRP16V = report.PWRP16V
+	row.PWRP16C = report.PWRP16C
+	row.PWRM16V = report.PWRM16V
+	row.PWRM16C = report.PWRM16C
+	row.PWRP3V3 = report.PWRP3V3
+	row.PWRP3C3 = report.PWRP3C3
+	row.Warnings = warnings
 }

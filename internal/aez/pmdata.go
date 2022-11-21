@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // PMData data from photometers
@@ -81,40 +82,20 @@ func (pm *PMData) CSVRow() []string {
 	return row
 }
 
-// PMDataParquet holds the parquet representation of the PMData
-type PMDataParquet struct {
-	PMTime        time.Time `parquet:"PMTime"`
-	PMNanoseconds int64     `parquet:"PMNanoseconds"`
-	PM1A          uint32    `parquet:"PM1A"`
-	PM1ACNTR      uint32    `parquet:"PM1ACNTR"`
-	PM1B          uint32    `parquet:"PM1B"`
-	PM1BCNTR      uint32    `parquet:"PM1BCNTR"`
-	PM1S          uint32    `parquet:"PM1S"`
-	PM1SCNTR      uint32    `parquet:"PM1SCNTR"`
-	PM2A          uint32    `parquet:"PM2A"`
-	PM2ACNTR      uint32    `parquet:"PM2ACNTR"`
-	PM2B          uint32    `parquet:"PM2B"`
-	PM2BCNTR      uint32    `parquet:"PM2BCNTR"`
-	PM2S          uint32    `parquet:"PM2S"`
-	PM2SCNTR      uint32    `parquet:"PM2SCNTR"`
-}
-
-// GetParquet returns the parquet representation of the PMData
-func (pm *PMData) GetParquet() PMDataParquet {
-	return PMDataParquet{
-		pm.Time(GpsTime),
-		pm.Nanoseconds(),
-		pm.PM1A,
-		pm.PM1ACNTR,
-		pm.PM1B,
-		pm.PM1BCNTR,
-		pm.PM1S,
-		pm.PM1SCNTR,
-		pm.PM2A,
-		pm.PM2ACNTR,
-		pm.PM2B,
-		pm.PM2BCNTR,
-		pm.PM2S,
-		pm.PM2SCNTR,
-	}
+// SetParquet sets the parquet representation of the PMData
+func (pm *PMData) SetParquet(row *parquetrow.ParquetRow) {
+	row.PMTime = pm.Time(GpsTime)
+	row.PMNanoseconds = pm.Nanoseconds()
+	row.PM1A = pm.PM1A
+	row.PM1ACNTR = pm.PM1ACNTR
+	row.PM1B = pm.PM1B
+	row.PM1BCNTR = pm.PM1BCNTR
+	row.PM1S = pm.PM1S
+	row.PM1SCNTR = pm.PM1SCNTR
+	row.PM2A = pm.PM2A
+	row.PM2ACNTR = pm.PM2ACNTR
+	row.PM2B = pm.PM2B
+	row.PM2BCNTR = pm.PM2BCNTR
+	row.PM2S = pm.PM2S
+	row.PM2SCNTR = pm.PM2SCNTR
 }

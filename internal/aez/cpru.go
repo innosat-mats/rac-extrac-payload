@@ -7,6 +7,8 @@ import (
 	"log"
 	"math"
 	"reflect"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 type gate uint16
@@ -78,30 +80,30 @@ type CPRU struct {
 
 // CPRUReport structure
 type CPRUReport struct {
-	VGATE0       float64 `parquet:"VGATE0"`       // CCD0 Gate Voltage
-	VSUBS0       float64 `parquet:"VSUBS0"`       // CCD0 Substrate Voltage
-	VRD0         float64 `parquet:"VRD0"`         // CCD0 Reset transistor Drain Voltage
-	VOD0         float64 `parquet:"VOD0"`         // CCD0 Output Drain Voltage
-	Overvoltage0 bool    `parquet:"Overvoltage0"` // CCD0 overvoltage fault
-	Power0       bool    `parquet:"Power0"`       // CCD0 overvoltage fault
-	VGATE1       float64 `parquet:"VGATE1"`       // CCD1 Gate Voltage
-	VSUBS1       float64 `parquet:"VSUBS1"`       // CCD1 Substrate Voltage
-	VRD1         float64 `parquet:"VRD1"`         // CCD1 Reset transistor Drain Voltage
-	VOD1         float64 `parquet:"VOD1"`         // CCD1 Output Drain Voltage
-	Overvoltage1 bool    `parquet:"Overvoltage1"` // CCD1 overvoltage fault
-	Power1       bool    `parquet:"Power1"`       // CCD1 overvoltage fault
-	VGATE2       float64 `parquet:"VGATE2"`       // CCD2 Gate Voltage
-	VSUBS2       float64 `parquet:"VSUBS2"`       // CCD2 Substrate Voltage
-	VRD2         float64 `parquet:"VRD2"`         // CCD2 Reset transistor Drain Voltage
-	VOD2         float64 `parquet:"VOD2"`         // CCD2 Output Drain Voltage
-	Overvoltage2 bool    `parquet:"Overvoltage2"` // CCD2 overvoltage fault
-	Power2       bool    `parquet:"Power2"`       // CCD2 overvoltage fault
-	VGATE3       float64 `parquet:"VGATE3"`       // CCD3 Gate Voltage
-	VSUBS3       float64 `parquet:"VSUBS3"`       // CCD3 Substrate Voltage
-	VRD3         float64 `parquet:"VRD3"`         // CCD3 Reset transistor Drain Voltage
-	VOD3         float64 `parquet:"VOD3"`         // CCD3 Output Drain Voltage
-	Overvoltage3 bool    `parquet:"Overvoltage3"` // CCD3 overvoltage fault
-	Power3       bool    `parquet:"Power3"`       // CCD3 overvoltage fault
+	VGATE0       float64 // CCD0 Gate Voltage
+	VSUBS0       float64 // CCD0 Substrate Voltage
+	VRD0         float64 // CCD0 Reset transistor Drain Voltage
+	VOD0         float64 // CCD0 Output Drain Voltage
+	Overvoltage0 bool    // CCD0 overvoltage fault
+	Power0       bool    // CCD0 overvoltage fault
+	VGATE1       float64 // CCD1 Gate Voltage
+	VSUBS1       float64 // CCD1 Substrate Voltage
+	VRD1         float64 // CCD1 Reset transistor Drain Voltage
+	VOD1         float64 // CCD1 Output Drain Voltage
+	Overvoltage1 bool    // CCD1 overvoltage fault
+	Power1       bool    // CCD1 overvoltage fault
+	VGATE2       float64 // CCD2 Gate Voltage
+	VSUBS2       float64 // CCD2 Substrate Voltage
+	VRD2         float64 // CCD2 Reset transistor Drain Voltage
+	VOD2         float64 // CCD2 Output Drain Voltage
+	Overvoltage2 bool    // CCD2 overvoltage fault
+	Power2       bool    // CCD2 overvoltage fault
+	VGATE3       float64 // CCD3 Gate Voltage
+	VSUBS3       float64 // CCD3 Substrate Voltage
+	VRD3         float64 // CCD3 Reset transistor Drain Voltage
+	VOD3         float64 // CCD3 Output Drain Voltage
+	Overvoltage3 bool    // CCD3 overvoltage fault
+	Power3       bool    // CCD3 overvoltage fault
 }
 
 // NewCPRU reads buffer into a new CPRU
@@ -167,10 +169,31 @@ func (cpru *CPRU) CSVRow() []string {
 	return values
 }
 
-// CPRUParquet holds the parquet representation of the CPRU
-type CPRUParquet CPRUReport
-
-// GetParquet returns the parquet representation of the CPRU
-func (cpru *CPRU) GetParquet() CPRUParquet {
-	return CPRUParquet(cpru.Report())
+// SetParquet sets the parquet representation of the CPRU
+func (cpru *CPRU) SetParquet(row *parquetrow.ParquetRow) {
+	report := cpru.Report()
+	row.VGATE0 = report.VGATE0
+	row.VSUBS0 = report.VSUBS0
+	row.VRD0 = report.VRD0
+	row.VOD0 = report.VOD0
+	row.Overvoltage0 = report.Overvoltage0
+	row.Power0 = report.Power0
+	row.VGATE1 = report.VGATE1
+	row.VSUBS1 = report.VSUBS1
+	row.VRD1 = report.VRD1
+	row.VOD1 = report.VOD1
+	row.Overvoltage1 = report.Overvoltage1
+	row.Power1 = report.Power1
+	row.VGATE2 = report.VGATE2
+	row.VSUBS2 = report.VSUBS2
+	row.VRD2 = report.VRD2
+	row.VOD2 = report.VOD2
+	row.Overvoltage2 = report.Overvoltage2
+	row.Power2 = report.Power2
+	row.VGATE3 = report.VGATE3
+	row.VSUBS3 = report.VSUBS3
+	row.VRD3 = report.VRD3
+	row.VOD3 = report.VOD3
+	row.Overvoltage3 = report.Overvoltage3
+	row.Power3 = report.Power3
 }

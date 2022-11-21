@@ -104,8 +104,6 @@ func getCallback(
 	} else if toParquet {
 		callback, teardown := exports.ParquetCallbackFactory(
 			project,
-			!skipImages,
-			!skipTimeseries,
 			wg,
 		)
 		return callback, teardown, nil

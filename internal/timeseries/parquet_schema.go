@@ -2,149 +2,149 @@ package timeseries
 
 // RacSchema is the parquet schema for saving RAC data, one row per packet
 const RacSchema = `message schema {
-	required string OriginFile
-	requried int64  ProcessingDate (TIMESPAMP(NANOS, true))
-	required int64  RamsesTime (TIMESPAMP(NANOS, true))
-	required uint8  QualityIndicator
-	required uint8  LossFlag
-	required uint8  VCFrameCounter
-	required uint16 SPSequenceCount
-	required int64  TMHeaderTime (TIMESTAMP(NANOS, true))
-	required int64  TMHeaderNanoseconds
-	required string SID
-	required string RID
+	required binary OriginFile (STRING);
+	required int64  ProcessingTime (TIMESTAMP(NANOS, true));
+	required int64  RamsesTime (TIMESTAMP(NANOS, true));
+	required int32  QualityIndicator;
+	required int32  LossFlag;
+	required int32  VCFrameCounter;
+	required int32  SPSequenceCount;
+	required int64  TMHeaderTime (TIMESTAMP(NANOS, true));
+	required int64  TMHeaderNanoseconds;
+	required binary SID (STRING);
+	required binary RID (STRING);
 
-	optional uint8  CCDSEL
-	optional int64  EXPNanoseconds
-	optional int64  EXPDate (TIMESTAMP(NANOS, true))
-	optional string WDWMode
-	optional string WDWInputDataWindow
-	optional uint16 WDWOV
-	optional uint8  JPEGQ
-	optional uint16 FRAME
-	optional uint16 NROW
-	optional uint16 NRBIN
-	optional uint16 NRSKIP
-	optional uint16 NCOL
-	optional int    NCBINFPGAColumns
-	optional int    NCBINCCDColumns
-	optional uint16 NCSKIP
-	optional uint16 NFLUSH
-	optional uint32 TEXPMS
-	optional string GAINMode
-	optional string GAINTiming
-	optional uint8  GAINTruncation
-	optional uint16 TEMP
-	optional uint16 FBINOV
-	optional uint16 LBLNK
-	optional uint16 TBLNK
-	optional uint16 ZERO
-	optional uint16 TIMING1
-	optional uint16 TIMING2
-	optional uint16 VERSION
-	optional uint16 TIMING3
-	optional uint16 NBC
+	optional int32  CCDSEL;
+	optional int64  EXPNanoseconds;
+	optional int64  EXPDate (TIMESTAMP(NANOS, true));
+	optional binary WDWMode (STRING);
+	optional binary WDWInputDataWindow (STRING);
+	optional int32  WDWOV;
+	optional int32  JPEGQ;
+	optional int32  FRAME;
+	optional int32  NROW;
+	optional int32  NRBIN;
+	optional int32  NRSKIP;
+	optional int32  NCOL;
+	optional int32  NCBINFPGAColumns;
+	optional int32  NCBINCCDColumns;
+	optional int32  NCSKIP;
+	optional int32  NFLUSH;
+	optional int32  TEXPMS;
+	optional binary GAINMode (STRING);
+	optional binary GAINTiming (STRING);
+	optional int32  GAINTruncation;
+	optional int32  TEMP;
+	optional int32  FBINOV;
+	optional int32  LBLNK;
+	optional int32  TBLNK;
+	optional int32  ZERO;
+	optional int32  TIMING1;
+	optional int32  TIMING2;
+	optional int32  VERSION;
+	optional int32  TIMING3;
+	optional int32  NBC;
 	optional group  BadColumns (LIST) {
 		repeated group list {
-			required uint16 column
+			required int32 element;
 		}
 	}
-	optional string ImageFileName
-	optional binary ImageFile
+	optional binary ImageName (STRING);
+	optional binary ImageData;
 
-	optional int64  PMTime (TIMESTAMP(NANOS, true))
-	optional int64  PMNanoseconds
-	optional uint32 PM1A
-	optional uint32 PM1ACNTR
-	optional uint32 PM1B
-	optional uint32 PM1BCNTR
-	optional uint32 PM1S
-	optional uint32 PM1SCNTR
-	optional uint32 PM2A
-	optional uint32 PM2ACNTR
-	optional uint32 PM2B
-	optional uint32 PM2BCNTR
-	optional uint32 PM2S
-	optional uint32 PM2SCNTR
+	optional int64 PMTime (TIMESTAMP(NANOS, true));
+	optional int64 PMNanoseconds;
+	optional int32 PM1A;
+	optional int32 PM1ACNTR;
+	optional int32 PM1B;
+	optional int32 PM1BCNTR;
+	optional int32 PM1S;
+	optional int32 PM1SCNTR;
+	optional int32 PM2A;
+	optional int32 PM2ACNTR;
+	optional int32 PM2B;
+	optional int32 PM2BCNTR;
+	optional int32 PM2S;
+	optional int32 PM2SCNTR;
 
-	optional float64 HTR1A
-	optional float64 HTR1B
-	optional float64 HTR1OD
-	optional float64 HTR2A
-	optional float64 HTR2B
-	optional float64 HTR2OD
-	optional float64 HTR7A
-	optional float64 HTR7B
-	optional float64 HTR7OD
-	optional float64 HTR8A
-	optional float64 HTR8B
-	optional float64 HTR8OD
+	optional double HTR1A;
+	optional double HTR1B;
+	optional double HTR1OD;
+	optional double HTR2A;
+	optional double HTR2B;
+	optional double HTR2OD;
+	optional double HTR7A;
+	optional double HTR7B;
+	optional double HTR7OD;
+	optional double HTR8A;
+	optional double HTR8B;
+	optional double HTR8OD;
 
-	optional float64 PWRT
-	optional float64 PWRP32V
-	optional float64 PWRP32C
-	optional float64 PWRP16V
-	optional float64 PWRP16C
-	optional float64 PWRM16V
-	optional float64 PWRM16C
-	optional float64 PWRP3V3
-	optional float64 PWRP3C3
+	optional double PWRT;
+	optional double PWRP32V;
+	optional double PWRP32C;
+	optional double PWRP16V;
+	optional double PWRP16C;
+	optional double PWRM16V;
+	optional double PWRM16C;
+	optional double PWRP3V3;
+	optional double PWRP3C3;
 
-	optional float64 VGATE0
-	optional float64 VSUBS0
-	optional float64 VRD0
-	optional float64 VOD0
-	optional boolean Overvoltage0
-	optional boolean Power0
-	optional float64 VGATE1
-	optional float64 VSUBS1
-	optional float64 VRD1
-	optional float64 VOD1
-	optional boolean Overvoltage1
-	optional boolean Power1
-	optional float64 VGATE2
-	optional float64 VSUBS2
-	optional float64 VRD2
-	optional float64 VOD2
-	optional boolean Overvoltage2
-	optional boolean Power2
-	optional float64 VGATE3
-	optional float64 VSUBS3
-	optional float64 VRD3
-	optional float64 VOD3
-	optional boolean Overvoltage3
-	optional boolean Power3
+	optional double  VGATE0;
+	optional double  VSUBS0;
+	optional double  VRD0;
+	optional double  VOD0;
+	optional boolean Overvoltage0;
+	optional boolean Power0;
+	optional double  VGATE1;
+	optional double  VSUBS1;
+	optional double  VRD1;
+	optional double  VOD1;
+	optional boolean Overvoltage1;
+	optional boolean Power1;
+	optional double  VGATE2;
+	optional double  VSUBS2;
+	optional double  VRD2;
+	optional double  VOD2;
+	optional boolean Overvoltage2;
+	optional boolean Power2;
+	optional double  VGATE3;
+	optional double  VSUBS3;
+	optional double  VRD3;
+	optional double  VOD3;
+	optional boolean Overvoltage3;
+	optional boolean Power3;
 
-	optional int64  STATTime (TIMESTAMP(NANOS, true))
-	optional int64  STATNanoseconds
-	optional uint16 SPID
-	optional uint8  SPREV
-	optional uint16 FPID
-	optional uint8  FPREV
-	optional uint8  SVNA
-	optional uint8  SVNB
-	optional uint8  SVNC
-	optional uint8  MODE
-	optional uint32 EDACE
-	optional uint32 EDACCE
-	optional uint32 EDACN
-	optional uint32 SPWEOP
-	optional uint32 SPWEEP
-	optional uint8  ANOMALY
+	optional int64 STATTime (TIMESTAMP(NANOS, true));
+	optional int64 STATNanoseconds;
+	optional int32 SPID;
+	optional int32 SPREV;
+	optional int32 FPID;
+	optional int32 FPREV;
+	optional int32 SVNA;
+	optional int32 SVNB;
+	optional int32 SVNC;
+	optional int32 MODE;
+	optional int32 EDACE;
+	optional int32 EDACCE;
+	optional int32 EDACN;
+	optional int32 SPWEOP;
+	optional int32 SPWEEP;
+	optional int32 ANOMALY;
 
-	optional string TCV
-	optional uint16 TCPID
-	optional uint16 PSC
-	optional uint8  ErrorCode
+	optional binary TCV (STRING);
+	optional int32  TCPID;
+	optional int32  PSC;
+	optional int32  ErrorCode;
 
 	optional group Warnings (LIST) {
 		repeated group list {
-			required string warning
+			required binary element (STRING);
 		}
 	}
 	optional group Errors (LIST) {
 		repeated group list {
-			required string error
+			required binary element (STRING);
 		}
 	}
 }`

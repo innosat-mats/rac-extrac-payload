@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // WDWMode describes the CCD WDW parameter
@@ -286,76 +287,40 @@ func (ccd *CCDImagePackData) CSVRow() []string {
 	}
 }
 
-// CCDImagePackDataParquet holds the parquet representation of the CCDImagePackData
-type CCDImagePackDataParquet struct {
-	CCDSEL             uint8     `parquet:"CCDSEL"`
-	EXPNanoseconds     int64     `parquet:"EXPNanoseconds"`
-	EXPDate            time.Time `parquet:"EXPDate"`
-	WDWMode            string    `parquet:"WDWMode"`
-	WDWInputDataWindow string    `parquet:"WDWInputDataWindow"`
-	WDWOV              uint16    `parquet:"WDWOV"`
-	JPEGQ              uint8     `parquet:"JPEGQ"`
-	FRAME              uint16    `parquet:"FRAME"`
-	NROW               uint16    `parquet:"NROW"`
-	NRBIN              uint16    `parquet:"NRBIN"`
-	NRSKIP             uint16    `parquet:"NRSKIP"`
-	NCOL               uint16    `parquet:"NCOL"`
-	NCBINFPGAColumns   int       `parquet:"NCBINFPGAColumns"`
-	NCBINCCDColumns    int       `parquet:"NCBINCCDColumns"`
-	NCSKIP             uint16    `parquet:"NCSKIP"`
-	NFLUSH             uint16    `parquet:"NFLUSH"`
-	TEXPMS             uint32    `parquet:"TEXPMS"`
-	GAINMode           string    `parquet:"GAINMode"`
-	GAINTiming         string    `parquet:"GAINTiming"`
-	GAINTruncation     uint8     `parquet:"GAINTruncation"`
-	TEMP               uint16    `parquet:"TEMP"`
-	FBINOV             uint16    `parquet:"FBINOV"`
-	LBLNK              uint16    `parquet:"LBLNK"`
-	TBLNK              uint16    `parquet:"TBLNK"`
-	ZERO               uint16    `parquet:"ZERO"`
-	TIMING1            uint16    `parquet:"TIMING1"`
-	TIMING2            uint16    `parquet:"TIMING2"`
-	VERSION            uint16    `parquet:"VERSION"`
-	TIMING3            uint16    `parquet:"TIMING3"`
-	NBC                uint16    `parquet:"NBC"`
-}
-
-// GetParquet returns the parquet representation of the CCDImagePackData
-func (ccd *CCDImagePackData) GetParquet() CCDImagePackDataParquet {
+// SetParquet sets the parquet representation of the CCDImagePackData
+func (ccd *CCDImagePackData) SetParquet(row *parquetrow.ParquetRow) {
 	wdwhigh, wdwlow, _ := ccd.WDW.InputDataWindow()
 	wdwMode := ccd.WDW.Mode()
 	gainMode := ccd.GAIN.Mode()
 	gainTiming := ccd.GAIN.Timing()
-	return CCDImagePackDataParquet{
-		ccd.CCDSEL,
-		ccd.Nanoseconds(),
-		ccd.Time(GpsTime),
-		(&wdwMode).String(),
-		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
-		ccd.WDWOV,
-		ccd.JPEGQ,
-		ccd.FRAME,
-		ccd.NROW,
-		ccd.NRBIN,
-		ccd.NRSKIP,
-		ccd.NCOL,
-		ccd.NCBIN.FPGAColumns(),
-		ccd.NCBIN.CCDColumns(),
-		ccd.NCSKIP,
-		ccd.NFLUSH,
-		ccd.TEXPMS,
-		(&gainMode).String(),
-		(&gainTiming).String(),
-		ccd.GAIN.Truncation(),
-		ccd.TEMP,
-		ccd.FBINOV,
-		ccd.LBLNK,
-		ccd.TBLNK,
-		ccd.ZERO,
-		ccd.TIMING1,
-		ccd.TIMING2,
-		ccd.VERSION,
-		ccd.TIMING3,
-		ccd.NBC,
-	}
+	row.CCDSEL = ccd.CCDSEL
+	row.EXPNanoseconds = ccd.Nanoseconds()
+	row.EXPDate = ccd.Time(GpsTime)
+	row.WDWMode = (&wdwMode).String()
+	row.WDWInputDataWindow = fmt.Sprintf("%v..%v", wdwhigh, wdwlow)
+	row.WDWOV = ccd.WDWOV
+	row.JPEGQ = ccd.JPEGQ
+	row.FRAME = ccd.FRAME
+	row.NROW = ccd.NROW
+	row.NRBIN = ccd.NRBIN
+	row.NRSKIP = ccd.NRSKIP
+	row.NCOL = ccd.NCOL
+	row.NCBINFPGAColumns = ccd.NCBIN.FPGAColumns()
+	row.NCBINCCDColumns = ccd.NCBIN.CCDColumns()
+	row.NCSKIP = ccd.NCSKIP
+	row.NFLUSH = ccd.NFLUSH
+	row.TEXPMS = ccd.TEXPMS
+	row.GAINMode = (&gainMode).String()
+	row.GAINTiming = (&gainTiming).String()
+	row.GAINTruncation = ccd.GAIN.Truncation()
+	row.TEMP = ccd.TEMP
+	row.FBINOV = ccd.FBINOV
+	row.LBLNK = ccd.LBLNK
+	row.TBLNK = ccd.TBLNK
+	row.ZERO = ccd.ZERO
+	row.TIMING1 = ccd.TIMING1
+	row.TIMING2 = ccd.TIMING2
+	row.VERSION = ccd.VERSION
+	row.TIMING3 = ccd.TIMING3
+	row.NBC = ccd.NBC
 }

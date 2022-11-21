@@ -6,6 +6,8 @@ import (
 	"io"
 	"reflect"
 	"strings"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 var htrTemperatures = [...]float64{
@@ -63,19 +65,19 @@ type HTR struct {
 
 // HTRReport housekeeping report returns data on all heater regulators in useful units.
 type HTRReport struct {
-	HTR1A    float64 `parquet:"HTR1A"`  // Heater 1 Temperature sense A ⁰C
-	HTR1B    float64 `parquet:"HTR1B"`  // Heater 1 Temperature sense B ⁰C
-	HTR1OD   float64 `parquet:"HTR1OD"` // Heater 1 Output Drive setting voltage
-	HTR2A    float64 `parquet:"HTR2A"`
-	HTR2B    float64 `parquet:"HTR2B"`
-	HTR2OD   float64 `parquet:"HTR2OD"`
-	HTR7A    float64 `parquet:"HTR7A"`
-	HTR7B    float64 `parquet:"HTR7B"`
-	HTR7OD   float64 `parquet:"HTR7OD"`
-	HTR8A    float64 `parquet:"HTR8A"`
-	HTR8B    float64 `parquet:"HTR8B"`
-	HTR8OD   float64 `parquet:"HTR8OD"`
-	WARNINGS []error `parquet:"Warnings"`
+	HTR1A    float64 // Heater 1 Temperature sense A ⁰C
+	HTR1B    float64 // Heater 1 Temperature sense B ⁰C
+	HTR1OD   float64 // Heater 1 Output Drive setting voltage
+	HTR2A    float64
+	HTR2B    float64
+	HTR2OD   float64
+	HTR7A    float64
+	HTR7B    float64
+	HTR7OD   float64
+	HTR8A    float64
+	HTR8B    float64
+	HTR8OD   float64
+	Warnings []error
 }
 
 // NewHTR reads an HTR from buffer
@@ -141,7 +143,7 @@ func (htr *HTR) Report() HTRReport {
 		HTR8A:    temp8a,
 		HTR8B:    temp8b,
 		HTR8OD:   htr.HTR8OD.voltage(),
-		WARNINGS: warnings,
+		Warnings: warnings,
 	}
 }
 
@@ -157,7 +159,7 @@ func (htr *HTR) CSVRow() []string {
 	t := val.Type()
 	for i := range values {
 		valueField := val.Field(i)
-		if t.Field(i).Name == "WARNINGS" {
+		if t.Field(i).Name == "Warnings" {
 			if valueField.Len() == 0 {
 				values[i] = ""
 			} else {
@@ -180,10 +182,26 @@ func (htr *HTR) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
-// HTRParquet holds the parquet representation of the HTR
-type HTRParquet HTRReport
-
-// GetParquet returns the parquet representation of the HTR
-func (htr *HTR) GetParquet() HTRParquet {
-	return HTRParquet(htr.Report())
+// SetParquet sets the parquet representation of the HTR
+func (htr *HTR) SetParquet(row *parquetrow.ParquetRow) {
+	report := htr.Report()
+	var warnings []string
+	if report.Warnings != nil {
+		for err := range report.Warnings {
+			warnings = append(warnings, report.Warnings[err].Error())
+		}
+	}
+	row.HTR1A = report.HTR1A
+	row.HTR1B = report.HTR1B
+	row.HTR1OD = report.HTR1OD
+	row.HTR2A = report.HTR2A
+	row.HTR2B = report.HTR2B
+	row.HTR2OD = report.HTR2OD
+	row.HTR7A = report.HTR7A
+	row.HTR7B = report.HTR7B
+	row.HTR7OD = report.HTR7OD
+	row.HTR8A = report.HTR8A
+	row.HTR8B = report.HTR8B
+	row.HTR8OD = report.HTR8OD
+	row.Warnings = warnings
 }

@@ -1,13 +1,18 @@
 package aez
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"image"
+	"image/png"
 	"io"
+	"log"
 	"path/filepath"
 	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // CCDImage is a container for the invariant CCDImagePackData header and the variable BadColumns that follow
@@ -154,21 +159,31 @@ func (ccd *CCDImage) FullImageName(prefix string) string {
 	return filepath.Join(prefix, ccd.ImageFileName)
 }
 
-// CCDImageParquet holds the parquet representation of the CCDImage
-type CCDImageParquet struct {
-	CCDImagePackDataParquet
-	BC            []uint16 `parquet:"BadColumns"`
-	ImageFileName string   `parquet:"ImageFileName"`
-	ImageData     []byte   `parquet:"ImageData"`
+func (ccd *CCDImage) getPNG(buffer []byte) []byte {
+	recoverWrite := func() {
+		if r := recover(); r != nil {
+			log.Printf(
+				"Processing incomplete for image %s, skipping (%v)",
+				ccd.ImageFileName, r,
+			)
+		}
+	}
+	defer recoverWrite()
+	img := ccd.Image(buffer)
+	pngImg := bytes.NewBuffer([]byte{})
+	err := png.Encode(pngImg, img)
+	if err != nil {
+		log.Panicf("failed encoding %s: %s", ccd.ImageFileName, err)
+	}
+
+	return pngImg.Bytes()
 }
 
-// GetParquet returns the parquet representation of the CCDImage
-func (ccd *CCDImage) GetParquet() CCDImageParquet {
-	ccdPack := ccd.PackData.GetParquet()
-	return CCDImageParquet{
-		ccdPack,
-		ccd.BadColumns,
-		ccd.ImageFileName,
-		[]byte{}, // TODO: get png
-	}
+// SetParquet sets the parquet representation of the CCDImage
+func (ccd *CCDImage) SetParquet(row *parquetrow.ParquetRow, buffer []byte) {
+	ccd.PackData.SetParquet(row)
+	pngImg := ccd.getPNG(buffer)
+	row.BC = ccd.BadColumns
+	row.ImageName = ccd.ImageFileName
+	row.ImageData = pngImg
 }

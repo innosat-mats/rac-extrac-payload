@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // SourcePacketHeaderType is the type of the source packet (TM/TC)
@@ -136,14 +138,7 @@ func (sph *SourcePacketHeader) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// SourcePackedHeaderParquet holds the parquet representation of the SourcePacketHeader
-type SourcePacketHeaderParquet struct {
-	SPSequenceCount uint16 `parquet:"SPSequenceCount"`
-}
-
-// GetParquet returns the parquet representation of the SourcePacketHeader
-func (sph *SourcePacketHeader) GetParquet() SourcePacketHeaderParquet {
-	return SourcePacketHeaderParquet{
-		sph.PacketSequenceControl.SequenceCount(),
-	}
+// SetParquet sets the parquet representation of the SourcePacketHeader
+func (sph *SourcePacketHeader) SetParquet(row *parquetrow.ParquetRow) {
+	row.SPSequenceCount = sph.PacketSequenceControl.SequenceCount()
 }

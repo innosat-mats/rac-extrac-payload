@@ -54,16 +54,6 @@ func (sid *SID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(sid.String())
 }
 
-// SIDParquet holds the parquet representation of the SID
-type SIDParquet struct {
-	SID string `parquet:"SID"`
-}
-
-// GetParquet returns the parquet representation of the SID
-func (sid *SID) GetParquet() SIDParquet {
-	return SIDParquet{sid.String()}
-}
-
 // RID is Report Identification
 type RID uint16
 
@@ -141,14 +131,4 @@ func (rid *RID) String() string {
 // MarshalJSON makes a custom json of what is of interest in the struct
 func (rid *RID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(rid.String())
-}
-
-// RIDParquet holds the parquet representation of the RID
-type RIDParquet struct {
-	RID string `parquet:"RID"`
-}
-
-// GetParquet returns the parquet representation of the RID
-func (rid *RID) GetParquet() RIDParquet {
-	return RIDParquet{rid.String()}
 }

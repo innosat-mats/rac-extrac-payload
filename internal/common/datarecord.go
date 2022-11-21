@@ -6,6 +6,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
@@ -215,62 +216,32 @@ func (record *DataRecord) OriginName() string {
 	return ""
 }
 
-// DataRecordParquet holds the parquet representation of the DataRecord
-type DataRecordParquet struct {
-	OriginDescriptionParquet
-	ramses.RamsesParquet
-	ramses.RamsesTMHeaderParquet
-	innosat.SourcePacketHeaderParquet
-	innosat.TMHeaderParquet
-	aez.SIDParquet
-	aez.RIDParquet
-	Errors []string `parquet:"Errors"`
-}
-
-// GetParquet returns the parquet representation of the DataRecord
-func (record *DataRecord) GetParquet() DataRecordParquet {
-	origin := OriginDescriptionParquet{}
+// SetParquet returns the parquet representation of the DataRecord
+func (record *DataRecord) SetParquet(row *parquetrow.ParquetRow) {
 	if record.Origin != nil {
-		origin = record.Origin.GetParquet()
+		record.Origin.SetParquet(row)
 	}
 
-	ramsesHeader := ramses.RamsesParquet{}
 	if record.RamsesHeader != nil {
-		ramsesHeader = record.RamsesHeader.GetParquet()
+		record.RamsesHeader.SetParquet(row)
 	}
 
-	ramsesTMHeader := ramses.RamsesTMHeaderParquet{}
 	if record.RamsesHeader != nil {
-		ramsesTMHeader = record.RamsesTMHeader.GetParquet()
+		record.RamsesTMHeader.SetParquet(row)
 	}
 
-	sourceHeader := innosat.SourcePacketHeaderParquet{}
 	if record.SourceHeader != nil {
-		sourceHeader = record.SourceHeader.GetParquet()
+		record.SourceHeader.SetParquet(row)
 	}
 
-	sourceTMHeader := innosat.TMHeaderParquet{}
 	if record.TMHeader != nil {
-		sourceTMHeader = record.TMHeader.GetParquet()
+		record.TMHeader.SetParquet(row)
 	}
 
-	sid := record.SID.GetParquet()
+	row.SID = record.SID.String()
+	row.RID = record.RID.String()
 
-	rid := record.RID.GetParquet()
-
-	errors := []string{}
 	if record.Error != nil {
-		errors = append(errors, record.Error.Error())
-	}
-
-	return DataRecordParquet{
-		origin,
-		ramsesHeader,
-		ramsesTMHeader,
-		sourceHeader,
-		sourceTMHeader,
-		sid,
-		rid,
-		errors,
+		row.Errors = []string{record.Error.Error()}
 	}
 }

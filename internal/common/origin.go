@@ -3,6 +3,8 @@ package common
 import (
 	"path/filepath"
 	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // OriginDescription describes the origin of ramses packages
@@ -24,13 +26,8 @@ func (origin *OriginDescription) CSVRow() []string {
 	}
 }
 
-// OriginDescriptionParquet holds the parquet representation of the OriginDescription
-type OriginDescriptionParquet struct {
-	OriginFile     string    `parquet:"OriginFile"`
-	ProcessingDate time.Time `parquet:"ProcessingTime"`
-}
-
-// GetParquet returns the parquet representation of the OriginDescription
-func (origin *OriginDescription) GetParquet() OriginDescriptionParquet {
-	return OriginDescriptionParquet{origin.Name, origin.ProcessingDate}
+// SetParquet sets the parquet representation of the OriginDescription
+func (origin *OriginDescription) SetParquet(row *parquetrow.ParquetRow) {
+	row.OriginFile = filepath.Base(origin.Name)
+	row.ProcessingTime = origin.ProcessingDate
 }

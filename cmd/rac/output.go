@@ -164,7 +164,7 @@ Celcius.
 - HTR8A:    temperature,
 - HTR8B:    temperature,
 - HTR8OD:   voltage,
-- WARNINGS: A summary of warnings from the temperature calculations.
+- Warnings: A summary of warnings from the temperature calculations.
   The warnings come from the interpolator and probably indicate the measured
   resistance is out of range.
   Each warning is separated by a '|' character.
@@ -191,7 +191,7 @@ Celcius.
 - PWRM16C:  current,
 - PWRP3V3:  voltage,
 - PWRP3C3:  current,
-- WARNINGS: A summary of warnings from the temperature calculations.
+- Warnings: A summary of warnings from the temperature calculations.
   The warnings come from the interpolator and probably indicate the measured
   resistance is out of range.
   Each warning is separated by a '|' character.

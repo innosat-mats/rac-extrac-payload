@@ -5,14 +5,9 @@ import (
 	"fmt"
 	"io"
 	"reflect"
-)
 
-type TCVParquet struct {
-	TCV       string `parquet:"TCV"`
-	TCPID     uint16 `parquet:"TCPID"`
-	PSC       uint16 `parquet:"PSC"`
-	ErrorCode uint8  `parquet:"ErrorCode"`
-}
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
+)
 
 /*
 TCAcceptSuccess:
@@ -55,13 +50,11 @@ func (tcv *TCAcceptSuccessData) CSVRow() []string {
 	return append(row, "")
 }
 
-// GetParquet returns the parquet representation of the TCV
-func (tcv *TCAcceptSuccessData) GetParquet() TCVParquet {
-	return TCVParquet{
-		TCV:   "Accept",
-		PSC:   tcv.PSC,
-		TCPID: tcv.TCPID,
-	}
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCAcceptSuccessData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Accept"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
 }
 
 /*
@@ -105,14 +98,12 @@ func (tcv *TCAcceptFailureData) CSVRow() []string {
 	return row
 }
 
-// GetParquet returns the parquet representation of the TCV
-func (tcv *TCAcceptFailureData) GetParquet() TCVParquet {
-	return TCVParquet{
-		TCV:       "Accept",
-		PSC:       tcv.PSC,
-		TCPID:     tcv.TCPID,
-		ErrorCode: tcv.ErrorCode,
-	}
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCAcceptFailureData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Accept"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
+	row.ErrorCode = tcv.ErrorCode
 }
 
 /*
@@ -156,13 +147,11 @@ func (tcv *TCExecSuccessData) CSVRow() []string {
 	return append(row, "")
 }
 
-// GetParquet returns the parquet representation of the TCV
-func (tcv *TCExecSuccessData) GetParquet() TCVParquet {
-	return TCVParquet{
-		TCV:   "Accept",
-		PSC:   tcv.PSC,
-		TCPID: tcv.TCPID,
-	}
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCExecSuccessData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Exec"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
 }
 
 /*
@@ -207,12 +196,10 @@ func (tcv *TCExecFailureData) CSVRow() []string {
 	return row
 }
 
-// GetParquet returns the parquet representation of the TCV
-func (tcv *TCExecFailureData) GetParquet() TCVParquet {
-	return TCVParquet{
-		TCV:       "Exec",
-		PSC:       tcv.PSC,
-		TCPID:     tcv.TCPID,
-		ErrorCode: tcv.ErrorCode,
-	}
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCExecFailureData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Exec"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
+	row.ErrorCode = tcv.ErrorCode
 }

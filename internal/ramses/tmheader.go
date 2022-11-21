@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"io"
 	"strconv"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // QualityIndicator indicates whether the transported data is complete or partial
@@ -60,18 +62,9 @@ func (header *TMHeader) CSVRow() []string {
 	}
 }
 
-// RamsesTMHeaderParquet holds the parquet representation of the TMHeader
-type RamsesTMHeaderParquet struct {
-	QualityIndicator uint8 `parquet:"QualityIndicator"`
-	LossFlag         uint8 `parquet:"LossFlag"`
-	VCFrameCounter   uint8 `parquet:"VCFrameCounter"`
-}
-
-// GetParquet returns the parquet representation of the TMHeader
-func (header *TMHeader) GetParquet() RamsesTMHeaderParquet {
-	return RamsesTMHeaderParquet{
-		uint8(header.QualityIndicator),
-		uint8(header.LossFlag),
-		header.VCFrameCounter,
-	}
+// SetParquet sets the parquet representation of the TMHeader
+func (header *TMHeader) SetParquet(row *parquetrow.ParquetRow) {
+	row.QualityIndicator = uint8(header.QualityIndicator)
+	row.LossFlag = uint8(header.LossFlag)
+	row.VCFrameCounter = header.VCFrameCounter
 }
