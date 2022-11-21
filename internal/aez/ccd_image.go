@@ -67,7 +67,7 @@ func (ccd *CCDImage) CSVSpecifications() []string {
 
 // CSVHeaders returns the exportable field names
 func (ccd *CCDImage) CSVHeaders() []string {
-	return append(ccd.PackData.CSVHeaders(), "BC", "ImageFileName")
+	return append(ccd.PackData.CSVHeaders(), "BC", "ImageName")
 }
 
 // CSVRow returns the exportable field values

@@ -21,7 +21,7 @@ type Parquet struct {
 
 // NewParquet returns a Timeseries as parquet
 func NewParquet(name string, pkg *common.DataRecord) ParquetWriter {
-	sd, err := parquetschema.ParseSchemaDefinition(RacSchema)
+	sd, err := parquetschema.ParseSchemaDefinition(parquetrow.RacSchema)
 	if err != nil {
 		log.Fatalf("could not parse parquet schema definition: %v", err)
 	}

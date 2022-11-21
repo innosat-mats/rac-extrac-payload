@@ -74,9 +74,9 @@ func (wdw *Wdw) InputDataWindow() (int, int, error) {
 // NCBin contains the FPGA and CCD columns bin count
 type NCBin uint16
 
-// FPGAColumns returns number FPGA columns to bin, Bit[11..8]
+// FPGAColumns returns number of FPGA columns to bin, Bit[11..8]
 //
-//	the value is encoded as 2^x
+//	The value is encoded as 2^x
 func (ncBin *NCBin) FPGAColumns() int {
 	return 1 << ((*ncBin >> 8) & 0x0f)
 }
@@ -86,7 +86,7 @@ func (ncBin *NCBin) CCDColumns() int {
 	return (int)(*ncBin & 0xff)
 }
 
-// CCDGain is game composite information
+// CCDGain is gain composite information
 type CCDGain uint16
 
 // CCDGainMode is high/low signal mode

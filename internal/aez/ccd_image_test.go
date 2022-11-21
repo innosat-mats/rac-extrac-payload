@@ -21,7 +21,7 @@ func TestCCDImage_CSVHeaders_AddsOwn(t *testing.T) {
 	ccdI := CCDImage{}
 	ccdIPD := CCDImagePackData{}
 	headersI := ccdI.CSVHeaders()
-	want := append(ccdIPD.CSVHeaders(), "BC", "ImageFileName")
+	want := append(ccdIPD.CSVHeaders(), "BC", "ImageName")
 
 	for i, header := range headersI {
 		if i < len(want) {

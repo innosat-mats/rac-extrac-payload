@@ -1,4 +1,4 @@
-package timeseries
+package parquetrow
 
 // RacSchema is the parquet schema for saving RAC data, one row per packet
 const RacSchema = `message schema {
