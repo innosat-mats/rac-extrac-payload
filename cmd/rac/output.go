@@ -103,7 +103,7 @@ The following columns parse the values further:
   "Full" used even for pixels that are not read out (value in rac 0b1)
 - GAINTrunctation
   The value of the truncation bits
-- ImageFileName
+- ImageName
   The name of the image file associated with these measurements
 - ImageFile
   The image data encoded as a 16 bit grey scale PNG

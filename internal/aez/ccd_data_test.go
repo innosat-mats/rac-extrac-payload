@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestWdw_Mode(t *testing.T) {
@@ -329,5 +330,72 @@ func TestCCDImagePackData_CSVRow(t *testing.T) {
 	}
 	if got := ccd.CSVRow(); !reflect.DeepEqual(got, want) {
 		t.Errorf("CCDImagePackData.CSVRow() = %v, want %v", got, want)
+	}
+}
+
+func TestCCDImagePackData_SetParquet(t *testing.T) {
+	ccd := CCDImagePackData{
+		CCDSEL:  5,
+		EXPTS:   10,
+		EXPTSS:  0xc000,
+		WDW:     0x83,
+		WDWOV:   13,
+		JPEGQ:   101,
+		FRAME:   14,
+		NROW:    15,
+		NRBIN:   16,
+		NRSKIP:  17,
+		NCOL:    18,
+		NCBIN:   0xf648, // 0x6 -> 2^6 and then 0x48 -> 72
+		NCSKIP:  19,
+		NFLUSH:  20,
+		TEXPMS:  21,
+		GAIN:    0x1100, // Low and Full
+		TEMP:    22,
+		FBINOV:  23,
+		LBLNK:   24,
+		TBLNK:   25,
+		ZERO:    26,
+		TIMING1: 27,
+		TIMING2: 28,
+		VERSION: 29,
+		TIMING3: 30,
+		NBC:     31,
+	}
+
+	want := parquetrow.ParquetRow{
+		CCDSEL:             5,
+		EXPNanoseconds:     10750000000,
+		EXPDate:            ccd.Time(GpsTime),
+		WDWMode:            "Automatic",
+		WDWInputDataWindow: "14..3",
+		WDWOV:              13,
+		JPEGQ:              101,
+		FRAME:              14,
+		NROW:               15,
+		NRBIN:              16,
+		NRSKIP:             17,
+		NCOL:               18,
+		NCBINFPGAColumns:   64,
+		NCBINCCDColumns:    72,
+		NCSKIP:             19,
+		NFLUSH:             20,
+		TEXPMS:             21,
+		GAINMode:           "Low",
+		GAINTiming:         "Full",
+		TEMP:               22,
+		FBINOV:             23,
+		LBLNK:              24,
+		TBLNK:              25,
+		ZERO:               26,
+		TIMING1:            27,
+		TIMING2:            28,
+		VERSION:            29,
+		TIMING3:            30,
+		NBC:                31,
+	}
+	row := parquetrow.ParquetRow{}
+	if ccd.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("CCDImagePackData.SetParquet() = %v, want %v", row, want)
 	}
 }

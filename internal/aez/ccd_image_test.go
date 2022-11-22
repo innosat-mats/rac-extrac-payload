@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestCCDImage_CSVSpecifications(t *testing.T) {
@@ -156,5 +158,31 @@ func TestCCDImage_FullImageName(t *testing.T) {
 				t.Errorf("CCDImage.FullImageName() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestCCDImage_SetParquet(t *testing.T) {
+	packData := CCDImagePackData{NBC: 2, JPEGQ: 95}
+	buf := getTestImage()
+	ccd := CCDImage{
+		PackData:      &packData,
+		BadColumns:    []uint16{1, 2},
+		ImageFileName: "my_rac_0_1.png",
+	}
+	want := parquetrow.ParquetRow{
+		EXPDate:            packData.Time(GpsTime),
+		WDWMode:            "Manual",
+		WDWInputDataWindow: "11..0",
+		NCBINFPGAColumns:   1,
+		GAINMode:           "High",
+		GAINTiming:         "Faster",
+		JPEGQ:              95,
+		NBC:                2,
+		BC:                 []uint16{1, 2},
+		ImageName:          "my_rac_0_1.png",
+	}
+	row := parquetrow.ParquetRow{}
+	if ccd.SetParquet(&row, buf); !reflect.DeepEqual(row, want) {
+		t.Errorf("CCDImage.SetParquet() = %v, want %v", row, want)
 	}
 }

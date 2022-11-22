@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestPWR_Report(t *testing.T) {
@@ -180,5 +182,44 @@ func TestPWR_CSVRow(t *testing.T) {
 				t.Errorf("PWR.CSVRow() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestPWR_SetParquet(t *testing.T) {
+	pwr := PWR{
+		PWRT:    pwrt(1),
+		PWRP32V: pwrp32v(2),
+		PWRP32C: pwrp32c(3),
+		PWRP16V: pwrp16v(4),
+		PWRP16C: pwrp16c(5),
+		PWRM16V: pwrm16v(6),
+		PWRM16C: pwrm16c(7),
+		PWRP3V3: pwrp3v3(8),
+		PWRP3C3: pwrp3c3(9),
+	}
+	pwrp32v2 := pwrp32v(2)
+	pwrp32c3 := pwrp32c(3)
+	pwrp16v4 := pwrp16v(4)
+	pwrp16c5 := pwrp16c(5)
+	pwrm16v6 := pwrm16v(6)
+	pwrm16c7 := pwrm16c(7)
+	pwrp3v38 := pwrp3v3(8)
+	pwrp3c39 := pwrp3c3(9)
+	want := parquetrow.ParquetRow{
+		PWRT:     -55,
+		PWRP32V:  pwrp32v2.voltage(),
+		PWRP32C:  pwrp32c3.current(),
+		PWRP16V:  pwrp16v4.voltage(),
+		PWRP16C:  pwrp16c5.current(),
+		PWRM16V:  pwrm16v6.voltage(),
+		PWRM16C:  pwrm16c7.current(),
+		PWRP3V3:  pwrp3v38.voltage(),
+		PWRP3C3:  pwrp3c39.current(),
+		Warnings: []string{"PWRT: 5.4044e+06 is too large for interpolator. Returning value for maximum."},
+	}
+
+	row := parquetrow.ParquetRow{}
+	if pwr.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("PWR.SetParquet() = %v, want %v", row, want)
 	}
 }
