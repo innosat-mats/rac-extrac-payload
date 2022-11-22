@@ -106,7 +106,7 @@ func (record *DataRecord) CSVSpecifications() []string {
 }
 
 func (record *DataRecord) ParquetSpecifications() map[string]string {
-	specifications := map[string]string{}
+	specifications := map[string]string{"CODE": FullVersion()}
 
 	if record.RamsesHeader != nil {
 		spec := record.RamsesHeader.CSVSpecifications()

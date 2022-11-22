@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestVersion(t *testing.T) {
@@ -253,5 +255,16 @@ func TestSourcePacketHeader_MarshalJSON(t *testing.T) {
 				t.Errorf("SourcePacketHeader.MarshalJSON() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestSourcePacketHeader_SetParquet(t *testing.T) {
+	source := SourcePacketHeader{41, 42, 43}
+	want := parquetrow.ParquetRow{
+		SPSequenceCount: 42,
+	}
+	row := parquetrow.ParquetRow{}
+	if source.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("SourcePacketHeader.SetParquet() = %v, want %v", row, want)
 	}
 }
