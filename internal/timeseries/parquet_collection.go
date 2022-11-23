@@ -11,7 +11,7 @@ import (
 )
 
 // ParquetFactory is a function that creates ParquetWriters
-type ParquetFactory func(pkg *common.DataRecord, stream OutStream) (ParquetWriter, error)
+type ParquetFactory func(pkg *common.DataRecord) (ParquetWriter, error)
 
 // ParquetCollection holds all active ParquetWriters
 type ParquetCollection struct {
@@ -52,7 +52,7 @@ func (collection ParquetCollection) Write(pkg *common.DataRecord) error {
 
 	writer, ok = collection.streams[streamName]
 	if !ok {
-		writer, err = collection.factory(pkg, stream)
+		writer, err = collection.factory(pkg)
 		if err != nil {
 			return err
 		}

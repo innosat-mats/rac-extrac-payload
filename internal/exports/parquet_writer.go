@@ -19,7 +19,7 @@ func parquetName(dir string, pkg *common.DataRecord) string {
 func parquetFileWriterFactoryCreator(
 	dir string,
 ) timeseries.ParquetFactory {
-	return func(pkg *common.DataRecord, stream timeseries.OutStream) (timeseries.ParquetWriter, error) {
+	return func(pkg *common.DataRecord) (timeseries.ParquetWriter, error) {
 		outPath := parquetName(dir, pkg)
 
 		err := os.MkdirAll(filepath.Dir(outPath), os.ModePerm)

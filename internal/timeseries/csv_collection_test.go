@@ -31,6 +31,7 @@ func TestNewCollection_IsReadyToUse(t *testing.T) {
 	if err != nil {
 		t.Errorf("NewCollection() returned collection that couldn't write, %v", err)
 	}
+	got.CloseAll()
 }
 
 func TestCSVCollection_Write(t *testing.T) {
