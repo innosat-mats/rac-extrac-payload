@@ -16,6 +16,7 @@ import (
 func Test_getCallback(t *testing.T) {
 	type args struct {
 		toStdout       bool
+		toParquet      bool
 		project        string
 		skipImages     bool
 		skipTimeseries bool
@@ -34,6 +35,7 @@ func Test_getCallback(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, _, err := getCallback(
 				tt.args.toStdout,
+				tt.args.toParquet,
 				tt.args.project,
 				tt.args.skipImages,
 				tt.args.skipTimeseries,

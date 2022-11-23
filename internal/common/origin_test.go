@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestOriginDescription_CSVHeaders(t *testing.T) {
@@ -16,7 +18,7 @@ func TestOriginDescription_CSVHeaders(t *testing.T) {
 		fields fields
 		want   []string
 	}{
-		{"Returns headers", fields{}, []string{"File", "ProcessingDate"}},
+		{"Returns headers", fields{}, []string{"OriginFile", "ProcessingDate"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -60,5 +62,17 @@ func TestOriginDescription_CSVRow(t *testing.T) {
 				t.Errorf("OriginDescription.CSVRow() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestOriginDescription_SetParquet(t *testing.T) {
+	origin := OriginDescription{"Name", time.Time{}}
+	want := parquetrow.ParquetRow{
+		OriginFile:     "Name",
+		ProcessingTime: time.Time{},
+	}
+	row := parquetrow.ParquetRow{}
+	if origin.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("OriginDescription.SetParquet() = %v, want %v", row, want)
 	}
 }

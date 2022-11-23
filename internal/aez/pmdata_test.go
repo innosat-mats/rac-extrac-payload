@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestPMData_Time(t *testing.T) {
@@ -320,5 +321,45 @@ func TestPMData_CSVSpecifications(t *testing.T) {
 				t.Errorf("PMData.CSVSpecifications() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestPMData_SetParquet(t *testing.T) {
+	pm := PMData{
+		EXPTS:    1,
+		EXPTSS:   2,
+		PM1A:     3,
+		PM1ACNTR: 4,
+		PM1B:     5,
+		PM1BCNTR: 6,
+		PM1S:     7,
+		PM1SCNTR: 8,
+		PM2A:     9,
+		PM2ACNTR: 10,
+		PM2B:     11,
+		PM2BCNTR: 12,
+		PM2S:     13,
+		PM2SCNTR: 14,
+	}
+
+	want := parquetrow.ParquetRow{
+		PMTime:        pm.Time(GpsTime),
+		PMNanoseconds: 1000030518,
+		PM1A:          3,
+		PM1ACNTR:      4,
+		PM1B:          5,
+		PM1BCNTR:      6,
+		PM1S:          7,
+		PM1SCNTR:      8,
+		PM2A:          9,
+		PM2ACNTR:      10,
+		PM2B:          11,
+		PM2BCNTR:      12,
+		PM2S:          13,
+		PM2SCNTR:      14,
+	}
+	row := parquetrow.ParquetRow{}
+	if pm.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("PMData.SetParquet() = %v, want %v", row, want)
 	}
 }

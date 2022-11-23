@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 /*
-	TCAcceptSuccess:
+TCAcceptSuccess:
 */
 
 // TCAcceptSuccessData Telecommand Acceptance Report - Success
@@ -46,6 +48,13 @@ func (tcv *TCAcceptSuccessData) CSVRow() []string {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
 	return append(row, "")
+}
+
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCAcceptSuccessData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Accept"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
 }
 
 /*
@@ -89,6 +98,14 @@ func (tcv *TCAcceptFailureData) CSVRow() []string {
 	return row
 }
 
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCAcceptFailureData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Accept"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
+	row.ErrorCode = tcv.ErrorCode
+}
+
 /*
 	TCExecSuccess:
 */
@@ -128,6 +145,13 @@ func (tcv *TCExecSuccessData) CSVRow() []string {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
 	return append(row, "")
+}
+
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCExecSuccessData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Exec"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
 }
 
 /*
@@ -170,4 +194,12 @@ func (tcv *TCExecFailureData) CSVRow() []string {
 		row = append(row, fmt.Sprintf("%v", val.Field(i).Uint()))
 	}
 	return row
+}
+
+// SetParquet sets the parquet representation of the TCV
+func (tcv *TCExecFailureData) SetParquet(row *parquetrow.ParquetRow) {
+	row.TCV = "Exec"
+	row.PSC = tcv.PSC
+	row.TCPID = tcv.TCPID
+	row.ErrorCode = tcv.ErrorCode
 }

@@ -1,13 +1,18 @@
 package aez
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"image"
+	"image/png"
 	"io"
+	"log"
 	"path/filepath"
 	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // CCDImage is a container for the invariant CCDImagePackData header and the variable BadColumns that follow
@@ -57,12 +62,12 @@ func (ccd *CCDImage) Image(
 
 // CSVSpecifications returns the specs used in creating the struct
 func (ccd *CCDImage) CSVSpecifications() []string {
-	return []string{"Specification", Specification}
+	return []string{"AEZ", Specification}
 }
 
 // CSVHeaders returns the exportable field names
 func (ccd *CCDImage) CSVHeaders() []string {
-	return append(ccd.PackData.CSVHeaders(), "BC", "Image File Name")
+	return append(ccd.PackData.CSVHeaders(), "BC", "ImageName")
 }
 
 // CSVRow returns the exportable field values
@@ -114,7 +119,7 @@ func (ccd *CCDImage) MarshalJSON() ([]byte, error) {
 		Specification,
 		ccd.PackData.CCDSEL,
 		ccd.PackData.Nanoseconds(),
-		ccd.PackData.Time(gpsTime).Format(time.RFC3339Nano),
+		ccd.PackData.Time(GpsTime).Format(time.RFC3339Nano),
 		(&wdwMode).String(),
 		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
 		ccd.PackData.WDWOV,
@@ -152,4 +157,33 @@ func (ccd *CCDImage) FullImageName(prefix string) string {
 		return ccd.ImageFileName
 	}
 	return filepath.Join(prefix, ccd.ImageFileName)
+}
+
+func (ccd *CCDImage) getPNG(buffer []byte) []byte {
+	recoverWrite := func() {
+		if r := recover(); r != nil {
+			log.Printf(
+				"Processing incomplete for image %s, skipping (%v)",
+				ccd.ImageFileName, r,
+			)
+		}
+	}
+	defer recoverWrite()
+	img := ccd.Image(buffer)
+	pngImg := bytes.NewBuffer([]byte{})
+	err := png.Encode(pngImg, img)
+	if err != nil {
+		log.Panicf("failed encoding %s: %s", ccd.ImageFileName, err)
+	}
+
+	return pngImg.Bytes()
+}
+
+// SetParquet sets the parquet representation of the CCDImage
+func (ccd *CCDImage) SetParquet(row *parquetrow.ParquetRow, buffer []byte) {
+	ccd.PackData.SetParquet(row)
+	pngImg := ccd.getPNG(buffer)
+	row.BC = ccd.BadColumns
+	row.ImageName = ccd.ImageFileName
+	row.ImageData = pngImg
 }

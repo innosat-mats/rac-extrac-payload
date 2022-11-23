@@ -20,8 +20,8 @@ The header row starts with a couple of columns common to all output and then
 follows columns specific to each file
 
 
-- File
-  The full path to the rac-file on the computer that produced the csv
+- OriginFile
+  Name of the rac-file from which the record originated
 - ProcessingDate
   The local time when the file was processed
 - RamsesTime (Ramses Header)
@@ -63,6 +63,10 @@ For information about fields specific to a certain csv use any of these:
 
 -help CCD, -help CPRU, -help HTR, -help PWR, -help STAT, -help TCV,
 -help PM
+
+For info about parquet format use:
+
+-help PARQUET
 	`)
 }
 
@@ -76,14 +80,14 @@ TEXPMS, TEMP, FBINOV, LBLNK, TBLNK, ZERO, TIMING1, TIMING2, VERSION
 TIMING3, NBC, BC
 
 The following columns parse the values further:
-- EXP Nanoseconds
+- EXPNanoseconds
   Time of exposure (nanoseconds since epoch)
-- EXP Date
+- EXPDate
   Time of exposure (UTC)
-- WDW Mode
+- WDWMode
   "Manual" (value in rac 0b0)
   "Automatic" (value in rac 0b1)
-- WDW InputDataWindow
+- WDWInputDataWindow
   Written as the from - to bits used in the original image
   "11..0" (value in rac 0x0)
   "12..1" (value in rac 0x1)
@@ -91,20 +95,22 @@ The following columns parse the values further:
   "14..3" (value in rac 0x3)
   "15..4" (value in rac 0x4)
   "15..0" which is the full image (value in rac 0x7)
-- NCBIN FPGAColumns
+- NCBINFPGAColumns
   The actual number of FPGA Columns (value in rac is the exponent in 2^N)
-- NCBIN CCDColumns
+- NCBINCCDColumns
   The number of CCD Columns
-- GAIN Mode
+- GAINMode
   "High" (value in rac 0b0)
   "Low" (value in rac 0b1)
-- GAIN Timing
+- GAINTiming
   "Faster" used for binned and discarded (value in rac 0b0)
   "Full" used even for pixels that are not read out (value in rac 0b1)
-- GAIN Trunctation
+- GAINTrunctation
   The value of the truncation bits
-- Image File Name
+- ImageName
   The name of the image file associated with these measurements
+- ImageFile
+  The image data encoded as a 16 bit grey scale PNG
 	`)
 }
 
@@ -162,7 +168,7 @@ Celcius.
 - HTR8A:    temperature,
 - HTR8B:    temperature,
 - HTR8OD:   voltage,
-- WARNINGS: A summary of warnings from the temperature calculations.
+- Warnings: A summary of warnings from the temperature calculations.
   The warnings come from the interpolator and probably indicate the measured
   resistance is out of range.
   Each warning is separated by a '|' character.
@@ -189,7 +195,7 @@ Celcius.
 - PWRM16C:  current,
 - PWRP3V3:  voltage,
 - PWRP3C3:  current,
-- WARNINGS: A summary of warnings from the temperature calculations.
+- Warnings: A summary of warnings from the temperature calculations.
   The warnings come from the interpolator and probably indicate the measured
   resistance is out of range.
   Each warning is separated by a '|' character.
@@ -241,6 +247,29 @@ The fields EXPTS and EXPTSS are replaced by:
 - PMTIME: The exposure time (UTC)
 - PMNANO: The exposure time (nanoseconds since epoch)
   `)
+}
+
+func infoParquet() {
+	println(`
+### Parquet files ###
+
+The parquet files follow the same naming conventions used in the CSVs, but the
+header row is stored as meta-data instead. Parquet files support variable length
+rows, so instead of one file per packet type, one file per input file is
+produced.
+
+In addition, the parquet files are written using a partitioning scheme so that
+data for each day is written to a file in a directory for that day. This means
+that files with the same name may occur in directories for subsequent days, if
+the original RAC-file covers two days. Partitioning is performed based on the
+CUC time of the source packet.
+
+When writing to parquet the PNG-files are stored in the parquet files
+themselves, rather than as separate files. This intriduces two new columns:
+- ImageName: The name of the PNG-image, if it had been written to disk
+- ImageData: The parsed PNG data
+
+ `)
 }
 
 func infoSpace() {

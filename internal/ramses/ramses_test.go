@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestRamses_Created(t *testing.T) {
@@ -312,5 +314,16 @@ func TestNewRamses(t *testing.T) {
 				t.Errorf("Ramses.Read() => %+v, want %+v", ramses, tt.ramsesOutcome)
 			}
 		})
+	}
+}
+
+func TestRamses_SetParquet(t *testing.T) {
+	ramses := Ramses{Date: 24, Time: 42}
+	want := parquetrow.ParquetRow{
+		RamsesTime: ramses.Created(),
+	}
+	row := parquetrow.ParquetRow{}
+	if ramses.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("Ramses.SetParquet() = %v, want %v", row, want)
 	}
 }

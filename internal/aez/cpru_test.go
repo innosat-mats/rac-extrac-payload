@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestCPRU_Report(t *testing.T) {
@@ -318,5 +320,45 @@ func Test_cpruStat_powerEnabled(t *testing.T) {
 				t.Errorf("cpruStat.powerEnabled() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestCPRU_SetParquet(t *testing.T) {
+	cpru := CPRU{
+		STAT:   1,
+		VGATE0: 2, VSUBS0: 3, VRD0: 4, VOD0: 5,
+		VGATE1: 6, VSUBS1: 7, VRD1: 8, VOD1: 9,
+		VGATE2: 10, VSUBS2: 11, VRD2: 12, VOD2: 13,
+		VGATE3: 14, VSUBS3: 15, VRD3: 16, VOD3: 17,
+	}
+	want := parquetrow.ParquetRow{
+		VGATE0:       0.01221001221001221,
+		VSUBS0:       0.013431013431013432,
+		VRD0:         0.027676027676027674,
+		VOD0:         0.06512006512006512,
+		Overvoltage0: false,
+		Power0:       false,
+		VGATE1:       0.03663003663003663,
+		VSUBS1:       0.03133903133903134,
+		VRD1:         0.05535205535205535,
+		VOD1:         0.1172161172161172,
+		Overvoltage1: false,
+		Power1:       false,
+		VGATE2:       0.06105006105006105,
+		VSUBS2:       0.04924704924704925,
+		VRD2:         0.08302808302808302,
+		VOD2:         0.1693121693121693,
+		Overvoltage2: false,
+		Power2:       false,
+		VGATE3:       0.08547008547008547,
+		VSUBS3:       0.06715506715506715,
+		VRD3:         0.1107041107041107,
+		VOD3:         0.2214082214082214,
+		Overvoltage3: false,
+		Power3:       true,
+	}
+	row := parquetrow.ParquetRow{}
+	if cpru.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("CPRU.SetParquet() = %v, want %v", row, want)
 	}
 }

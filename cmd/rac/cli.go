@@ -28,6 +28,7 @@ var skipImages *bool
 var skipTimeseries *bool
 var project *string
 var stdout *bool
+var parquet *bool
 var dregsDir *string
 var version *bool
 
@@ -54,6 +55,8 @@ func myUsage() {
 			infoTCV()
 		case "PM":
 			infoPM()
+		case "PARQUET":
+			infoParquet()
 		case "MATS", "SPACE", "M.A.T.S.", "SATELLITE":
 			infoSpace()
 		default:
@@ -63,7 +66,7 @@ func myUsage() {
 	}
 	flag.PrintDefaults()
 	fmt.Printf(
-		"\nFor extra information about the output CSV:s type \"%s -help output\"\n",
+		"\nFor extra information about the output formats type \"%s -help output\"\n",
 		os.Args[0],
 	)
 
@@ -82,6 +85,7 @@ or if you want the Buffer contents which can be rather large if you are unlucky:
 
 func getCallback(
 	toStdout bool,
+	toParquet bool,
 	project string,
 	skipImages bool,
 	skipTimeseries bool,
@@ -98,6 +102,12 @@ func getCallback(
 
 	if toStdout {
 		callback, teardown := exports.StdoutCallbackFactory(os.Stdout, !skipTimeseries)
+		return callback, teardown, nil
+	} else if toParquet {
+		callback, teardown := exports.ParquetCallbackFactory(
+			project,
+			wg,
+		)
 		return callback, teardown, nil
 	}
 	callback, teardown := exports.DiskCallbackFactory(
@@ -156,6 +166,11 @@ func init() {
 		false,
 		"Output to standard out instead of to disk (only timeseries)\n(Default: false)",
 	)
+	parquet = flag.Bool(
+		"parquet",
+		false,
+		"Output to disk as parquet",
+	)
 	dregsDir = flag.String(
 		"dregs",
 		"",
@@ -185,6 +200,7 @@ func main() {
 	}
 	callback, teardown, err := getCallback(
 		*stdout,
+		*parquet,
 		*project,
 		*skipImages,
 		*skipTimeseries,

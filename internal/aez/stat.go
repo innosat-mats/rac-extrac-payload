@@ -8,9 +8,10 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
-//STAT General status housekeeping report of the payload instrument.
+// STAT General status housekeeping report of the payload instrument.
 type STAT struct { //(34 octets)
 	SPID    uint16 // Software Part ID
 	SPREV   uint8  // Software Part Revision
@@ -39,6 +40,9 @@ func NewSTAT(buf io.Reader) (*STAT, error) {
 
 // Time returns the measurement time in UTC
 func (stat *STAT) Time(epoch time.Time) time.Time {
+	if (epoch == time.Time{}) {
+		epoch = GpsTime
+	}
 	return ccsds.UnsegmentedTimeDate(stat.TS, stat.TSS, epoch)
 }
 
@@ -63,7 +67,7 @@ func (stat *STAT) CSVHeaders() []string {
 // CSVRow returns the data row
 func (stat *STAT) CSVRow() []string {
 	var row []string
-	statTime := stat.Time(gpsTime)
+	statTime := stat.Time(GpsTime)
 	row = append(row, statTime.Format(time.RFC3339Nano), fmt.Sprintf("%v", stat.Nanoseconds()))
 	val := reflect.Indirect(reflect.ValueOf(stat))
 	t := val.Type()
@@ -76,4 +80,25 @@ func (stat *STAT) CSVRow() []string {
 		}
 	}
 	return row
+}
+
+// STATParquet holds the parquet representation of the STAT
+// SetParquet sets the parquet representation of the STAT
+func (stat *STAT) SetParquet(row *parquetrow.ParquetRow) {
+	row.STATTime = stat.Time(GpsTime)
+	row.STATNanoseconds = stat.Nanoseconds()
+	row.SPID = stat.SPID
+	row.SPREV = stat.SPREV
+	row.FPID = stat.FPID
+	row.FPREV = stat.FPREV
+	row.SVNA = stat.SVNA
+	row.SVNB = stat.SVNB
+	row.SVNC = stat.SVNC
+	row.MODE = stat.MODE
+	row.EDACE = stat.EDACE
+	row.EDACCE = stat.EDACCE
+	row.EDACN = stat.EDACN
+	row.SPWEOP = stat.SPWEOP
+	row.SPWEEP = stat.SPWEEP
+	row.ANOMALY = stat.ANOMALY
 }

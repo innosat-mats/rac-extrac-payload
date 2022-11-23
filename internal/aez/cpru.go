@@ -7,6 +7,8 @@ import (
 	"log"
 	"math"
 	"reflect"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 type gate uint16
@@ -53,7 +55,7 @@ func (stat *cpruStat) powerEnabled(ccd uint8) bool {
 	return uint8(*stat)&mask != 0
 }
 
-//CPRU structure
+// CPRU structure
 type CPRU struct {
 	STAT cpruStat // CPRU/CRB power status
 	// CCD overvoltage fault, one bit per CCD. Bit [7..4]
@@ -76,7 +78,7 @@ type CPRU struct {
 	VOD3   od   // CCD3 Output Drain Voltage 0..4095
 }
 
-//CPRUReport structure
+// CPRUReport structure
 type CPRUReport struct {
 	VGATE0       float64 // CCD0 Gate Voltage
 	VSUBS0       float64 // CCD0 Substrate Voltage
@@ -102,7 +104,6 @@ type CPRUReport struct {
 	VOD3         float64 // CCD3 Output Drain Voltage
 	Overvoltage3 bool    // CCD3 overvoltage fault
 	Power3       bool    // CCD3 overvoltage fault
-
 }
 
 // NewCPRU reads buffer into a new CPRU
@@ -142,17 +143,17 @@ func (cpru *CPRU) Report() CPRUReport {
 	}
 }
 
-//CSVSpecifications returns the specs used in creating the struct
+// CSVSpecifications returns the specs used in creating the struct
 func (cpru *CPRU) CSVSpecifications() []string {
 	return []string{"AEZ", Specification}
 }
 
-//CSVHeaders returns the field names
+// CSVHeaders returns the field names
 func (cpru *CPRU) CSVHeaders() []string {
 	return csvHeader(cpru.Report())
 }
 
-//CSVRow returns the field values
+// CSVRow returns the field values
 func (cpru *CPRU) CSVRow() []string {
 	val := reflect.Indirect(reflect.ValueOf(cpru.Report()))
 	values := make([]string, val.NumField())
@@ -166,4 +167,33 @@ func (cpru *CPRU) CSVRow() []string {
 		}
 	}
 	return values
+}
+
+// SetParquet sets the parquet representation of the CPRU
+func (cpru *CPRU) SetParquet(row *parquetrow.ParquetRow) {
+	report := cpru.Report()
+	row.VGATE0 = report.VGATE0
+	row.VSUBS0 = report.VSUBS0
+	row.VRD0 = report.VRD0
+	row.VOD0 = report.VOD0
+	row.Overvoltage0 = report.Overvoltage0
+	row.Power0 = report.Power0
+	row.VGATE1 = report.VGATE1
+	row.VSUBS1 = report.VSUBS1
+	row.VRD1 = report.VRD1
+	row.VOD1 = report.VOD1
+	row.Overvoltage1 = report.Overvoltage1
+	row.Power1 = report.Power1
+	row.VGATE2 = report.VGATE2
+	row.VSUBS2 = report.VSUBS2
+	row.VRD2 = report.VRD2
+	row.VOD2 = report.VOD2
+	row.Overvoltage2 = report.Overvoltage2
+	row.Power2 = report.Power2
+	row.VGATE3 = report.VGATE3
+	row.VSUBS3 = report.VSUBS3
+	row.VRD3 = report.VRD3
+	row.VOD3 = report.VOD3
+	row.Overvoltage3 = report.Overvoltage3
+	row.Power3 = report.Power3
 }

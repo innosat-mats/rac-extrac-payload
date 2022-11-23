@@ -5,7 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestTMHeader_PUSVersion(t *testing.T) {
@@ -320,5 +322,20 @@ func TestTMHeader_IsTCVerification(t *testing.T) {
 				t.Errorf("TMHeader.IsTCVerification() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestTMHeader_SetParquet(t *testing.T) {
+	header := TMHeader{
+		CUCTimeSeconds:  42,
+		CUCTimeFraction: 0xc000,
+	}
+	want := parquetrow.ParquetRow{
+		TMHeaderTime:        header.Time(aez.GpsTime),
+		TMHeaderNanoseconds: 42750000000,
+	}
+	row := parquetrow.ParquetRow{}
+	if header.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("TMHeader.SetParquet() = %v, want %v", row, want)
 	}
 }

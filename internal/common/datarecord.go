@@ -6,6 +6,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
@@ -104,6 +105,33 @@ func (record *DataRecord) CSVSpecifications() []string {
 	return specifications
 }
 
+func (record *DataRecord) ParquetSpecifications() map[string]string {
+	specifications := map[string]string{"CODE": FullVersion()}
+
+	if record.RamsesHeader != nil {
+		spec := record.RamsesHeader.CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	} else {
+		spec := (&ramses.Ramses{}).CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	}
+
+	if record.SourceHeader != nil {
+		spec := record.SourceHeader.CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	} else {
+		spec := (&innosat.SourcePacketHeader{}).CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	}
+
+	if record.Data != nil {
+		spec := record.Data.CSVSpecifications()
+		specifications[spec[0]] = spec[1]
+	}
+
+	return specifications
+}
+
 // CSVHeaders returns a header row for the data record
 func (record *DataRecord) CSVHeaders() []string {
 	var headers []string
@@ -186,4 +214,34 @@ func (record *DataRecord) OriginName() string {
 		return record.Origin.Name
 	}
 	return ""
+}
+
+// SetParquet returns the parquet representation of the DataRecord
+func (record *DataRecord) SetParquet(row *parquetrow.ParquetRow) {
+	if record.Origin != nil {
+		record.Origin.SetParquet(row)
+	}
+
+	if record.RamsesHeader != nil {
+		record.RamsesHeader.SetParquet(row)
+	}
+
+	if record.RamsesHeader != nil {
+		record.RamsesTMHeader.SetParquet(row)
+	}
+
+	if record.SourceHeader != nil {
+		record.SourceHeader.SetParquet(row)
+	}
+
+	if record.TMHeader != nil {
+		record.TMHeader.SetParquet(row)
+	}
+
+	row.SID = record.SID.String()
+	row.RID = record.RID.String()
+
+	if record.Error != nil {
+		row.Errors = []string{record.Error.Error()}
+	}
 }

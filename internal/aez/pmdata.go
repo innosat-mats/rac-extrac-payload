@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // PMData data from photometers
@@ -37,6 +38,9 @@ func NewPMData(buf io.Reader) (*PMData, error) {
 
 // Time returns the measurement time in UTC
 func (pm *PMData) Time(epoch time.Time) time.Time {
+	if (epoch == time.Time{}) {
+		epoch = GpsTime
+	}
 	return ccsds.UnsegmentedTimeDate(pm.EXPTS, pm.EXPTSS, epoch)
 }
 
@@ -61,10 +65,8 @@ func (pm *PMData) CSVHeaders() []string {
 
 // CSVRow returns the data row
 func (pm *PMData) CSVRow() []string {
-	const gpsTimeCorrection = -18 // Seconds
 	var row []string
-	gpsTime := time.Date(1980, time.January, 6, 0, 0, gpsTimeCorrection, 0, time.UTC)
-	pmTime := pm.Time(gpsTime)
+	pmTime := pm.Time(GpsTime)
 	row = append(row, pmTime.Format(time.RFC3339Nano), fmt.Sprintf("%v", pm.Nanoseconds()))
 	val := reflect.Indirect(reflect.ValueOf(pm))
 	t := val.Type()
@@ -78,4 +80,22 @@ func (pm *PMData) CSVRow() []string {
 		}
 	}
 	return row
+}
+
+// SetParquet sets the parquet representation of the PMData
+func (pm *PMData) SetParquet(row *parquetrow.ParquetRow) {
+	row.PMTime = pm.Time(GpsTime)
+	row.PMNanoseconds = pm.Nanoseconds()
+	row.PM1A = pm.PM1A
+	row.PM1ACNTR = pm.PM1ACNTR
+	row.PM1B = pm.PM1B
+	row.PM1BCNTR = pm.PM1BCNTR
+	row.PM1S = pm.PM1S
+	row.PM1SCNTR = pm.PM1SCNTR
+	row.PM2A = pm.PM2A
+	row.PM2ACNTR = pm.PM2ACNTR
+	row.PM2B = pm.PM2B
+	row.PM2BCNTR = pm.PM2BCNTR
+	row.PM2S = pm.PM2S
+	row.PM2SCNTR = pm.PM2SCNTR
 }

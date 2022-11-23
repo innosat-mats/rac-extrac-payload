@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestSTAT_Time(t *testing.T) {
@@ -196,5 +197,49 @@ func TestSTAT_CSVSpecifications(t *testing.T) {
 	want := []string{"AEZ", Specification}
 	if got := stat.CSVSpecifications(); !reflect.DeepEqual(got, want) {
 		t.Errorf("STAT.CSVSpecifications() = %v, want %v", got, want)
+	}
+}
+
+func TestSTAT_SetParquet(t *testing.T) {
+	stat := STAT{
+		SPID:    1,
+		SPREV:   2,
+		FPID:    3,
+		FPREV:   4,
+		SVNA:    5,
+		SVNB:    6,
+		SVNC:    7,
+		TS:      8,
+		TSS:     9,
+		MODE:    10,
+		EDACE:   11,
+		EDACCE:  12,
+		EDACN:   13,
+		SPWEOP:  14,
+		SPWEEP:  15,
+		ANOMALY: 16,
+	}
+
+	want := parquetrow.ParquetRow{
+		STATTime:        stat.Time(GpsTime),
+		STATNanoseconds: 8000137329,
+		SPID:            1,
+		SPREV:           2,
+		FPID:            3,
+		FPREV:           4,
+		SVNA:            5,
+		SVNB:            6,
+		SVNC:            7,
+		MODE:            10,
+		EDACE:           11,
+		EDACCE:          12,
+		EDACN:           13,
+		SPWEOP:          14,
+		SPWEEP:          15,
+		ANOMALY:         16,
+	}
+	row := parquetrow.ParquetRow{}
+	if stat.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("STAT.SetParquet() = %v, want %v", row, want)
 	}
 }

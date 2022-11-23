@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/innosat-mats/rac-extract-payload/internal/ccsds"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // WDWMode describes the CCD WDW parameter
@@ -73,8 +74,9 @@ func (wdw *Wdw) InputDataWindow() (int, int, error) {
 // NCBin contains the FPGA and CCD columns bin count
 type NCBin uint16
 
-// FPGAColumns returns number FPGA columns to bin, Bit[11..8]
-//  the value is encoded as 2^x
+// FPGAColumns returns number of FPGA columns to bin, Bit[11..8]
+//
+//	The value is encoded as 2^x
 func (ncBin *NCBin) FPGAColumns() int {
 	return 1 << ((*ncBin >> 8) & 0x0f)
 }
@@ -84,7 +86,7 @@ func (ncBin *NCBin) CCDColumns() int {
 	return (int)(*ncBin & 0xff)
 }
 
-// CCDGain is game composite information
+// CCDGain is gain composite information
 type CCDGain uint16
 
 // CCDGainMode is high/low signal mode
@@ -197,6 +199,9 @@ func NewCCDImagePackData(buf io.Reader) (*CCDImagePackData, error) {
 
 // Time returns the measurement time in UTC
 func (ccd *CCDImagePackData) Time(epoch time.Time) time.Time {
+	if (epoch == time.Time{}) {
+		epoch = GpsTime
+	}
 	return ccsds.UnsegmentedTimeDate(ccd.EXPTS, ccd.EXPTSS, epoch)
 }
 
@@ -209,10 +214,10 @@ func (ccd *CCDImagePackData) Nanoseconds() int64 {
 func (ccd *CCDImagePackData) CSVHeaders() []string {
 	return []string{
 		"CCDSEL",
-		"EXP Nanoseconds",
-		"EXP Date",
-		"WDW Mode",
-		"WDW InputDataWindow",
+		"EXPNanoseconds",
+		"EXPDate",
+		"WDWMode",
+		"WDWInputDataWindow",
 		"WDWOV",
 		"JPEGQ",
 		"FRAME",
@@ -220,14 +225,14 @@ func (ccd *CCDImagePackData) CSVHeaders() []string {
 		"NRBIN",
 		"NRSKIP",
 		"NCOL",
-		"NCBIN FPGAColumns",
-		"NCBIN CCDColumns",
+		"NCBINFPGAColumns",
+		"NCBINCCDColumns",
 		"NCSKIP",
 		"NFLUSH",
 		"TEXPMS",
-		"GAIN Mode",
-		"GAIN Timing",
-		"GAIN Truncation",
+		"GAINMode",
+		"GAINTiming",
+		"GAINTruncation",
 
 		"TEMP",
 		"FBINOV",
@@ -251,7 +256,7 @@ func (ccd *CCDImagePackData) CSVRow() []string {
 	return []string{
 		strconv.Itoa(int(ccd.CCDSEL)),
 		strconv.FormatInt(ccd.Nanoseconds(), 10),
-		ccd.Time(gpsTime).Format(time.RFC3339Nano),
+		ccd.Time(GpsTime).Format(time.RFC3339Nano),
 		(&wdwMode).String(),
 		fmt.Sprintf("%v..%v", wdwhigh, wdwlow),
 		strconv.Itoa(int(ccd.WDWOV)),
@@ -280,4 +285,42 @@ func (ccd *CCDImagePackData) CSVRow() []string {
 		strconv.Itoa(int(ccd.TIMING3)),
 		strconv.Itoa(int(ccd.NBC)),
 	}
+}
+
+// SetParquet sets the parquet representation of the CCDImagePackData
+func (ccd *CCDImagePackData) SetParquet(row *parquetrow.ParquetRow) {
+	wdwhigh, wdwlow, _ := ccd.WDW.InputDataWindow()
+	wdwMode := ccd.WDW.Mode()
+	gainMode := ccd.GAIN.Mode()
+	gainTiming := ccd.GAIN.Timing()
+	row.CCDSEL = ccd.CCDSEL
+	row.EXPNanoseconds = ccd.Nanoseconds()
+	row.EXPDate = ccd.Time(GpsTime)
+	row.WDWMode = (&wdwMode).String()
+	row.WDWInputDataWindow = fmt.Sprintf("%v..%v", wdwhigh, wdwlow)
+	row.WDWOV = ccd.WDWOV
+	row.JPEGQ = ccd.JPEGQ
+	row.FRAME = ccd.FRAME
+	row.NROW = ccd.NROW
+	row.NRBIN = ccd.NRBIN
+	row.NRSKIP = ccd.NRSKIP
+	row.NCOL = ccd.NCOL
+	row.NCBINFPGAColumns = ccd.NCBIN.FPGAColumns()
+	row.NCBINCCDColumns = ccd.NCBIN.CCDColumns()
+	row.NCSKIP = ccd.NCSKIP
+	row.NFLUSH = ccd.NFLUSH
+	row.TEXPMS = ccd.TEXPMS
+	row.GAINMode = (&gainMode).String()
+	row.GAINTiming = (&gainTiming).String()
+	row.GAINTruncation = ccd.GAIN.Truncation()
+	row.TEMP = ccd.TEMP
+	row.FBINOV = ccd.FBINOV
+	row.LBLNK = ccd.LBLNK
+	row.TBLNK = ccd.TBLNK
+	row.ZERO = ccd.ZERO
+	row.TIMING1 = ccd.TIMING1
+	row.TIMING2 = ccd.TIMING2
+	row.VERSION = ccd.VERSION
+	row.TIMING3 = ccd.TIMING3
+	row.NBC = ccd.NBC
 }

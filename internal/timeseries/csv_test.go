@@ -13,7 +13,6 @@ func getTestFile() (*CSV, *os.File, error) {
 		return nil, file, err
 	}
 	return &CSV{writer: file, csvWriter: csv.NewWriter(file)}, file, err
-
 }
 
 func Test_CSV_Close_WithFile(t *testing.T) {
@@ -29,6 +28,7 @@ func Test_CSV_Close_WithFile(t *testing.T) {
 		t.Error("CSV.Close(), didn't Close file")
 	}
 }
+
 func Test_CSV_SetSpecifications(t *testing.T) {
 	csv, file, err := getTestFile()
 	defer os.Remove(file.Name())
@@ -100,7 +100,6 @@ func Test_CSV_SetHeaderRow_requires_SetSpecifications(t *testing.T) {
 	if string(content) != want {
 		t.Errorf("CSV.SetHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
 	}
-
 }
 
 func Test_CSV_SetHeaderRow(t *testing.T) {
@@ -123,7 +122,6 @@ func Test_CSV_SetHeaderRow(t *testing.T) {
 	if string(content) != want {
 		t.Errorf("CSV.SetHeaderRow() output file content '%v',' wanted '%v'", string(content), want)
 	}
-
 }
 
 func Test_CSV_SetHeaderRow_only_one_header(t *testing.T) {

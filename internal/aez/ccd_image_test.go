@@ -7,11 +7,13 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 func TestCCDImage_CSVSpecifications(t *testing.T) {
 	ccd := CCDImage{}
-	want := []string{"Specification", Specification}
+	want := []string{"AEZ", Specification}
 	if got := ccd.CSVSpecifications(); !reflect.DeepEqual(got, want) {
 		t.Errorf("CCDImage.CSVSpecifications() = %v, want %v", got, want)
 	}
@@ -21,7 +23,7 @@ func TestCCDImage_CSVHeaders_AddsOwn(t *testing.T) {
 	ccdI := CCDImage{}
 	ccdIPD := CCDImagePackData{}
 	headersI := ccdI.CSVHeaders()
-	want := append(ccdIPD.CSVHeaders(), "BC", "Image File Name")
+	want := append(ccdIPD.CSVHeaders(), "BC", "ImageName")
 
 	for i, header := range headersI {
 		if i < len(want) {
@@ -156,5 +158,31 @@ func TestCCDImage_FullImageName(t *testing.T) {
 				t.Errorf("CCDImage.FullImageName() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestCCDImage_SetParquet(t *testing.T) {
+	packData := CCDImagePackData{NBC: 2, JPEGQ: 95}
+	buf := getTestImage()
+	ccd := CCDImage{
+		PackData:      &packData,
+		BadColumns:    []uint16{1, 2},
+		ImageFileName: "my_rac_0_1.png",
+	}
+	want := parquetrow.ParquetRow{
+		EXPDate:            packData.Time(GpsTime),
+		WDWMode:            "Manual",
+		WDWInputDataWindow: "11..0",
+		NCBINFPGAColumns:   1,
+		GAINMode:           "High",
+		GAINTiming:         "Faster",
+		JPEGQ:              95,
+		NBC:                2,
+		BC:                 []uint16{1, 2},
+		ImageName:          "my_rac_0_1.png",
+	}
+	row := parquetrow.ParquetRow{}
+	if ccd.SetParquet(&row, buf); !reflect.DeepEqual(row, want) {
+		t.Errorf("CCDImage.SetParquet() = %v, want %v", row, want)
 	}
 }

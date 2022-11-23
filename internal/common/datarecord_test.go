@@ -10,6 +10,7 @@ import (
 
 	"github.com/innosat-mats/rac-extract-payload/internal/aez"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
 )
 
@@ -100,7 +101,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 			"Handles missing pointers",
 			fields{},
 			[]string{
-				"File",
+				"OriginFile",
 				"ProcessingDate",
 				"RamsesTime",
 				"QualityIndicator",
@@ -125,7 +126,7 @@ func TestDataRecord_CSVHeaders(t *testing.T) {
 				Data:           &aez.STAT{},
 			},
 			[]string{
-				"File",
+				"OriginFile",
 				"ProcessingDate",
 				"RamsesTime",
 				"QualityIndicator",
@@ -381,4 +382,35 @@ func TestDataRecord_OriginName(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDataRecord_ParquetSpecifications(t *testing.T) {
+	data := DataRecord{
+		Origin:         &OriginDescription{Name: "Sputnik", ProcessingDate: procDate},
+		RamsesHeader:   &ramses.Ramses{Date: 24, Time: 42000},
+		RamsesTMHeader: &ramses.TMHeader{LossFlag: 1, VCFrameCounter: 42},
+		SourceHeader:   &innosat.SourcePacketHeader{PacketSequenceControl: innosat.PacketSequenceControl(0xc003)},
+		TMHeader:       &innosat.TMHeader{CUCTimeSeconds: 42, CUCTimeFraction: 0xc000},
+		SID:            aez.SIDSTAT,
+		Error:          errors.New("Wrong satellite!"),
+	}
+	want := parquetrow.ParquetRow{
+		OriginFile:          "Sputnik",
+		ProcessingTime:      procDate,
+		RamsesTime:          data.RamsesHeader.Created(),
+		QualityIndicator:    0,
+		LossFlag:            1,
+		VCFrameCounter:      42,
+		SPSequenceCount:     3,
+		TMHeaderTime:        data.TMHeader.Time(aez.GpsTime),
+		TMHeaderNanoseconds: 42750000000,
+		SID:                 "STAT",
+		RID:                 "",
+		Errors:              []string{"Wrong satellite!"},
+	}
+	row := parquetrow.ParquetRow{}
+	if data.SetParquet(&row); !reflect.DeepEqual(row, want) {
+		t.Errorf("DataRercord.SetParquet() = %v, want %v", row, want)
+	}
+
 }

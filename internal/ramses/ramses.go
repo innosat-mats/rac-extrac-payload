@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/innosat-mats/rac-extract-payload/internal/parquetrow"
 )
 
 // Ramses data header
@@ -71,14 +73,14 @@ func (ramses *Ramses) CSVSpecifications() []string {
 	return []string{"RAMSES", Specification}
 }
 
-//CSVHeaders returns the field names
+// CSVHeaders returns the field names
 func (ramses *Ramses) CSVHeaders() []string {
 	return []string{
 		"RamsesTime",
 	}
 }
 
-//CSVRow returns the field values
+// CSVRow returns the field values
 func (ramses *Ramses) CSVRow() []string {
 	return []string{
 		fmt.Sprintf("%v", ramses.Created().Format(time.RFC3339Nano)),
@@ -94,4 +96,9 @@ func (ramses *Ramses) MarshalJSON() ([]byte, error) {
 		Specification: Specification,
 		RamsesTime:    ramses.Created().Format(time.RFC3339Nano),
 	})
+}
+
+// SetParquet sets the parquet representation of the Ramses header
+func (ramses *Ramses) SetParquet(row *parquetrow.ParquetRow) {
+	row.RamsesTime = ramses.Created()
 }
