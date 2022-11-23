@@ -45,7 +45,9 @@ func TestParquetCollection_Write(t *testing.T) {
 				},
 			},
 			false,
-			[]string{"1980/1/5/test1.parquet"},
+			[]string{
+				filepath.FromSlash("1980/1/5/test1.parquet"),
+			},
 		},
 		{
 			"Two different streams",
@@ -68,7 +70,10 @@ func TestParquetCollection_Write(t *testing.T) {
 				},
 			},
 			false,
-			[]string{"1980/1/5/test1.parquet", "1980/1/5/test2.parquet"},
+			[]string{
+				filepath.FromSlash("1980/1/5/test1.parquet"),
+				filepath.FromSlash("1980/1/5/test2.parquet"),
+			},
 		},
 	}
 	for _, tt := range tests {

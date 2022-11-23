@@ -31,7 +31,7 @@ func Test_parquetName(t *testing.T) {
 		args args
 		want string
 	}{
-		{"Case 1", args{".", record}, "1980/1/5/File1.parquet"},
+		{"Case 1", args{".", record}, filepath.FromSlash("1980/1/5/File1.parquet")},
 		{"Case 2", args{"my/dir", record}, filepath.FromSlash("my/dir/1980/1/5/File1.parquet")},
 	}
 	for _, tt := range tests {
