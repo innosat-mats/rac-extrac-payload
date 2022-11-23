@@ -55,6 +55,8 @@ func myUsage() {
 			infoTCV()
 		case "PM":
 			infoPM()
+		case "PARQUET":
+			infoParquet()
 		case "MATS", "SPACE", "M.A.T.S.", "SATELLITE":
 			infoSpace()
 		default:
@@ -64,7 +66,7 @@ func myUsage() {
 	}
 	flag.PrintDefaults()
 	fmt.Printf(
-		"\nFor extra information about the output CSV:s type \"%s -help output\"\n",
+		"\nFor extra information about the output formats type \"%s -help output\"\n",
 		os.Args[0],
 	)
 

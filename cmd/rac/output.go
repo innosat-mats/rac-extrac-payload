@@ -63,6 +63,10 @@ For information about fields specific to a certain csv use any of these:
 
 -help CCD, -help CPRU, -help HTR, -help PWR, -help STAT, -help TCV,
 -help PM
+
+For info about parquet format use:
+
+-help PARQUET
 	`)
 }
 
@@ -243,6 +247,29 @@ The fields EXPTS and EXPTSS are replaced by:
 - PMTIME: The exposure time (UTC)
 - PMNANO: The exposure time (nanoseconds since epoch)
   `)
+}
+
+func infoParquet() {
+	println(`
+### Parquet files ###
+
+The parquet files follow the same naming conventions used in the CSVs, but the
+header row is stored as meta-data instead. Parquet files support variable length
+rows, so instead of one file per packet type, one file per input file is
+produced.
+
+In addition, the parquet files are written using a partitioning scheme so that
+data for each day is written to a file in a directory for that day. This means
+that files with the same name may occur in directories for subsequent days, if
+the original RAC-file covers two days. Partitioning is performed based on the
+CUC time of the source packet.
+
+When writing to parquet the PNG-files are stored in the parquet files
+themselves, rather than as separate files. This intriduces two new columns:
+- ImageName: The name of the PNG-image, if it had been written to disk
+- ImageData: The parsed PNG data
+
+ `)
 }
 
 func infoSpace() {
