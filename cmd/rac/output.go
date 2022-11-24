@@ -265,7 +265,7 @@ the original RAC-file covers two days. Partitioning is performed based on the
 CUC time of the source packet.
 
 When writing to parquet the PNG-files are stored in the parquet files
-themselves, rather than as separate files. This intriduces two new columns:
+themselves, rather than as separate files. This introduces two new columns:
 - ImageName: The name of the PNG-image, if it had been written to disk
 - ImageData: The parsed PNG data
 
