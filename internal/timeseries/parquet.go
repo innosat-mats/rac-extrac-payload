@@ -19,9 +19,21 @@ type Parquet struct {
 	NHeaders      int
 }
 
+var streamToScheme = map[OutStream]string{
+	Unknown: parquetrow.RacSchema,
+	HTR:     parquetrow.RacHTRSchema,
+	PWR:     parquetrow.RacPWRSchema,
+	CPRU:    parquetrow.RacCPRUSchema,
+	STAT:    parquetrow.RacSTATSchema,
+	PM:      parquetrow.RacPMSchema,
+	CCD:     parquetrow.RacCCDSchema,
+	TCV:     parquetrow.RacTCVSchema,
+}
+
 // NewParquet returns a Timeseries as parquet
 func NewParquet(name string, pkg *common.DataRecord) ParquetWriter {
-	sd, err := parquetschema.ParseSchemaDefinition(parquetrow.RacSchema)
+	schema := streamToScheme[OutStreamFromDataRecord(pkg)]
+	sd, err := parquetschema.ParseSchemaDefinition(schema)
 	if err != nil {
 		log.Fatalf("could not parse parquet schema definition: %v", err)
 	}

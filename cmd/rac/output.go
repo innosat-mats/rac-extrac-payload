@@ -254,9 +254,8 @@ func infoParquet() {
 ### Parquet files ###
 
 The parquet files follow the same naming conventions used in the CSVs, but the
-header row is stored as meta-data instead. Parquet files support variable length
-rows, so instead of one file per packet type, one file per input file is
-produced.
+header row is stored as meta-data instead. Rather than one file per parameter
+and batch, one file per parameter and input file is produced.
 
 In addition, the parquet files are written using a partitioning scheme so that
 data for each day is written to a file in a directory for that day. This means
@@ -268,8 +267,7 @@ When writing to parquet the PNG-files are stored in the parquet files
 themselves, rather than as separate files. This introduces two new columns:
 - ImageName: The name of the PNG-image, if it had been written to disk
 - ImageData: The parsed PNG data
-
- `)
+  `)
 }
 
 func infoSpace() {
