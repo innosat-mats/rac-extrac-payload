@@ -25,7 +25,32 @@ func TestParquetCollection_Write(t *testing.T) {
 			[]string{},
 		},
 		{
-			"A single streams",
+			"A single stream from same file",
+			[]common.DataRecord{
+				{
+					Origin:         &common.OriginDescription{Name: "test1"},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.STAT{},
+				},
+				{
+					Origin:         &common.OriginDescription{Name: "test1"},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					Data:           &aez.STAT{},
+				},
+			},
+			false,
+			[]string{
+				filepath.FromSlash("1980/1/5/STAT_test1.parquet"),
+			},
+		},
+		{
+			"Two different streams from same file",
 			[]common.DataRecord{
 				{
 					Origin:         &common.OriginDescription{Name: "test1"},
@@ -46,11 +71,12 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("1980/1/5/test1.parquet"),
+				filepath.FromSlash("1980/1/5/HTR_test1.parquet"),
+				filepath.FromSlash("1980/1/5/STAT_test1.parquet"),
 			},
 		},
 		{
-			"Two different streams",
+			"Two different streams from different files",
 			[]common.DataRecord{
 				{
 					Origin:         &common.OriginDescription{Name: "test1"},
@@ -58,7 +84,7 @@ func TestParquetCollection_Write(t *testing.T) {
 					RamsesTMHeader: &ramses.TMHeader{},
 					SourceHeader:   &innosat.SourcePacketHeader{},
 					TMHeader:       &innosat.TMHeader{},
-					Data:           &aez.HTR{},
+					Data:           &aez.STAT{},
 				},
 				{
 					Origin:         &common.OriginDescription{Name: "test2"},
@@ -71,8 +97,8 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("1980/1/5/test1.parquet"),
-				filepath.FromSlash("1980/1/5/test2.parquet"),
+				filepath.FromSlash("1980/1/5/STAT_test1.parquet"),
+				filepath.FromSlash("1980/1/5/STAT_test2.parquet"),
 			},
 		},
 	}
@@ -82,7 +108,7 @@ func TestParquetCollection_Write(t *testing.T) {
 			if err != nil {
 				t.Errorf("ParquetCollection() could not setup output directory '%v'", err)
 			}
-			factory := func(pkg *common.DataRecord) (ParquetWriter, error) {
+			factory := func(pkg *common.DataRecord, stream OutStream) (ParquetWriter, error) {
 				f := filepath.Join(dir, "test")
 				parquet := NewParquet(f, pkg)
 				return parquet, nil
