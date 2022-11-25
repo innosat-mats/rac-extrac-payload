@@ -16,7 +16,7 @@ const RacCCDSchema = `message schema {
 
 	required int32  CCDSEL;
 	required int64  EXPNanoseconds;
-	required int64  EXPDate (TIMESTAMP(MICROS, true));
+	required int64  EXPDate (TIMESTAMP(NANOS, true));
 	required binary WDWMode (STRING);
 	required binary WDWInputDataWindow (STRING);
 	required int32  WDWOV;
