@@ -11,12 +11,14 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/common"
 	"github.com/innosat-mats/rac-extract-payload/internal/innosat"
 	"github.com/innosat-mats/rac-extract-payload/internal/ramses"
+	"github.com/innosat-mats/rac-extract-payload/internal/timeseries"
 )
 
 func Test_parquetName(t *testing.T) {
 	type args struct {
 		dir    string
 		packet common.DataRecord
+		stream timeseries.OutStream
 	}
 	record := common.DataRecord{
 		Origin:         &common.OriginDescription{Name: "File1.rac"},
@@ -26,17 +28,18 @@ func Test_parquetName(t *testing.T) {
 		TMHeader:       &innosat.TMHeader{},
 		Data:           &aez.STAT{},
 	}
+	stream := timeseries.OutStreamFromDataRecord(&record)
 	tests := []struct {
 		name string
 		args args
 		want string
 	}{
-		{"Case 1", args{".", record}, filepath.FromSlash("1980/1/5/File1.parquet")},
-		{"Case 2", args{"my/dir", record}, filepath.FromSlash("my/dir/1980/1/5/File1.parquet")},
+		{"Case 1", args{".", record, stream}, filepath.FromSlash("1980/1/5/STAT_File1.parquet")},
+		{"Case 2", args{"my/dir", record, stream}, filepath.FromSlash("my/dir/1980/1/5/STAT_File1.parquet")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := parquetName(tt.args.dir, &tt.args.packet); got != tt.want {
+			if got := parquetName(tt.args.dir, &tt.args.packet, tt.args.stream); got != tt.want {
 				t.Errorf("parquetName() = %v, want %v", got, tt.want)
 			}
 		})
@@ -79,7 +82,7 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1.parquet"},
+				{"STAT_File1.parquet"},
 			},
 		},
 		{
@@ -104,8 +107,8 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1.parquet"},
-				{"File2.parquet"},
+				{"STAT_File1.parquet"},
+				{"STAT_File2.parquet"},
 			},
 		},
 		{
@@ -218,7 +221,12 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1.parquet"},
+				{"CPRU_File1.parquet"},
+				{"HTR_File1.parquet"},
+				{"PM_File1.parquet"},
+				{"PWR_File1.parquet"},
+				{"STAT_File1.parquet"},
+				{"TCV_File1.parquet"},
 			},
 		},
 		{
@@ -257,8 +265,8 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"File1.parquet"},
-				{"File2.parquet"},
+				{"CCD_File1.parquet"},
+				{"CCD_File2.parquet"},
 			},
 		},
 		/*

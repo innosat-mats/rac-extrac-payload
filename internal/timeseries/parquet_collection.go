@@ -11,7 +11,7 @@ import (
 )
 
 // ParquetFactory is a function that creates ParquetWriters
-type ParquetFactory func(pkg *common.DataRecord) (ParquetWriter, error)
+type ParquetFactory func(pkg *common.DataRecord, stream OutStream) (ParquetWriter, error)
 
 // ParquetCollection holds all active ParquetWriters
 type ParquetCollection struct {
@@ -25,7 +25,7 @@ func NewParquetCollection(factory ParquetFactory) ParquetCollection {
 }
 
 // ParquetName returns the whole name of the parquet, including partitioning prefix
-func ParquetName(pkg *common.DataRecord) string {
+func ParquetName(pkg *common.DataRecord, stream OutStream) string {
 	tmTime := pkg.TMHeader.Time(time.Time{})
 	prefix := filepath.Join(
 		fmt.Sprintf("%v", tmTime.Year()),
@@ -34,7 +34,7 @@ func ParquetName(pkg *common.DataRecord) string {
 	)
 	baseName := filepath.Base(pkg.Origin.Name)
 	ext := filepath.Ext(pkg.Origin.Name)
-	name := fmt.Sprintf("%v.parquet", strings.TrimSuffix(baseName, ext))
+	name := fmt.Sprintf("%v_%v.parquet", stream.String(), strings.TrimSuffix(baseName, ext))
 	return filepath.Join(prefix, name)
 }
 
@@ -48,11 +48,11 @@ func (collection ParquetCollection) Write(pkg *common.DataRecord) error {
 		log.Printf("Unknown timeseries stream RID %v, SID %v", pkg.RID, pkg.SID)
 		return nil
 	}
-	streamName := ParquetName(pkg)
+	streamName := ParquetName(pkg, stream)
 
 	writer, ok = collection.streams[streamName]
 	if !ok {
-		writer, err = collection.factory(pkg)
+		writer, err = collection.factory(pkg, stream)
 		if err != nil {
 			return err
 		}

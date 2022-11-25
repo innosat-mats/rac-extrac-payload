@@ -11,16 +11,16 @@ import (
 	"github.com/innosat-mats/rac-extract-payload/internal/timeseries"
 )
 
-func parquetName(dir string, pkg *common.DataRecord) string {
-	name := timeseries.ParquetName(pkg)
+func parquetName(dir string, pkg *common.DataRecord, stream timeseries.OutStream) string {
+	name := timeseries.ParquetName(pkg, stream)
 	return filepath.Join(dir, name)
 }
 
 func parquetFileWriterFactoryCreator(
 	dir string,
 ) timeseries.ParquetFactory {
-	return func(pkg *common.DataRecord) (timeseries.ParquetWriter, error) {
-		outPath := parquetName(dir, pkg)
+	return func(pkg *common.DataRecord, stream timeseries.OutStream) (timeseries.ParquetWriter, error) {
+		outPath := parquetName(dir, pkg, stream)
 
 		err := os.MkdirAll(filepath.Dir(outPath), os.ModePerm)
 		if err != nil {
