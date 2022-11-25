@@ -321,7 +321,7 @@ const RacSchema = `message schema {
 
 	optional int32  CCDSEL;
 	optional int64  EXPNanoseconds;
-	optional int64  EXPDate (TIMESTAMP(MICROS, true));
+	optional int64  EXPDate (TIMESTAMP(NANOS, true));
 	optional binary WDWMode (STRING);
 	optional binary WDWInputDataWindow (STRING);
 	optional int32  WDWOV;
