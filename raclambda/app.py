@@ -10,7 +10,7 @@ import aws_cdk as cdk
 from raclambda.raclambda_stack import RacLambdaStack
 
 
-RAC_VERSION = "v0.2.7"
+RAC_VERSION = "v1.1.0"
 RAC_OS = "Linux"
 RAC_URL = f"https://github.com/innosat-mats/rac-extract-payload/releases/download/{RAC_VERSION}/Rac_for_{RAC_OS}.tar.gz"  # noqa: E501
 RAC_DIR = "./raclambda/handler"
@@ -39,7 +39,9 @@ RacLambdaStack(
     input_bucket_name="mats-l0-raw",
     output_bucket_name="mats-l0-artifacts",
     project_name=os.environ.get("RAC_PROJECT", "mats-test-project"),
-    queue_arn_export_name="L0RACFetcherStackOutputQueue"
+    queue_arn_export_name="L0RACFetcherStackOutputQueue",
+    config_ssm_name="/rclone/l0-fetcher",
+    rclone_arn="arn:aws:lambda:eu-north-1:968500071567:layer:RCLONE:1",
 )
 
 app.synth()
