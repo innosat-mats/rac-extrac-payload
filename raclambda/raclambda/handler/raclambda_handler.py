@@ -67,6 +67,7 @@ def format_rclone_command(
     config_path: str,
     source: str,
     destination: str,
+    sloppy: bool = False
 ) -> List[str]:
     cmd = [
         "rclone",
@@ -75,8 +76,9 @@ def format_rclone_command(
         "copy",
         source,
         destination,
-        "--size-only",
     ]
+    if sloppy:
+        cmd.append("--size-only")
 
     return cmd
 
@@ -116,6 +118,7 @@ def handler(event: Event, context: Context):
             rclone_config_path,
             f"S3:{dregs_bucket}",
             dregs_dir,
+            sloppy=True,
         ))
 
         # Process RAC files
@@ -139,6 +142,7 @@ def handler(event: Event, context: Context):
             rclone_config_path,
             dregs_dir,
             f"S3:{dregs_bucket}",
+            sloppy=True,
         ))
 
 

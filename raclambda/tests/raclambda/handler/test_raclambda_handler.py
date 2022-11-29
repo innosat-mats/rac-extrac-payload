@@ -88,7 +88,7 @@ def test_handler(monkeypatch):
     patched_call.assert_has_calls([
         call(["rclone", "--config", "/rclone/config", "copy", "S3:rac-dregs-bucket", ANY, "--size-only"]),  # noqa: E501
         call(["./rac", "-parquet", "-project", ANY, "-dregs", ANY, ANY]),
-        call(["rclone", "--config", "/rclone/config", "copy", ANY, "S3:rac-output-bucket", "--size-only"]),  # noqa: E501
+        call(["rclone", "--config", "/rclone/config", "copy", ANY, "S3:rac-output-bucket"]),  # noqa: E501
         call(["rclone", "--config", "/rclone/config", "copy", ANY, "S3:rac-dregs-bucket", "--size-only"]),  # noqa: E501
     ], any_order=False)
 
@@ -140,7 +140,13 @@ def test_rclone_config_path():
     path.unlink()
 
 
+def test_format_rclone_command_sloppy():
+    assert format_rclone_command("config", "from_path", "to_path", True) == [
+        "rclone", "--config", "config", "copy", "from_path", "to_path", "--size-only",  # noqa: E501
+    ]
+
+
 def test_format_rclone_command():
     assert format_rclone_command("config", "from_path", "to_path") == [
-        "rclone", "--config", "config", "copy", "from_path", "to_path", "--size-only",  # noqa: E501
+        "rclone", "--config", "config", "copy", "from_path", "to_path",
     ]
