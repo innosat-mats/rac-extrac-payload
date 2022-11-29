@@ -1,14 +1,15 @@
 import json
 import os
 import subprocess
-from glob import glob as glob
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from typing import Any, Dict, List, Tuple
 
 import boto3
 
-S3Client = Any
+BotoClient = Any
+S3Client = BotoClient
+SSMClient = BotoClient
 Event = Dict[str, Any]
 Context = Any
 
@@ -30,13 +31,6 @@ def parse_event_message(event: Event) -> Tuple[List[str], str]:
     return objects, bucket
 
 
-def get_all_files(
-    bucket_name: str,
-) -> List[str]:
-    bucket = boto3.resource("s3").Bucket(bucket_name)
-    return [obj.key for obj in bucket.objects.all()]
-
-
 def download_files(
     s3_client: S3Client,
     bucket_name: str,
@@ -55,35 +49,42 @@ def download_files(
         )
 
 
-def get_new_files(
-    path_name: str,
-    old_file_names: List[str],
+def get_rclone_config_path(
+    ssm_client: SSMClient,
+    rclone_config_ssm_name: str
+) -> str:
+    rclone_config = ssm_client.get_parameter(
+        Name=rclone_config_ssm_name, WithDecryption=True
+    )["Parameter"]["Value"]
+
+    f = NamedTemporaryFile(buffering=0, delete=False)
+    f.write(rclone_config.encode())
+
+    return f.name
+
+
+def format_rclone_command(
+    config_path: str,
+    source: str,
+    destination: str,
 ) -> List[str]:
-    old_files = {Path(f).name for f in old_file_names}
-    files = set(glob(f"{path_name}/*"))
-    return list(files - old_files)
+    cmd = [
+        "rclone",
+        "--config",
+        config_path,
+        "copy",
+        source,
+        destination,
+        "--size-only",
+    ]
 
-
-def upload_files(
-    s3_client: S3Client,
-    bucket_name: str,
-    path_name: str,
-    file_names: List[str],
-) -> None:
-    local_path = Path(path_name)
-
-    for file_name in file_names:
-        file_path = Path.joinpath(local_path, file_name)
-        s3_client.upload_file(
-            bucket_name,
-            file_name,
-            str(file_path),
-        )
+    return cmd
 
 
 def handler(event: Event, context: Context):
     project = get_env_or_raise("RAC_PROJECT")
     dregs_bucket = get_env_or_raise("RAC_DREGS")
+    output_bucket = get_env_or_raise("RAC_OUTPUT")
 
     with TemporaryDirectory(
         "_rac",
@@ -91,7 +92,10 @@ def handler(event: Event, context: Context):
     ) as rac_dir, TemporaryDirectory(
         "_dregs",
         "/tmp/",
-    ) as dregs_dir:
+    ) as dregs_dir, TemporaryDirectory(
+        "_parquet",
+        "/tmp/",
+    ) as parquet_dir:
         s3_client = boto3.client('s3')
 
         # Download RAC files
@@ -100,22 +104,42 @@ def handler(event: Event, context: Context):
             raise NothingToDo
         download_files(s3_client, rac_bucket, rac_dir, objects)
 
+        # Setup rclone
+        ssm_client = boto3.client("ssm")
+        rclone_config_path = get_rclone_config_path(
+            ssm_client,
+            get_env_or_raise("RCLONE_CONFIG_SSM_NAME")
+        )
+
         # Download Dregs
-        dregs = get_all_files(dregs_bucket)
-        download_files(s3_client, dregs_bucket, dregs_dir, dregs)
+        subprocess.call(format_rclone_command(
+            rclone_config_path,
+            f"S3:{dregs_bucket}",
+            dregs_dir,
+        ))
 
         # Process RAC files
         subprocess.call([
             "./rac",
-            "-aws",
-            "-project", project,
+            "-parquet",
+            "-project", f"{parquet_dir}/{project}",
             "-dregs", dregs_dir,
             f"{rac_dir}/*.rac",
         ])
 
-        # Upload new Dregs
-        new_dregs = get_new_files(dregs_dir, dregs)
-        upload_files(s3_client, dregs_bucket, dregs_dir, new_dregs)
+        # Upload Parquet files
+        subprocess.call(format_rclone_command(
+            rclone_config_path,
+            parquet_dir,
+            f"S3:{output_bucket}",
+        ))
+
+        # Sync Dregs
+        subprocess.call(format_rclone_command(
+            rclone_config_path,
+            dregs_dir,
+            f"S3:{dregs_bucket}",
+        ))
 
 
 if __name__ == "__main__":

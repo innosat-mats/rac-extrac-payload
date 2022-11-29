@@ -17,6 +17,8 @@ def template():
         "output-bucket",
         "test-project",
         "queue-arn",
+        "rclone-config",
+        "rclone-arn",
     )
 
     return Template.from_stack(stack)
@@ -42,6 +44,11 @@ class TestRacLambdaStack:
                             "Resource": {
                                 "Fn::ImportValue": "queue-arn"
                             }
+                        },
+                        {
+                            "Action": "ssm:GetParameter",
+                            "Effect": "Allow",
+                            "Resource": "arn:aws:ssm:*:*:parameterrclone-config"
                         },
                         {
                             "Action": [
@@ -79,6 +86,10 @@ class TestRacLambdaStack:
                         },
                         {
                             "Action": [
+                                "s3:GetObject*",
+                                "s3:GetBucket*",
+                                "s3:List*",
+                                "s3:DeleteObject*",
                                 "s3:PutObject",
                                 "s3:PutObjectLegalHold",
                                 "s3:PutObjectRetention",
@@ -87,18 +98,32 @@ class TestRacLambdaStack:
                                 "s3:Abort*"
                             ],
                             "Effect": "Allow",
-                            "Resource": {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        "arn:",
-                                        {
-                                            "Ref": "AWS::Partition"
-                                        },
-                                        ":s3:::output-bucket/*"
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:",
+                                            {
+                                                "Ref": "AWS::Partition"
+                                            },
+                                            ":s3:::output-bucket"
+                                        ]
                                     ]
-                                ]
-                            }
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:",
+                                            {
+                                                "Ref": "AWS::Partition"
+                                            },
+                                            ":s3:::output-bucket/*"
+                                        ]
+                                    ]
+                                }
+                            ]
                         },
                         {
                            "Action": [
