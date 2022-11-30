@@ -23,7 +23,7 @@ func JpegImageData(jpegData []byte) (rawData []uint16, height int, width int, er
 	jpegChar := C.CString(string(jpegData))
 	defer C.free(unsafe.Pointer(jpegChar))
 
-	jErrBuf := strings.Repeat(" ", CJMSG_LENGTH_MAX)
+	jErrBuf := strings.Repeat(" ", C.JMSG_LENGTH_MAX)
 
 	jpegErr := C.CString(string(jErrBuf))
 	defer C.free(unsafe.Pointer(jpegErr))
