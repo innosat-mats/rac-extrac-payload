@@ -12,22 +12,35 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"strings"
 	"unsafe"
 )
 
-//JpegImageData converts a grayscale image encoded in 12-bit jpeg to raw data
+// JpegImageData converts a grayscale image encoded in 12-bit jpeg to raw data
 func JpegImageData(jpegData []byte) (rawData []uint16, height int, width int, err error) {
 
 	jpegChar := C.CString(string(jpegData))
 	defer C.free(unsafe.Pointer(jpegChar))
 
-	imageData, err := C.read_JPEG_file(jpegChar, C.size_t(len(jpegData)))
-	if err != nil {
-		return rawData, height, width, err
-	}
+	jErrBuf := strings.Repeat(" ", C.JMSG_LENGTH_MAX)
+
+	jpegErr := C.CString(string(jErrBuf))
+	defer C.free(unsafe.Pointer(jpegErr))
+
+	imageData, err := C.read_JPEG_file(jpegChar, C.size_t(len(jpegData)), jpegErr)
 	defer C.free(unsafe.Pointer(imageData.pix))
 
-	pixelString := C.GoStringN(imageData.pix, C.int(imageData.width*imageData.height*C.sizeof_short))
+	jErr := C.GoStringN(jpegErr, C.JMSG_LENGTH_MAX)
+	jErr = strings.Trim(jErr, " ")
+	if jErr != "" {
+		return rawData, height, width, fmt.Errorf("JPEG decode error: %v", jErr)
+	}
+
+	pixelString := C.GoStringN(
+		imageData.pix,
+		C.int(imageData.width*imageData.height*C.sizeof_short),
+	)
 	height = int(imageData.height)
 	width = int(imageData.width)
 	buffer := bytes.NewBufferString(pixelString)
