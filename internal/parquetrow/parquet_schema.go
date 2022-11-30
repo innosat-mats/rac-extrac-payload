@@ -50,7 +50,7 @@ const RacCCDSchema = `message schema {
 		}
 	}
 	required binary ImageName (STRING);
-	required binary ImageData;
+	optional binary ImageData;
 
 	optional group Warnings (LIST) {
 		repeated group list {
