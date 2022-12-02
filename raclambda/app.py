@@ -36,12 +36,12 @@ app = cdk.App()
 RacLambdaStack(
     app,
     "RacLambdaStack",
-    input_bucket_name="mats-l0-raw",
-    output_bucket_name="mats-l0-artifacts",
+    input_bucket_name="ops-payload-level0-source",
+    output_bucket_name="ops-payload-level0-v0.1",
     project_name=os.environ.get("RAC_PROJECT", "mats-test-project"),
     queue_arn_export_name="L0RACFetcherStackOutputQueue",
     config_ssm_name="/rclone/l0-fetcher",
-    rclone_arn="arn:aws:lambda:eu-north-1:968500071567:layer:RCLONE:1",
+    rclone_arn="arn:aws:lambda:eu-north-1:671150066425:layer:rclone-amd64:1",
 )
 
 app.synth()
