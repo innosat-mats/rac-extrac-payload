@@ -3,6 +3,10 @@ name: Rac Lambda CD
 on:
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: raclambda
+
 jobs:
   aws_cdk:
     runs-on: ubuntu-latest
