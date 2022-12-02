@@ -13,7 +13,6 @@ from aws_cdk import (
 from constructs import Construct
 
 
-RAC_PROJECT = os.environ.get("RAC_PROJECT", "mats-test-project")
 RETENTION_PERIOD = 14 * 24 * 3600  # 14 days [s]
 
 
@@ -25,7 +24,6 @@ class RacLambdaStack(Stack):
         construct_id: str,
         input_bucket_name: str,
         output_bucket_name: str,
-        project_name: str,
         queue_arn_export_name: str,
         config_ssm_name: str,
         rclone_arn: str,
@@ -75,7 +73,6 @@ class RacLambdaStack(Stack):
             memory_size=1024,
             ephemeral_storage_size=Size.mebibytes(1024),
             environment={
-                "RAC_PROJECT": project_name,
                 "RAC_DREGS": dregs_bucket.bucket_name,
                 "RAC_OUTPUT": output_bucket.bucket_name,
                 "RCLONE_CONFIG_SSM_NAME": config_ssm_name,

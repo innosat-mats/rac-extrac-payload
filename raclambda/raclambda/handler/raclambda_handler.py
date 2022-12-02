@@ -84,7 +84,6 @@ def format_rclone_command(
 
 
 def handler(event: Event, context: Context):
-    project = get_env_or_raise("RAC_PROJECT")
     dregs_bucket = get_env_or_raise("RAC_DREGS")
     output_bucket = get_env_or_raise("RAC_OUTPUT")
 
@@ -122,12 +121,14 @@ def handler(event: Event, context: Context):
         ))
 
         # Process RAC files
+        files = [str(p) for p in Path(rac_dir).glob("*.rac")]
+
         subprocess.call([
-            "./rac",
+            str(Path(__file__).parent / "rac"),
             "-parquet",
-            "-project", f"{parquet_dir}/{project}",
+            "-project", parquet_dir,
             "-dregs", dregs_dir,
-            f"{rac_dir}/*.rac",
+            *files,
         ])
 
         # Upload Parquet files
