@@ -2,6 +2,7 @@ import os
 from aws_cdk import (
     Duration,
     Fn,
+    Size,
     Stack,
     aws_lambda_event_sources as sources,
     aws_lambda as lambda_,
@@ -72,6 +73,7 @@ class RacLambdaStack(Stack):
             architecture=lambda_.Architecture.X86_64,
             runtime=lambda_.Runtime.PYTHON_3_9,
             memory_size=1024,
+            ephemeral_storage_size=Size.mebibytes(1024),
             environment={
                 "RAC_PROJECT": project_name,
                 "RAC_DREGS": dregs_bucket.bucket_name,
