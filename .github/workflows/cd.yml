@@ -1,6 +1,8 @@
 name: Rac Lambda CD
 
 on:
+  release:
+    types: [released]
   workflow_dispatch:
 
 defaults:
