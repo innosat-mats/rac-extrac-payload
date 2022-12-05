@@ -73,6 +73,9 @@ def test_handler(monkeypatch):
     ) as patched_rclone_config, patch(
         'raclambda.handler.raclambda_handler.download_files',
     ) as patched_download, patch(
+        'raclambda.handler.raclambda_handler.Path.glob',
+        return_value=rac_files,
+    ), patch(
         'raclambda.handler.raclambda_handler.subprocess.call',
     ) as patched_call:
         patched_client = patched_boto.return_value
@@ -87,7 +90,7 @@ def test_handler(monkeypatch):
     )
     patched_call.assert_has_calls([
         call(["rclone", "--config", "/rclone/config", "copy", "S3:rac-dregs-bucket", ANY, "--size-only"]),  # noqa: E501
-        call(["./rac", "-parquet", "-project", ANY, "-dregs", ANY, ANY]),
+        call([ANY, "-parquet", "-project", ANY, "-dregs", ANY, 'path/to/file.rac', 'path/to/other-file.rac']),  # noqa: E501
         call(["rclone", "--config", "/rclone/config", "copy", ANY, "S3:rac-output-bucket"]),  # noqa: E501
         call(["rclone", "--config", "/rclone/config", "copy", ANY, "S3:rac-dregs-bucket", "--size-only"]),  # noqa: E501
     ], any_order=False)

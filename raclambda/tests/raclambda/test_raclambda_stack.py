@@ -15,7 +15,6 @@ def template():
         "raclambda",
         "input-bucket",
         "output-bucket",
-        "test-project",
         "queue-arn",
         "rclone-config",
         "rclone-arn",
@@ -190,11 +189,6 @@ class TestRacLambdaStack:
                         "raclambdaServiceRole61297EF8",
                         "Arn"
                     ]
-                },
-                "Environment": {
-                    "Variables": {
-                        "RAC_PROJECT": "test-project"
-                    }
                 },
                 "Handler": "raclambda_handler.handler",
                 "Runtime": "python3.9",
