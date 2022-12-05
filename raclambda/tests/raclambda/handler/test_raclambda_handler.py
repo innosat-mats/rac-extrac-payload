@@ -74,7 +74,7 @@ def test_handler(monkeypatch):
         'raclambda.handler.raclambda_handler.download_files',
     ) as patched_download, patch(
         'raclambda.handler.raclambda_handler.Path.glob',
-        return_value=rac_files
+        return_value=rac_files,
     ), patch(
         'raclambda.handler.raclambda_handler.subprocess.call',
     ) as patched_call:
