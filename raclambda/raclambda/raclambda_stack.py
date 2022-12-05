@@ -26,7 +26,7 @@ class RacLambdaStack(Stack):
         queue_arn_export_name: str,
         config_ssm_name: str,
         rclone_arn: str,
-        lambda_timeout: Duration = Duration.seconds(300),
+        lambda_timeout: Duration = Duration.seconds(600),
         dregs_expiration: Duration = Duration.days(7),
         **kwargs,
     ) -> None:
@@ -69,8 +69,8 @@ class RacLambdaStack(Stack):
             timeout=lambda_timeout,
             architecture=lambda_.Architecture.X86_64,
             runtime=lambda_.Runtime.PYTHON_3_9,
-            memory_size=1024,
-            ephemeral_storage_size=Size.mebibytes(1024),
+            memory_size=4096,
+            ephemeral_storage_size=Size.mebibytes(4096),
             environment={
                 "RAC_DREGS": dregs_bucket.bucket_name,
                 "RAC_OUTPUT": output_bucket.bucket_name,

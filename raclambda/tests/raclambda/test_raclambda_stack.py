@@ -192,6 +192,6 @@ class TestRacLambdaStack:
                 },
                 "Handler": "raclambda_handler.handler",
                 "Runtime": "python3.9",
-                "Timeout": 300
+                "Timeout": 600
             },
         )
