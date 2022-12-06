@@ -34,8 +34,8 @@ func Test_parquetName(t *testing.T) {
 		args args
 		want string
 	}{
-		{"Case 1", args{".", record, stream}, filepath.FromSlash("1980/1/5/STAT_File1.parquet")},
-		{"Case 2", args{"my/dir", record, stream}, filepath.FromSlash("my/dir/1980/1/5/STAT_File1.parquet")},
+		{"Case 1", args{".", record, stream}, filepath.FromSlash("STAT/1980/1/5/File1.parquet")},
+		{"Case 2", args{"my/dir", record, stream}, filepath.FromSlash("my/dir/STAT/1980/1/5/File1.parquet")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -51,7 +51,8 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 		wg *sync.WaitGroup
 	}
 	type wantFile struct {
-		base string
+		prefix string
+		base   string
 	}
 	tests := []struct {
 		name         string
@@ -82,7 +83,7 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"STAT_File1.parquet"},
+				{"STAT", "File1.parquet"},
 			},
 		},
 		{
@@ -107,8 +108,8 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"STAT_File1.parquet"},
-				{"STAT_File2.parquet"},
+				{"STAT", "File1.parquet"},
+				{"STAT", "File2.parquet"},
 			},
 		},
 		{
@@ -221,12 +222,12 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"CPRU_File1.parquet"},
-				{"HTR_File1.parquet"},
-				{"PM_File1.parquet"},
-				{"PWR_File1.parquet"},
-				{"STAT_File1.parquet"},
-				{"TCV_File1.parquet"},
+				{"CPRU", "File1.parquet"},
+				{"HTR", "File1.parquet"},
+				{"PM", "File1.parquet"},
+				{"PWR", "File1.parquet"},
+				{"STAT", "File1.parquet"},
+				{"TCV", "File1.parquet"},
 			},
 		},
 		{
@@ -265,12 +266,10 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 				},
 			},
 			[]wantFile{
-				{"CCD_File1.parquet"},
-				{"CCD_File2.parquet"},
+				{"CCD", "File1.parquet"},
+				{"CCD", "File2.parquet"},
 			},
 		},
-		/*
-		 */
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -290,9 +289,9 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 			}
 			teardown()
 
-			savePath := filepath.Join(dir, "1980", "1", "5")
 			for _, want := range tt.wantFiles {
-				// Test each output for file name and expected number of lines
+				// Test each output for file name
+				savePath := filepath.Join(dir, want.prefix, "1980", "1", "5")
 				path := filepath.Join(savePath, want.base)
 				_, err := os.ReadFile(path)
 				if err != nil {
@@ -307,23 +306,6 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 					}
 				}
 			}
-
-			// Test that number of output files equals expected
-			files, err := os.ReadDir(savePath)
-			if err != nil {
-				t.Errorf("ParquetCallbackFactory() could not read directory: %v", err)
-			}
-			if nFiles, expect := len(files), len(tt.wantFiles); nFiles != expect {
-				t.Errorf(
-					"ParquetCallbackFactory() created %v files, expected %v files",
-					nFiles, expect,
-				)
-				fmt.Printf("Files in %v:\n", savePath)
-				for _, file := range files {
-					fmt.Printf("  %v %v\n", file.Name(), file.IsDir())
-				}
-			}
-
 		})
 	}
 }

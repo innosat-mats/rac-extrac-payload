@@ -28,13 +28,14 @@ func NewParquetCollection(factory ParquetFactory) ParquetCollection {
 func ParquetName(pkg *common.DataRecord, stream OutStream) string {
 	tmTime := pkg.TMHeader.Time(time.Time{})
 	prefix := filepath.Join(
+		stream.String(),
 		fmt.Sprintf("%v", tmTime.Year()),
 		fmt.Sprintf("%v", int(tmTime.Month())),
 		fmt.Sprintf("%v", tmTime.Day()),
 	)
 	baseName := filepath.Base(pkg.Origin.Name)
 	ext := filepath.Ext(pkg.Origin.Name)
-	name := fmt.Sprintf("%v_%v.parquet", stream.String(), strings.TrimSuffix(baseName, ext))
+	name := fmt.Sprintf("%v.parquet", strings.TrimSuffix(baseName, ext))
 	return filepath.Join(prefix, name)
 }
 
