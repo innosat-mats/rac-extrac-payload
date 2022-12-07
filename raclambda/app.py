@@ -10,7 +10,7 @@ import aws_cdk as cdk
 from raclambda.raclambda_stack import RacLambdaStack
 
 
-RAC_VERSION = "v1.1.2"
+RAC_VERSION = "v1.2.0"
 RAC_OS = "Linux"
 RAC_URL = f"https://github.com/innosat-mats/rac-extract-payload/releases/download/{RAC_VERSION}/Rac_for_{RAC_OS}.tar.gz"  # noqa: E501
 RAC_DIR = "./raclambda/handler"
