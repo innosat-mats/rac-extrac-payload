@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import List
 from unittest.mock import ANY, Mock, call, patch
 
 import botocore
@@ -8,13 +7,12 @@ import pytest  # type: ignore
 from botocore.stub import Stubber
 
 from raclambda.handler.raclambda_handler import (
-    download_files,
+    download_file,
     format_rclone_command,
     get_env_or_raise,
     get_rclone_config_path,
     handler,
     parse_event_message,
-    NothingToDo,
 )
 
 
@@ -32,22 +30,23 @@ def test_parse_event_message():
     event = {
         "Records": [
             {
-                "body": '{"bucket": "rac-bucket", "objects": ["path/to/file.rac"]}'  # noqa: E501
+                "body": '{"bucket": "rac-bucket", "object": "path/to/file.rac"}'  # noqa: E501
             }
         ]
     }
-    assert parse_event_message(event) == (["path/to/file.rac"], "rac-bucket")
+    assert parse_event_message(event) == ("path/to/file.rac", "rac-bucket")
 
 
-def test_download_files(tmp_path):
+def test_download_file(tmp_path):
     mocked_client = Mock()
     bucket_name = "bucket"
-    file_names = ["file1", "file2"]
-    download_files(mocked_client, bucket_name, tmp_path, file_names)
-    mocked_client.download_file.assert_has_calls([
-        call('bucket', 'file1', f'{tmp_path}/file1'),
-        call('bucket', 'file2', f'{tmp_path}/file2'),
-    ])
+    file_name = "file1"
+    download_file(mocked_client, bucket_name, tmp_path, file_name)
+    mocked_client.download_file.assert_called_once_with(
+        'bucket',
+        'file1',
+        f'{tmp_path}/file1',
+    )
 
 
 def test_handler(monkeypatch):
@@ -55,11 +54,11 @@ def test_handler(monkeypatch):
     monkeypatch.setenv("RAC_DREGS", "rac-dregs-bucket")
     monkeypatch.setenv("RAC_OUTPUT", "rac-output-bucket")
     monkeypatch.setenv("RCLONE_CONFIG_SSM_NAME", "rclone-config")
-    rac_files = ["path/to/file.rac", "path/to/other-file.rac"]
+    rac_file = "path/to/file.rac"
     event = {
         "Records": [{
             "body": json.dumps({
-                "objects": rac_files,
+                "object": rac_file,
                 "bucket": "rac-bucket",
             })
         }]
@@ -71,11 +70,9 @@ def test_handler(monkeypatch):
         'raclambda.handler.raclambda_handler.get_rclone_config_path',
         return_value="/rclone/config",
     ) as patched_rclone_config, patch(
-        'raclambda.handler.raclambda_handler.download_files',
+        'raclambda.handler.raclambda_handler.download_file',
+        return_value=rac_file
     ) as patched_download, patch(
-        'raclambda.handler.raclambda_handler.Path.glob',
-        return_value=rac_files,
-    ), patch(
         'raclambda.handler.raclambda_handler.subprocess.call',
     ) as patched_call:
         patched_client = patched_boto.return_value
@@ -83,41 +80,17 @@ def test_handler(monkeypatch):
 
     patched_boto.assert_has_calls([call("s3"), call("ssm")], any_order=False)
     patched_download.assert_called_once_with(
-        patched_client, "rac-bucket", ANY, rac_files,
+        patched_client, "rac-bucket", ANY, rac_file,
     )
     patched_rclone_config.assert_called_once_with(
         patched_client, "rclone-config",
     )
     patched_call.assert_has_calls([
         call(["rclone", "--config", "/rclone/config", "copy", "S3:rac-dregs-bucket", ANY, "--size-only"]),  # noqa: E501
-        call([ANY, "-parquet", "-project", ANY, "-dregs", ANY, 'path/to/file.rac', 'path/to/other-file.rac']),  # noqa: E501
+        call([ANY, "-parquet", "-project", ANY, "-dregs", ANY, 'path/to/file.rac']),  # noqa: E501
         call(["rclone", "--config", "/rclone/config", "copy", ANY, "S3:rac-output-bucket"]),  # noqa: E501
         call(["rclone", "--config", "/rclone/config", "copy", ANY, "S3:rac-dregs-bucket", "--size-only"]),  # noqa: E501
     ], any_order=False)
-
-
-def test_handler_raises_nothing_to_do(monkeypatch):
-    monkeypatch.setenv("RAC_PROJECT", "rac-project")
-    monkeypatch.setenv("RAC_DREGS", "rac-dregs-bucket")
-    monkeypatch.setenv("RAC_OUTPUT", "rac-output-bucket")
-    monkeypatch.setenv("RCLONE_CONFIG_SSM_NAME", "rclone-config")
-    rac_files: List[str] = []
-    event = {
-        "Records": [{
-            "body": json.dumps({
-                "objects": rac_files,
-                "bucket": "rac-bucket",
-            })
-        }]
-    }
-
-    with patch(
-        'raclambda.handler.raclambda_handler.boto3.client',
-    ) as patched_boto:
-        with pytest.raises(NothingToDo):
-            handler(event, None)
-
-    patched_boto.assert_called_once_with("s3")
 
 
 def test_rclone_config_path():
