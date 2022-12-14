@@ -93,7 +93,7 @@ def handler(event: Event, context: Context):
     ) as parquet_dir:
         s3_client = boto3.client('s3')
 
-        # Download RAC files
+        # Download RAC file
         object, rac_bucket = parse_event_message(event)
         file = download_file(s3_client, rac_bucket, rac_dir, object)
 
