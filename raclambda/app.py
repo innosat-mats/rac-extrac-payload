@@ -10,7 +10,7 @@ import aws_cdk as cdk
 from raclambda.raclambda_stack import RacLambdaStack
 
 
-RAC_VERSION = "v1.2.0"
+RAC_VERSION = "v1.3.0"
 RAC_OS = "Linux"
 RAC_URL = f"https://github.com/innosat-mats/rac-extract-payload/releases/download/{RAC_VERSION}/Rac_for_{RAC_OS}.tar.gz"  # noqa: E501
 RAC_DIR = "./raclambda/handler"
@@ -37,7 +37,7 @@ RacLambdaStack(
     app,
     "RacLambdaStack",
     input_bucket_name="ops-payload-level0-source",
-    output_bucket_name="ops-payload-level0-v0.1",
+    output_bucket_name="ops-payload-level0-v0.2",
     queue_arn_export_name="L0RACFetcherStackOutputQueue",
     config_ssm_name="/rclone/l0-fetcher",
     rclone_arn="arn:aws:lambda:eu-north-1:671150066425:layer:rclone-amd64:1",
