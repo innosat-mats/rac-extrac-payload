@@ -70,7 +70,7 @@ class RacLambdaStack(Stack):
             architecture=lambda_.Architecture.X86_64,
             runtime=lambda_.Runtime.PYTHON_3_9,
             memory_size=4096,
-            ephemeral_storage_size=Size.mebibytes(4096),
+            ephemeral_storage_size=Size.mebibytes(2048),
             environment={
                 "RAC_DREGS": dregs_bucket.bucket_name,
                 "RAC_OUTPUT": output_bucket.bucket_name,

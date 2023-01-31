@@ -14,39 +14,33 @@ Event = Dict[str, Any]
 Context = Any
 
 
-class NothingToDo(Exception):
-    pass
-
-
 def get_env_or_raise(envvar: str) -> str:
     if (val := os.environ.get(envvar)) is None:
         raise ValueError(f"'{envvar}' not found in env")
     return val
 
 
-def parse_event_message(event: Event) -> Tuple[List[str], str]:
+def parse_event_message(event: Event) -> Tuple[str, str]:
     message: Dict[str, Any] = json.loads(event["Records"][0]["body"])
     bucket = message["bucket"]
-    objects = message["objects"]
-    return objects, bucket
+    object = message["object"]
+    return object, bucket
 
 
-def download_files(
+def download_file(
     s3_client: S3Client,
     bucket_name: str,
     path_name: str,
-    file_names: List[str],
-) -> None:
-    local_path = Path(path_name)
-
-    for file_name in file_names:
-        file_path = Path.joinpath(local_path, file_name)
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        s3_client.download_file(
-            bucket_name,
-            file_name,
-            str(file_path),
-        )
+    file_name: str,
+) -> Path:
+    file_path = Path(path_name) / file_name
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    s3_client.download_file(
+        bucket_name,
+        file_name,
+        str(file_path),
+    )
+    return file_path
 
 
 def get_rclone_config_path(
@@ -97,11 +91,9 @@ def handler(event: Event, context: Context):
     ) as parquet_dir:
         s3_client = boto3.client('s3')
 
-        # Download RAC files
-        objects, rac_bucket = parse_event_message(event)
-        if objects == []:
-            raise NothingToDo
-        download_files(s3_client, rac_bucket, rac_dir, objects)
+        # Download RAC file
+        object, rac_bucket = parse_event_message(event)
+        file = download_file(s3_client, rac_bucket, rac_dir, object)
 
         # Setup rclone
         ssm_client = boto3.client("ssm")
@@ -118,15 +110,12 @@ def handler(event: Event, context: Context):
             sloppy=True,
         ))
 
-        # Process RAC files
-        files = [str(p) for p in Path(rac_dir).glob("*.rac")]
-
         subprocess.call([
             str(Path(__file__).parent / "rac"),
             "-parquet",
             "-project", parquet_dir,
             "-dregs", dregs_dir,
-            *files,
+            str(file),
         ])
 
         # Upload Parquet files
