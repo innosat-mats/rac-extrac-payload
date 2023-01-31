@@ -61,6 +61,7 @@ def format_rclone_command(
     config_path: str,
     source: str,
     destination: str,
+    sloppy: bool = False,
 ) -> List[str]:
     cmd = [
         "rclone",
@@ -69,9 +70,9 @@ def format_rclone_command(
         "copy",
         source,
         destination,
-        "--size-only"
     ]
-
+    if sloppy:
+        cmd.append("--size-only")
     return cmd
 
 
