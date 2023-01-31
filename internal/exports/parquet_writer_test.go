@@ -34,8 +34,8 @@ func Test_parquetName(t *testing.T) {
 		args args
 		want string
 	}{
-		{"Case 1", args{".", record, stream}, filepath.FromSlash("STAT/1980/1/5/File1.parquet")},
-		{"Case 2", args{"my/dir", record, stream}, filepath.FromSlash("my/dir/STAT/1980/1/5/File1.parquet")},
+		{"Case 1", args{".", record, stream}, filepath.FromSlash("STAT/1980/1/5/23/File1.parquet")},
+		{"Case 2", args{"my/dir", record, stream}, filepath.FromSlash("my/dir/STAT/1980/1/5/23/File1.parquet")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -291,7 +291,7 @@ func TestParquetCallbackFactoryCreator(t *testing.T) {
 
 			for _, want := range tt.wantFiles {
 				// Test each output for file name
-				savePath := filepath.Join(dir, want.prefix, "1980", "1", "5")
+				savePath := filepath.Join(dir, want.prefix, "1980", "1", "5", "23")
 				path := filepath.Join(savePath, want.base)
 				_, err := os.ReadFile(path)
 				if err != nil {
