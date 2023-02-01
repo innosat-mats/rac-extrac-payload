@@ -32,6 +32,7 @@ func ParquetName(pkg *common.DataRecord, stream OutStream) string {
 		fmt.Sprintf("%v", tmTime.Year()),
 		fmt.Sprintf("%v", int(tmTime.Month())),
 		fmt.Sprintf("%v", tmTime.Day()),
+		fmt.Sprintf("%v", tmTime.Hour()),
 	)
 	baseName := filepath.Base(pkg.Origin.Name)
 	ext := filepath.Ext(pkg.Origin.Name)

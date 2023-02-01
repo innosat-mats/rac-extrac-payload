@@ -46,7 +46,7 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("STAT/1980/1/5/test1.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/23/test1.parquet"),
 			},
 		},
 		{
@@ -71,8 +71,8 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("HTR/1980/1/5/test1.parquet"),
-				filepath.FromSlash("STAT/1980/1/5/test1.parquet"),
+				filepath.FromSlash("HTR/1980/1/5/23/test1.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/23/test1.parquet"),
 			},
 		},
 		{
@@ -97,8 +97,8 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("STAT/1980/1/5/test1.parquet"),
-				filepath.FromSlash("STAT/1980/1/5/test2.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/23/test1.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/23/test2.parquet"),
 			},
 		},
 	}
