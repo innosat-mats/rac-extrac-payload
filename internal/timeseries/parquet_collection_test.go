@@ -46,7 +46,7 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("STAT/1980/1/5/23/test1.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/test1.parquet"),
 			},
 		},
 		{
@@ -71,8 +71,8 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("HTR/1980/1/5/23/test1.parquet"),
-				filepath.FromSlash("STAT/1980/1/5/23/test1.parquet"),
+				filepath.FromSlash("HTR/1980/1/5/test1.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/test1.parquet"),
 			},
 		},
 		{
@@ -97,8 +97,35 @@ func TestParquetCollection_Write(t *testing.T) {
 			},
 			false,
 			[]string{
-				filepath.FromSlash("STAT/1980/1/5/23/test1.parquet"),
-				filepath.FromSlash("STAT/1980/1/5/23/test2.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/test1.parquet"),
+				filepath.FromSlash("STAT/1980/1/5/test2.parquet"),
+			},
+		},
+		{
+			"CCD is partitioned by hour",
+			[]common.DataRecord{
+				{
+					Origin:         &common.OriginDescription{Name: "test1"},
+					RamsesHeader:   &ramses.Ramses{},
+					RamsesTMHeader: &ramses.TMHeader{},
+					SourceHeader:   &innosat.SourcePacketHeader{},
+					TMHeader:       &innosat.TMHeader{},
+					RID:            aez.CCD3,
+					Data: &aez.CCDImage{
+						PackData: &aez.CCDImagePackData{
+							JPEGQ: aez.JPEGQUncompressed16bit,
+							NCOL:  1,
+							NROW:  2,
+							EXPTS: 6,
+						},
+						ImageFileName: "File1_6000000000_3.png",
+					},
+					Buffer: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+				},
+			},
+			false,
+			[]string{
+				filepath.FromSlash("CCD/1980/1/5/23/test1.parquet"),
 			},
 		},
 	}
